@@ -33,11 +33,4 @@ repos:
         name: Export development dependencies
         language: system
         pass_filenames: false
-        entry: poetry export --without-hashes --dev --output requirements/develop.txt
-        files: ^(pyproject.toml|poetry.lock)$
-      - id: export-prod-dependencies
-        name: Export production dependencies
-        language: system
-        pass_filenames: false
-        entry: poetry export --without-hashes --output requirements/production.txt
-        files: ^(pyproject.toml|poetry.lock)$
+        entry: poetry lock
