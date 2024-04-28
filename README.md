@@ -7,32 +7,32 @@ CMS для управления пользователями и расписан
 
 1. [ТЗ](https://docs.google.com/document/d/1VUSzwJ_7xS27LN53y2hdO5wPQ6rMDnPr/edit)
 
-   1.1. [ER - диаграмма сущностей](docs/Goodstart ER diagram.jpg)
+   1.1. [ER - диаграмма сущностей](docs/Goodstart%20ER%20diagram.jpg)
 
-   1.4. [Схема работы бота (в разработке)](https://miro.com/app/board/uXjVKTz7zLw=/)
+   1.2. [Схема работы бота (в разработке)](https://miro.com/app/board/uXjVKTz7zLw=/)
 
-2. [Используемых технологий в проекте](#technologies-project)
+2. [Используемые технологий](#technologies-project)
 
 3. [Правила работы с git](#git)
 
-## 2.Используемые технологии<a id="technologies-project"></a>:
+## Используемые технологии<a id="technologies-project"></a>:
 
-![Python 3.11](https://img.shields.io/badge/Python-3.11-brightgreen.svg?style=flat&logo=python&logoColor=white&color)
+![Python 3.11](https://img.shields.io/badge/Python-3.12-brightgreen.svg?style=flat&logo=python&logoColor=white)
 ![Poetry](https://img.shields.io/badge/Poetry-brightgreen.svg?style=flat&logo=poetry&logoColor=white&color=blue)
 ![Pre-commit](https://img.shields.io/badge/pre--commit-brightgreen.svg?style=flat&logo=pre-commit&logoColor=white&color=blue)
-![Python-telegram-bot 20.6](https://img.shields.io/badge/python--telegram--bot-20.6-brightgreen.svg?style=flat&logo=python&logoColor=white&color)
-![Django 4.2.6](https://img.shields.io/badge/Django-4.2.6-brightgreen.svg?style=flat&logo=django&logoColor=white&color)
+![Python-telegram-bot 20.6](https://img.shields.io/badge/python--telegram--bot-21.1.1-brightgreen.svg?style=flat&logo=python&logoColor=white)
+![Django 4.2.6](https://img.shields.io/badge/Django-5.0.4-brightgreen.svg?style=flat&logo=django&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-brightgreen.svg?style=flat&logo=docker&logoColor=white&color=blue)
 ![Postgres](https://img.shields.io/badge/Postgres-brightgreen.svg?style=flat&logo=postgresql&logoColor=white&color=blue)
 ![Redis](https://img.shields.io/badge/Redis-brightgreen.svg?style=flat&logo=redis&logoColor=white&color=blue)
 
 
-## 3. Правила работы с git<a id="git"></a>:
+## Правила работы с git<a id="git"></a>:
 
 1. Основные ветки:
 - `master` - "продуктовая" версия кода.
 - `dev` — “предрелизная” ветка, в которой должен находиться рабочий и проверенный код.
-2. Создавая новую ветку, наследуйтесь от ветки `dev`
+2. Создавая новую ветку, наследуйтесь от ветки `dev`:
     ```
     git checkout dev
     ```
@@ -52,3 +52,16 @@ CMS для управления пользователями и расписан
 с веткой `dev`, запуште её в репозиторий и инициируйте <b>Pull Request</b>:
 - вкладка <b>Pull requests</b> репозитория на <b>GitHub</b> -> <b>New pull request</b>.
 - необходимо указать целевую ветку и исходную ветку для изменений.
+
+## Авторы проекта
+
+**Константин Райхерт** - Тимлид - [GitHub](https://github.com/KonstantinRaikhert)
+
+Команда разработки:
+- **Антон Браун** - [GitHub](https://github.com/merkme)
+- **Александр Быньков** - [GitHub](https://github.com/BIXBER)
+- **Дмитрий Братков** - [GitHub](https://github.com/dbratkov)
+- **Николай Мельников** - [GitHub](https://github.com/mitsushidu)
+- **Павел Нестеров** - [GitHub](https://github.com/nesterovv89)
+- **Диана Ким** - [GitHub](https://github.com/DianaKim9319)
+- **Евгений Фастунов** - [GitHub](https://github.com/evgeny-fastunov)
