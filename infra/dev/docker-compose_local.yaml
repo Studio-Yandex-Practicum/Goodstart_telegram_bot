@@ -1,0 +1,12 @@
+version: "3.8"
+
+volumes:
+  pg_data:
+
+services:
+  db:
+    image: postgres:latest
+    env_file: ../../.env
+    container_name: GoodStart-DB
+    volumes:
+      - pg_data:/var/lib/postgresql/data
