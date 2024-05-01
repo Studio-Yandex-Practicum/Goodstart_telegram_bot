@@ -375,6 +375,21 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "django-asgi-lifespan"
+version = "0.3.1"
+description = "Django ASGI handler with Lifespan Protocol support."
+optional = false
+python-versions = ">=3.10,<4.0"
+files = [
+    {file = "django_asgi_lifespan-0.3.1-py3-none-any.whl", hash = "sha256:e2b27f34ab7773ab33a2a373fd074c0ff444c69a74a3ed146e6b027210eb37ab"},
+    {file = "django_asgi_lifespan-0.3.1.tar.gz", hash = "sha256:edb7ffe87f96d1f20675a7875e00ca114412cb73a292a79c02a234e42f693fac"},
+]
+
+[package.dependencies]
+asgiref = ">=3,<4"
+Django = ">=4.2,<5.0.0 || >5.0.0,<5.0.1 || >5.0.1,<5.0.2 || >5.0.2,<6"
+
+[[package]]
 name = "dulwich"
 version = "0.21.7"
 description = "Python Git Library"
