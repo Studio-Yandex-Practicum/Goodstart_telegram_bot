@@ -26,4 +26,4 @@ jobs:
 
       - name: ruff
         run: |
-          poetry run ruff --check
+          poetry run ruff check
