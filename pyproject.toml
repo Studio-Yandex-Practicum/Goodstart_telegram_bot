@@ -10,6 +10,7 @@ python = "^3.12"
 django = "^5.0.4"
 python-telegram-bot = "^21.1.1"
 poetry-plugin-export = "^1.7.1"
+django-phonenumber-field = "^7.3.0"
 
 
 [build-system]
