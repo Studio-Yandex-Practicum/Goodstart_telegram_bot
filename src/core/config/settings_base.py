@@ -7,11 +7,9 @@ ROOT_DIR = BASE_DIR.parent
 
 SECRET_KEY = "django-insecure-v3b$$**=s5=icl9=sn%p^8o3332r(ams5)vgpv+#ssmep*pq=1"
 
-DEBUG = True
-
 ALLOWED_HOSTS = []
 
-INSTALLED_APPS = [
+LOCAL_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -20,6 +18,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'bot.apps.BotConfig',
 ]
+
+EXTERNAL_APPS = []
+
+INSTALLED_APPS = EXTERNAL_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -50,13 +52,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "core.wsgi.application"
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
