@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ApplicationForm
+from potential_users.models import ApplicationForm
 
 
 admin.site.register(ApplicationForm)

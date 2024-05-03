@@ -3,8 +3,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class ApplicationForm(models.Model):
-    """Модель для регистрации пользователей."""
-    # Роли в системе
+    """Модель регистрации пользователей. Роль устанавливает администратор."""
     ROLE_CHOICES = (
         ('teacher', 'Преподаватель'),
         ('student', 'Учащийся'),
