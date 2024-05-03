@@ -18,7 +18,6 @@ SHELL_NC := \033[0m
 help:
 	@echo "$(SHELL_YELLOW)Список полезных функций:$(SHELL_NC)"
 	@echo "	init-app        - $(SHELL_GREEN)Команда для автоустановки статики, миграций и регистрации супер-юзера.$(SHELL_NC)"
-	@echo "	createsuperuser - $(SHELL_GREEN)Команда для создания супер-юзера.$(SHELL_NC)"
 	@echo "	start-db        - $(SHELL_GREEN)Команда для запуска локального контейнера postgres.$(SHELL_NC)"
 	@echo "	stop-db         - $(SHELL_GREEN)Команда для остановки локального контейнера postgres.$(SHELL_NC)"
 	@echo "	clear-db        - $(SHELL_GREEN)Команда для очистки volume локального контейнера postgres.$(SHELL_NC)"
@@ -29,7 +28,7 @@ help:
 
 
 # Подготовка проекта к локальному запуску
-init-app: collectstatic migrate createsuperuser
+init-app: collectstatic makemigrations createsuperuser
 
 
 # Сбор статических файлов проекта.
@@ -41,11 +40,6 @@ collectstatic:
 # и пременение их к базе данных.
 makemigrations: migrate
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) makemigrations --no-input
-
-
-# Применение собранных миграций к базе данных, на основе сформированных моделей.
-migrate:
-	cd $(PROJECT_DIR) && $(DJANGO_RUN) migrate --no-input
 
 
 # Создание супер-юзера.
