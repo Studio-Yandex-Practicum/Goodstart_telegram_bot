@@ -1,12 +1,21 @@
+import os
 from pathlib import Path
+
+import environ
+
+env = environ.Env(
+    DEBUG=(bool, False)
+)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-v3b$$**=s5=icl9=sn%p^8o3332r(ams5)vgpv+#ssmep*pq=1"
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-DEBUG = True
+SECRET_KEY = env('SECRET_KEY')
 
-ALLOWED_HOSTS = []
+DEBUG = env('DEBUG')
+
+ALLOWED_HOSTS = env('ALLOWED_HOSTS').split()
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -82,4 +91,4 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-TELEGRAM_TOKEN = 'нужно импортировать из environ'
+TELEGRAM_TOKEN = env('TELEGRAM_TOKEN')
