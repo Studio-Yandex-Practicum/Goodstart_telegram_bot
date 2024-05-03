@@ -3,21 +3,19 @@ from pathlib import Path
 
 import environ
 
-env = environ.Env(
-    DEBUG=(bool, False)
-)
+env = environ.Env()
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+ROOT_DIR = BASE_DIR.parent
 
-SECRET_KEY = env('SECRET_KEY')
+DEFAULT = "some_default_key"
 
-DEBUG = env('DEBUG')
+SECRET_KEY = env.str("SECRET_KEY", default=DEFAULT)
 
-ALLOWED_HOSTS = env('ALLOWED_HOSTS').split()
+ALLOWED_HOSTS = ['*']
 
-INSTALLED_APPS = [
+LOCAL_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -25,8 +23,11 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'bot.apps.BotConfig',
-    'potential_users.apps.PotentialUsersConfig',
 ]
+
+EXTERNAL_APPS = []
+
+INSTALLED_APPS = EXTERNAL_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -58,13 +59,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "core.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -91,5 +85,3 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-TELEGRAM_TOKEN = env('TELEGRAM_TOKEN')
