@@ -24,8 +24,8 @@ repos:
     hooks:
       - id: ruff
         types_or: [ python ]
-      - id: ruff-format
-        types_or: [ python ]
+      # - id: ruff-format
+      #   types_or: [ python ]
 
   - repo: local
     hooks:

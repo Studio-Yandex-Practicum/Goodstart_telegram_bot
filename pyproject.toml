@@ -50,6 +50,7 @@ exclude = [
     "buck-out",
     "build",
     "dist",
+    "migrations",
     "node_modules",
     "site-packages",
     "venv",
@@ -93,7 +94,7 @@ select = [
     "TCH"
 
 ]
-ignore = ["D100", "D103", "T201"]
+ignore = ["D100", "D103", "T201", "D104"]
 
 fixable = ["ALL"]
 unfixable = []
