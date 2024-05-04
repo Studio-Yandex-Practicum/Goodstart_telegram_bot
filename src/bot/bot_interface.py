@@ -33,7 +33,7 @@ class Bot:
         app.add_handler(start_handler)
         app.add_handler(echo_handler)
         return app
-        
+
     def _run(self):
         """Run the bot."""
         asyncio.set_event_loop(asyncio.new_event_loop())
