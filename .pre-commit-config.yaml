@@ -1,0 +1,36 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: no-commit-to-branch
+        name: Check to see if a commit is pushed to a safe branch
+      - id: check-toml
+        name: Check the files with `.toml` format
+      - id: check-yaml
+        name: Check the files with `.yaml` format
+        args: ['--allow-multiple-documents']
+      - id: end-of-file-fixer
+        name: Check for an empty line at the end of a file
+      - id: trailing-whitespace
+        name: Check for unnecessary white space
+        args: ['--markdown-linebreak-ext=md']
+      - id: check-docstring-first
+        name: Check docstrings location in python files
+      - id: check-merge-conflict
+        name: Сheck for no conflicts in the branch
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.2
+    hooks:
+      - id: ruff
+        types_or: [ python ]
+      - id: ruff-format
+        types_or: [ python ]
+
+  - repo: local
+    hooks:
+      - id: export-dev-dependencies
+        name: Export development dependencies
+        language: system
+        pass_filenames: false
+        entry: poetry lock
