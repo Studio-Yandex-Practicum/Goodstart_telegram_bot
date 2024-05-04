@@ -100,7 +100,7 @@ fixable = ["ALL"]
 unfixable = []
 
 [tool.ruff.format]
-quote-style = "single"
+quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
