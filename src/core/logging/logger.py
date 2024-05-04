@@ -1,9 +1,5 @@
 def log_errors(f):
-<<<<<<< HEAD
-    """Decorator to log errors raised by the decorated function."""
-=======
     """Log errors decorator raised by the decorated function."""
->>>>>>> dev
 
     def inner(*args, **kwargs):
         try:
