@@ -9,13 +9,14 @@ class BotConfig(AppConfig):
     name = "bot"
 
     def stop_bot(self, **kwargs):
+        """Stop application."""
         self.bot.stop()
 
     def ready(self) -> None:
         """Perform actions when the application is ready."""
         import os
 
-        if os.environ.get('RUN_MAIN', None) != 'true':
+        if os.environ.get("RUN_MAIN", None) != "true":
             from bot.bot_interface import Bot
 
             self.bot = Bot()

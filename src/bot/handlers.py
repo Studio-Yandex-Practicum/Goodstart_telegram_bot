@@ -1,31 +1,27 @@
-from telegram import Update
-from telegram.ext import (
-    filters,
-    ContextTypes,
-    CommandHandler,
-    MessageHandler
-)
-
 from core.logging import log_errors
+from telegram import Update
+from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handler for the /start command."""
+    """/start command handler."""
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=(
-            'Привет, я бот онлайн школы GoodStart.\n\n'
-            'Здесь ты найдёшь лучших преподавателей.')
+            "Привет, я бот онлайн школы GoodStart.\n\n"
+            "Здесь ты найдёшь лучших преподавателей."
+        ),
     )
 
 
 @log_errors
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handler for echoing user messages."""
+    """Echo messages handler."""
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text=update.message.text
+        text=update.message.text,
     )
 
-start_handler = CommandHandler('start', start)
+
+start_handler = CommandHandler("start", start)
 echo_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), echo)
