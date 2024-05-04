@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Anton Braun <merkme@yandex.ru>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -49,6 +50,7 @@ exclude = [
     "buck-out",
     "build",
     "dist",
+    "migrations",
     "node_modules",
     "site-packages",
     "venv",
@@ -92,13 +94,13 @@ select = [
     "TCH"
 
 ]
-ignore = ["D100", "D103", "T201"]
+ignore = ["D100", "D103", "T201", "D104"]
 
 fixable = ["ALL"]
 unfixable = []
 
 [tool.ruff.format]
-quote-style = "single"
+quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"

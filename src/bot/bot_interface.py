@@ -5,7 +5,7 @@ import threading
 from django.conf import settings
 from telegram.ext import ApplicationBuilder
 
-from bot.handlers import start_handler, echo_handler
+from bot.handlers import echo_handler, start_handler
 
 
 class Bot:
@@ -17,7 +17,7 @@ class Bot:
         self._stop_event = threading.Event()
 
     def start(self):
-        """Starts the bot in a separate thread and sets up signal handling."""
+        """Start the bot in a separate thread and sets up signal handling."""
         self._stop_event.clear()
         bot_thread = threading.Thread(target=self._run)
         bot_thread.start()
@@ -33,7 +33,7 @@ class Bot:
         app.add_handler(start_handler)
         app.add_handler(echo_handler)
         return app
-        
+
     def _run(self):
         """Run the bot."""
         asyncio.set_event_loop(asyncio.new_event_loop())
