@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import environ
@@ -13,9 +12,10 @@ DEFAULT = 'some_default_key'
 
 SECRET_KEY = env.str('SECRET_KEY', default=DEFAULT)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 LOCAL_APPS = [
+<<<<<<< HEAD
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -23,6 +23,15 @@ LOCAL_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bot.apps.BotConfig',
+=======
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "bot.apps.BotConfig",
+>>>>>>> dev
 ]
 
 EXTERNAL_APPS = []
