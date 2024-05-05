@@ -22,6 +22,8 @@ LOCAL_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "bot.apps.BotConfig",
+    "admin_user.apps.AdminUserConfig",
+    "phone_field",
 ]
 
 EXTERNAL_APPS = []
