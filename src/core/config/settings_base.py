@@ -85,3 +85,5 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+TELEGRAM_TOKEN = env("TELEGRAM_TOKEN")
