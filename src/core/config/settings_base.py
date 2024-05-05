@@ -1,6 +1,6 @@
-from pathlib import Path
 import os
 import environ
+from pathlib import Path
 
 env = environ.Env()
 
@@ -10,7 +10,7 @@ ROOT_DIR = BASE_DIR.parent
 
 environ.Env.read_env(os.path.join(ROOT_DIR, ".env"))
 
-STATIC_ROOT = os.path.join(ROOT_DIR, 'static/')
+STATIC_ROOT = os.path.join(ROOT_DIR, "static/")
 
 DEFAULT = "some_default_key"
 
