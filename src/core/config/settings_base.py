@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import environ
@@ -8,9 +9,15 @@ env = environ.Env()
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ROOT_DIR = BASE_DIR.parent
 
+environ.Env.read_env(os.path.join(ROOT_DIR, ".env"))
+
+STATIC_ROOT = os.path.join(ROOT_DIR, "static/")
+
 DEFAULT = "some_default_key"
 
 SECRET_KEY = env.str("SECRET_KEY", default=DEFAULT)
+
+TELEGRAM_TOKEN = env("TELEGRAM_TOKEN")
 
 ALLOWED_HOSTS = ["*"]
 
@@ -23,9 +30,12 @@ LOCAL_APPS = [
     "django.contrib.staticfiles",
     "bot.apps.BotConfig",
     "potential_users.apps.PotentialUsersConfig",
+    "admin_user.apps.AdminUserConfig",
 ]
 
-EXTERNAL_APPS = []
+EXTERNAL_APPS = [
+    "phone_field",
+]
 
 INSTALLED_APPS = EXTERNAL_APPS + LOCAL_APPS
 
@@ -85,5 +95,3 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-TELEGRAM_TOKEN = env("TELEGRAM_TOKEN")

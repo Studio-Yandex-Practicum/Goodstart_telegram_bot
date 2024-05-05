@@ -9,7 +9,7 @@ def main():
     """Run administrative tasks."""
     os.environ.setdefault(
         "DJANGO_SETTINGS_MODULE",
-        "core.config.settings_dev",
+        "core.config.settings_for_dev",
     )  # настройки для разработки
     try:
         from django.core.management import execute_from_command_line

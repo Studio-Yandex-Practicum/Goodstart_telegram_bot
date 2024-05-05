@@ -417,6 +417,20 @@ docs = ["furo (>=2021.8.17b43,<2021.9.dev0)", "sphinx (>=3.5.0)", "sphinx-notfou
 testing = ["coverage[toml] (>=5.0a4)", "pytest (>=4.6.11)"]
 
 [[package]]
+name = "django-phone-field"
+version = "1.8.1"
+description = "Lightweight model and form field for phone numbers in Django"
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-phone-field-1.8.1.tar.gz", hash = "sha256:db63af60fc3a3c66b9faa7e72bb7972cd1518299f2e93d68dd95d8df6214f7ed"},
+    {file = "django_phone_field-1.8.1-py3-none-any.whl", hash = "sha256:407e74b65e8f7dd14d0a0aa89e277516d57ad6a09ce992cdd94e15b1624b9961"},
+]
+
+[package.dependencies]
+Django = ">=1.10"
+
+[[package]]
 name = "django-phonenumber-field"
 version = "7.3.0"
 description = "An international phone number field for django models."
@@ -1417,4 +1431,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "95811ee1f3ed47f48cd5d70cd57618565a4eaf04a4dbf47a794dc385b5b21492"
+content-hash = "74ca259b7937a52de9515fe3166c80ed37e45a8a9f52d6067dceaf672f812fa2"
