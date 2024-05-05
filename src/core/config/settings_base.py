@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import os
 import environ
 
 env = environ.Env()
@@ -8,9 +8,15 @@ env = environ.Env()
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ROOT_DIR = BASE_DIR.parent
 
+environ.Env.read_env(os.path.join(ROOT_DIR, ".env"))
+
+STATIC_ROOT = os.path.join(ROOT_DIR, 'static/')
+
 DEFAULT = "some_default_key"
 
 SECRET_KEY = env.str("SECRET_KEY", default=DEFAULT)
+
+TELEGRAM_TOKEN = env("TELEGRAM_TOKEN")
 
 ALLOWED_HOSTS = ["*"]
 
