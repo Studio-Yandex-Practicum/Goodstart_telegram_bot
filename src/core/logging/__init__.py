@@ -1,1 +1,1 @@
-from core.logging.logger import log_errors # noqa
+from core.logging.logger import log_errors  # noqa

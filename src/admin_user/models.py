@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from phone_field import PhoneField
+from phonenumber_field.modelfields import PhoneNumberField
 
 DEFAULT_NAME_LENGTH = 150
 EMAIL_LENGTH = 254
@@ -11,7 +11,7 @@ class Administator(AbstractUser):
 
     first_name = models.CharField("Имя", max_length=DEFAULT_NAME_LENGTH)
     last_name = models.CharField("Фамилия", max_length=DEFAULT_NAME_LENGTH)
-    phone = PhoneField("Номер телефона", help_text="Формат +7XXXXXXXXXX")
+    phone = PhoneNumberField("Номер телефона", help_text="Формат +7XXXXXXXXXX")
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ("username", "first_name", "last_name", "phone")
 
