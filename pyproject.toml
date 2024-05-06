@@ -13,7 +13,7 @@ python-telegram-bot = "^21.1.1"
 poetry-plugin-export = "^1.7.1"
 django-environ= "^0.11.2"
 django-asgi-lifespan = "^0.3.1"
-django-phonenumber-field = "^7.3.0"
+django-phonenumber-field = {extras = ["phonenumbers"], version = "^7.3.0"}
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.2"
