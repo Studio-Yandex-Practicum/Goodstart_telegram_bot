@@ -25,7 +25,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "bot.apps.BotConfig",
-    "potential_users.apps.PotentialUsersConfig",
 ]
 
 MIDDLEWARE = [
@@ -91,7 +90,5 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-TELEGRAM_TOKEN = env("TELEGRAM_TOKEN")
 
 TELEGRAM_TOKEN = env("TELEGRAM_TOKEN")
