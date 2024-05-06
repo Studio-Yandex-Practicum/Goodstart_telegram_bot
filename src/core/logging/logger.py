@@ -5,7 +5,7 @@ def log_errors(f):
         try:
             return f(*args, **kwargs)
         except Exception as e:
-            error_message = f"Произошла ошибка: {e}"
+            error_message = f'Произошла ошибка: {e}'
             print(error_message)
             raise e
 
