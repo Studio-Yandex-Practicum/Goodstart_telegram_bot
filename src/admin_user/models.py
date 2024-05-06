@@ -6,8 +6,8 @@ DEFAULT_NAME_LENGTH = 150
 EMAIL_LENGTH = 254
 
 
-class Administator(AbstractUser):
-    """Custom administator model."""
+class Administrator(AbstractUser):
+    """Custom Administrator model."""
 
     first_name = models.CharField("Имя", max_length=DEFAULT_NAME_LENGTH)
     last_name = models.CharField("Фамилия", max_length=DEFAULT_NAME_LENGTH)

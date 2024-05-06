@@ -37,7 +37,7 @@ LOCAL_APPS = [
     "schooling.apps.SchoolingConfig",
 ]
 
-EXTERNAL_APPS = []
+EXTERNAL_APPS = ["phonenumber_field",]
 
 INSTALLED_APPS = DEFAULT_APPS + EXTERNAL_APPS + LOCAL_APPS
 
@@ -70,6 +70,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "core.wsgi.application"
+
+AUTH_USER_MODEL = "admin_user.Administrator"
 
 AUTH_PASSWORD_VALIDATORS = [
     {

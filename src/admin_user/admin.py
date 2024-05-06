@@ -1,11 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from admin_user.models import Administator
+from admin_user.models import Administrator
 
 
-@admin.register(Administator)
-class AdministatorAdmin(UserAdmin):
+@admin.register(Administrator)
+class AdministratorAdmin(UserAdmin):
     """Admin panel for the Admin model in the Django admin area.
 
     Changes made:
@@ -17,8 +17,8 @@ class AdministatorAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             "fields": (
-                Administator.USERNAME_FIELD,
-                *Administator.REQUIRED_FIELDS,
+                Administrator.USERNAME_FIELD,
+                *Administrator.REQUIRED_FIELDS,
                 "password1",
                 "password2",
                 "is_staff",

@@ -11,7 +11,7 @@ class ApplicationForm(models.Model):
     )
 
     telegram_id = models.IntegerField("Telegram ID", unique=True)
-    role = models.CharField(choices=ROLE_CHOICES)
+    role = models.CharField(choices=ROLE_CHOICES, max_length=20)
     name = models.CharField(max_length=20)
     surname = models.CharField(max_length=20)
     city = models.CharField(max_length=20)
