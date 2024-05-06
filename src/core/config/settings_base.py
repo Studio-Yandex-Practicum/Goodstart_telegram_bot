@@ -21,21 +21,25 @@ TELEGRAM_TOKEN = env("TELEGRAM_TOKEN")
 
 ALLOWED_HOSTS = ["*"]
 
-LOCAL_APPS = [
+DEFAULT_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+]
+
+LOCAL_APPS = [
     "bot.apps.BotConfig",
-    "potential_users.apps.PotentialUsersConfig",
+    "potential_user.apps.PotentialUserConfig",
     "admin_user.apps.AdminUserConfig",
+    "schooling.apps.SchoolingConfig",
 ]
 
 EXTERNAL_APPS = []
 
-INSTALLED_APPS = EXTERNAL_APPS + LOCAL_APPS
+INSTALLED_APPS = DEFAULT_APPS + EXTERNAL_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
