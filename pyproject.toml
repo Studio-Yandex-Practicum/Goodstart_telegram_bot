@@ -95,18 +95,21 @@ select = [
     "TCH"
 
 ]
-ignore = ["D100", "D103", "T201", "D104"]
+ignore = ["D100", "D103", "T201", "D104", "COM819", "D212"]
 
 fixable = ["ALL"]
 unfixable = []
 
 [tool.ruff.format]
-quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
 docstring-code-format = false
 
+[tool.ruff.lint."flake8-quotes"]
+inline-quotes = "single"
+
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 "settings*" = ["E501", "F405"]
+
