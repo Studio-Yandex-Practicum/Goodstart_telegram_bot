@@ -15,7 +15,7 @@ class BotConfig(AppConfig):
     def ready(self) -> None:
         """Perform actions when the application is ready."""
         import os
-        
+
         # TODO: временное решение, необходимо продумать улучшение.
         if os.environ.get("DJANGO_MIGRATE", False):
             if os.environ.get("RUN_MAIN", None) != "true":

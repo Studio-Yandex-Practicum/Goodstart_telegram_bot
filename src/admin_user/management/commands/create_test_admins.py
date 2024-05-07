@@ -1,5 +1,6 @@
-from admin_user.factories import create_admins
 from django.core.management.base import BaseCommand
+
+from admin_user.factories import create_admins
 
 
 class Command(BaseCommand):
@@ -9,4 +10,5 @@ class Command(BaseCommand):
         create_admins()
 
     def handle(self, *args, **options):
+        """Call the method `_generate` for the test Admin creation."""
         self._generate()
