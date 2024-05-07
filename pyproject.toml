@@ -97,7 +97,7 @@ select = [
     "TCH"
 
 ]
-ignore = ["D100", "D103", "T201", "D104"]
+ignore = ["D100", "D103", "T201", "D104", "D106"]
 
 fixable = ["ALL"]
 unfixable = []
