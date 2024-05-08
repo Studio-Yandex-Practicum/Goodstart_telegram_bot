@@ -18,7 +18,6 @@ class AdministratorAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'fields': (
-                Administrator.USERNAME_FIELD,
                 *Administrator.REQUIRED_FIELDS,
                 'password1',
                 'password2',
@@ -28,8 +27,8 @@ class AdministratorAdmin(UserAdmin):
         }),
     )
 
-    list_display = ('username', 'email',)
-    search_fields = ('username', 'email',)
+    list_display = ('email',)
+    search_fields = ('email',)
     list_filter = ('is_staff',)
-    list_display_links = ('username',)
     search_help_text = 'Поиск по почте или имени пользователя.'
+    ordering = ('last_name',)

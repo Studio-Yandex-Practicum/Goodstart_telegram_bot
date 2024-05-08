@@ -54,6 +54,10 @@ createsuperuser:
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) createsuperuser  --username $(ADMIN_NAME) --email $(ADMIN_EMAIL) --no-input
 
 
+create_test_admins:
+	cd $(PROJECT_DIR) && $(DJANGO_RUN) create_test_admins
+
+
 # Запуск локального контейнера Postgres
 start-db:
 	docker-compose -f $(DEV_DOCK_FILE) up -d; \
