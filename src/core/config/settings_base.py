@@ -17,7 +17,7 @@ DEFAULT = 'some_default_key'
 
 SECRET_KEY = env.str('SECRET_KEY', default=DEFAULT)
 
-TELEGRAM_TOKEN = env('TELEGRAM_TOKEN')
+TELEGRAM_TOKEN = env.str('TELEGRAM_TOKEN')
 
 ALLOWED_HOSTS = ['*']
 
@@ -37,7 +37,7 @@ LOCAL_APPS = [
     'schooling.apps.SchoolingConfig',
 ]
 
-EXTERNAL_APPS = ['phonenumber_field',]
+EXTERNAL_APPS = ['phonenumber_field']
 
 INSTALLED_APPS = DEFAULT_APPS + EXTERNAL_APPS + LOCAL_APPS
 
@@ -99,3 +99,5 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+PHONENUMBER_DEFAULT_REGION = 'RU'
