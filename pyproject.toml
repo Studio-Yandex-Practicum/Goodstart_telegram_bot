@@ -98,7 +98,7 @@ select = [
 
 ]
 
-ignore = ["D100", "D103", "T201", "D104", "D106", "COM819", "D212"]
+ignore = ["D100", "D103", "T201", "D104", "D106", "COM819", "D212", "I001",]
 
 fixable = ["ALL"]
 unfixable = []
