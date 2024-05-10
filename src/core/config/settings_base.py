@@ -108,7 +108,7 @@ PHONENUMBER_DEFAULT_REGION = 'RU'
 # EMAIL_BACKEND в .env должен быть установлен в 'django.core.mail.backends.smtp.EmailBackend'
 # Ниже приведены настройки по умолчанию, использующие переменные окружения.
 EMAIL_BACKEND = env.str(
-    'EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend'
+    'EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend',
 )
 EMAIL_TEMPLATE_NAME = 'emailing/greeting_email.html'
 EMAIL_HOST = env.str('EMAIL_HOST', default='smtp.yandex.ru')
