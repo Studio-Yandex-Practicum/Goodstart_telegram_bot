@@ -11,6 +11,9 @@ SHELL_NC := \033[0m
 ADMIN_NAME := admin
 ADMIN_EMAIL := root@admin.ru
 
+# Загрузка переменных окружения
+include .env
+export
 
 # Команда выполняемая по умолчанию.
 .DEFAULT_GOAL := help
@@ -51,7 +54,7 @@ makemigrations: migrate
 
 # Создание супер-юзера.
 createsuperuser:
-	cd $(PROJECT_DIR) && $(DJANGO_RUN) createsuperuser  --username $(ADMIN_NAME) --email $(ADMIN_EMAIL) --no-input
+	$(POETRY_RUN) $(MANAGE_DIR) createsuperuser --noinput --email=$(DJANGO_SUPERUSER_EMAIL) --first_name=$(DJANGO_SUPERUSER_FIRSTNAME) --last_name=$(DJANGO_SUPERUSER_LASTNAME) --phone=$(DJANGO_SUPERUSER_PHONE)
 
 
 create_test_admins:

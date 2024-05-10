@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+from .managers import UserManager
 
 DEFAULT_NAME_LENGTH = 150
 EMAIL_LENGTH = 254
@@ -18,6 +19,8 @@ class Administrator(AbstractUser):
         max_length=EMAIL_LENGTH,
         unique=True,
     )
+
+    objects = UserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('first_name', 'last_name', 'phone')
