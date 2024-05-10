@@ -2,16 +2,10 @@ from django.contrib.auth.models import BaseUserManager
 
 
 class UserManager(BaseUserManager):
-    """
-    Менеджер для модели пользователя,
-    обеспечивающий создание обычных пользователей и суперпользователей.
+    """Менеджер для модели пользователя"""
 
-    """
     def create_user(self, email, password=None, **extra_fields):
-        """
-        Создает и сохраняет обычного пользователя с заданным email и паролем.
-
-        """
+        """Создает обычного пользователя с заданным email и паролем."""
         if not email:
             raise ValueError('Пользователь должен иметь email')
 
@@ -22,10 +16,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password, **extra_fields):
-        """
-        Создает и сохраняет суперпользователя с заданным email и паролем.
-
-        """
+        """Создает суперпользователя с заданным email и паролем."""
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_staff', True)
 

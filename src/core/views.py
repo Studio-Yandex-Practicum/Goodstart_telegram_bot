@@ -3,8 +3,8 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-from admin_user.models import Administrator
 from .config.settings_base import EMAIL_HOST_USER, DEFAULT_RECEIVER
+from admin_user.models import Administrator
 
 
 # TODO: убрать после реализации функционала
