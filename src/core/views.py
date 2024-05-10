@@ -1,10 +1,10 @@
+from admin_user.models import Administrator
 from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-from .config.settings_base import EMAIL_HOST_USER, DEFAULT_RECEIVER
-from admin_user.models import Administrator
+from .config.settings_base import DEFAULT_RECEIVER, EMAIL_HOST_USER
 
 
 # TODO: убрать после реализации функционала

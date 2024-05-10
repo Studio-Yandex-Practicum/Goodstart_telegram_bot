@@ -2,7 +2,7 @@ from django.contrib.auth.models import BaseUserManager
 
 
 class UserManager(BaseUserManager):
-    """Менеджер для модели пользователя"""
+    """Менеджер для модели пользователя."""
 
     def create_user(self, email, password=None, **extra_fields):
         """Создает обычного пользователя с заданным email и паролем."""
@@ -22,11 +22,11 @@ class UserManager(BaseUserManager):
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError(
-                'Суперпользователь должен иметь is_staff=True.'
+                'Суперпользователь должен иметь is_staff=True.',
             )
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(
-                'Суперпользователь должен иметь is_superuser=True.'
+                'Суперпользователь должен иметь is_superuser=True.',
             )
 
         return self.create_user(email, password, **extra_fields)
