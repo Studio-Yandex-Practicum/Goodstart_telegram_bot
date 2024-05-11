@@ -1,5 +1,4 @@
 import asyncio
-import signal
 import threading
 
 from django.conf import settings
@@ -21,7 +20,6 @@ class Bot:
         self._stop_event.clear()
         bot_thread = threading.Thread(target=self._run)
         bot_thread.start()
-        signal.signal(signal.SIGINT, self._handle_sigint)
 
     def stop(self):
         """Stop the bot."""
@@ -49,7 +47,3 @@ class Bot:
             await asyncio.sleep(1)
 
         await self._app.stop()
-
-    def _handle_sigint(self, signum, frame):
-        """Handle pressing CTRL+C in terminal."""
-        self.stop()

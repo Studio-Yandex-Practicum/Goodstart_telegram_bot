@@ -8,8 +8,6 @@ DEV_DOCK_FILE := $(PROJECT_DIR)/infra/dev/docker-compose_local.yaml
 SHELL_GREEN = \033[32m
 SHELL_YELLOW = \033[33m
 SHELL_NC := \033[0m
-ADMIN_NAME := admin
-ADMIN_EMAIL := root@admin.ru
 
 # Загрузка переменных окружения
 include .env
@@ -33,7 +31,7 @@ help:
 
 
 # Подготовка проекта к локальному запуску
-init-app: collectstatic makemigrations createsuperuser
+init-app: collectstatic migrate createsuperuser
 
 
 # Сбор статических файлов проекта.
@@ -46,9 +44,8 @@ migrate:
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) migrate --no-input
 
 
-# Создание новых миграций на основе сформированных моделей,
-# и пременение их к базе данных.
-makemigrations: migrate
+# Создание новых миграций на основе сформированных моделей.
+makemigrations:
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) makemigrations --no-input
 
 
@@ -89,4 +86,3 @@ clear-db:
 # Локальный запуск сервера разработки.
 run:
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) runserver
-
