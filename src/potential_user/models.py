@@ -10,12 +10,12 @@ class ApplicationForm(models.Model):
         ('student', 'Учащийся'),
     )
 
-    telegram_id = models.IntegerField('Telegram ID', unique=True)
-    role = models.CharField(choices=ROLE_CHOICES, max_length=20)
-    name = models.CharField(max_length=20)
-    surname = models.CharField(max_length=20)
-    city = models.CharField(max_length=20)
-    phone_number = PhoneNumberField()
+    telegram_id = models.IntegerField('Telegram ID', unique=True, help_text='Введите свой ID')
+    role = models.CharField('Роль', choices=ROLE_CHOICES, max_length=20)
+    name = models.CharField('Имя', max_length=20, help_text="Обязательное поле")
+    surname = models.CharField('Фамилия', max_length=20, help_text="Обязательное поле")
+    city = models.CharField('Город', max_length=20)
+    phone_number = PhoneNumberField('Номер телефона')
     approved = models.BooleanField(default=False)
 
     class Meta:
