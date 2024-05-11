@@ -8,9 +8,6 @@ DEV_DOCK_FILE := $(PROJECT_DIR)/infra/dev/docker-compose_local.yaml
 SHELL_GREEN = \033[32m
 SHELL_YELLOW = \033[33m
 SHELL_NC := \033[0m
-ADMIN_NAME := admin
-ADMIN_EMAIL := root@admin.ru
-PASSWORD := 123456
 
 
 # Команда выполняемая по умолчанию.
@@ -31,7 +28,7 @@ help:
 
 
 # Подготовка проекта к локальному запуску
-init-app: collectstatic makemigrations createsuperuser
+init-app: collectstatic migrate createsuperuser
 
 
 # Сбор статических файлов проекта.
@@ -44,15 +41,18 @@ migrate:
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) migrate --no-input
 
 
-# Создание новых миграций на основе сформированных моделей,
-# и пременение их к базе данных.
-makemigrations: migrate
+# Создание новых миграций на основе сформированных моделей.
+makemigrations:
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) makemigrations --no-input
 
 
 # Создание супер-юзера.
 createsuperuser:
-	cd $(PROJECT_DIR) && $(DJANGO_RUN) createsuperuser  --username $(ADMIN_NAME) --email $(ADMIN_EMAIL) --first_name admin --last_name root --phone +79881234567 --password $(PASSWORD) --no-input
+	cd $(PROJECT_DIR) && $(DJANGO_RUN) createsuperuser --no-input
+
+
+create_test_admins:
+	cd $(PROJECT_DIR) && $(DJANGO_RUN) create_test_admins
 
 
 # Запуск локального контейнера Postgres
@@ -83,4 +83,3 @@ clear-db:
 # Локальный запуск сервера разработки.
 run:
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) runserver
-

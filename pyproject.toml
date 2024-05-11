@@ -15,9 +15,11 @@ django-environ= "^0.11.2"
 django-asgi-lifespan = "^0.3.1"
 django-phonenumber-field = {extras = ["phonenumbers"], version = "^7.3.0"}
 
+
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.2"
 pre-commit = "^3.7.0"
+factory-boy = "^3.3.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -95,7 +97,8 @@ select = [
     "TCH"
 
 ]
-ignore = ["D100", "D103", "T201", "D104", "COM819", "D212"]
+
+ignore = ["D100", "D103", "T201", "D104", "D106", "COM819", "D212", "I001",]
 
 fixable = ["ALL"]
 unfixable = []
