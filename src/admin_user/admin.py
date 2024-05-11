@@ -6,26 +6,24 @@ from admin_user.models import Administrator
 
 @admin.register(Administrator)
 class AdministratorAdmin(UserAdmin):
-    """
-    Admin panel for the Admin model in the Django admin area.
-
-    Changes made:
-    - 'USERNAME_FIELD from the User model is used for creating a user.'
-
-    Search is available by email or username.
-    """
+    """Admin panel for the Admin model in the Django admin area."""
 
     add_fieldsets = (
-        (None, {
-            'fields': (
-                *Administrator.REQUIRED_FIELDS,
-                Administrator.USERNAME_FIELD,
-                'password1',
-                'password2',
-                'is_staff',
-                'is_superuser',
-            ),
-        }),
+        (
+            None,
+            {
+                'classes': ('wide',),
+                'fields': (
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'password1',
+                    'password2',
+                    'is_staff',
+                    'is_superuser',
+                ),
+            },
+        ),
     )
 
     list_display = ('email',)

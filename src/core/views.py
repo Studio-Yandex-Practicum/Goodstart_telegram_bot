@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-from .config.settings_base import DEFAULT_RECEIVER, EMAIL_HOST_USER
+from core.config.settings_base import DEFAULT_RECEIVER, EMAIL_HOST_USER
 
 
 # TODO: убрать после реализации функционала

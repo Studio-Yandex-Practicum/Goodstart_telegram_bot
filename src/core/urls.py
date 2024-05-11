@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 
-from .views import send_greeting_email
+from core.views import send_greeting_email
 
 urlpatterns = [
     path('admin/', admin.site.urls),
