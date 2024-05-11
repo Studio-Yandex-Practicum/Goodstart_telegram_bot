@@ -10,6 +10,7 @@ SHELL_YELLOW = \033[33m
 SHELL_NC := \033[0m
 ADMIN_NAME := admin
 ADMIN_EMAIL := root@admin.ru
+PASSWORD := 123456
 
 
 # Команда выполняемая по умолчанию.
@@ -51,7 +52,7 @@ makemigrations: migrate
 
 # Создание супер-юзера.
 createsuperuser:
-	cd $(PROJECT_DIR) && $(DJANGO_RUN) createsuperuser  --username $(ADMIN_NAME) --email $(ADMIN_EMAIL) --no-input
+	cd $(PROJECT_DIR) && $(DJANGO_RUN) createsuperuser  --username $(ADMIN_NAME) --email $(ADMIN_EMAIL) --first_name admin --last_name root --phone +79881234567 --password $(PASSWORD) --no-input
 
 
 # Запуск локального контейнера Postgres

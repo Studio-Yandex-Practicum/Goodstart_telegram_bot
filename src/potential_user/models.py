@@ -9,13 +9,13 @@ class ApplicationForm(models.Model):
         ('teacher', 'Преподаватель'),
         ('student', 'Учащийся'),
     )
-
-    telegram_id = models.IntegerField('Telegram ID', unique=True, help_text='Введите свой ID')
+    # TODO Вернуть unique=True после реализации telegram_id
+    telegram_id = models.IntegerField('Telegram ID', help_text='Введите свой ID')
     role = models.CharField('Роль', choices=ROLE_CHOICES, max_length=20)
     name = models.CharField('Имя', max_length=20, help_text="Обязательное поле")
     surname = models.CharField('Фамилия', max_length=20, help_text="Обязательное поле")
     city = models.CharField('Город', max_length=20)
-    phone_number = PhoneNumberField('Номер телефона')
+    phone_number = PhoneNumberField('Номер телефона', help_text='Формат +7XXXXXXXXXX')
     approved = models.BooleanField(default=False)
 
     class Meta:
