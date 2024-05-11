@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 
 from .models import ApplicationForm
 from .forms import RegistrationForm
-
+from .utils import get_telegram_id
 
 class RegistrationCreateView(CreateView):
 
@@ -13,7 +13,7 @@ class RegistrationCreateView(CreateView):
 
     # TODO убрать после реализации получения telegram_id
     def form_valid(self, form):
-        form.instance.telegram_id = 12345678
+        form.instance.telegram_id = get_telegram_id()
         return super().form_valid(form)
 
     def get_success_url(self):

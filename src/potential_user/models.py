@@ -9,8 +9,7 @@ class ApplicationForm(models.Model):
         ('teacher', 'Преподаватель'),
         ('student', 'Учащийся'),
     )
-    # TODO Вернуть unique=True после реализации telegram_id
-    telegram_id = models.IntegerField('Telegram ID', help_text='Введите свой ID')
+    telegram_id = models.PositiveBigIntegerField('Telegram ID', unique=True, help_text='Введите свой ID')
     role = models.CharField('Роль', choices=ROLE_CHOICES, max_length=20)
     name = models.CharField('Имя', max_length=20, help_text="Обязательное поле")
     surname = models.CharField('Фамилия', max_length=20, help_text="Обязательное поле")
