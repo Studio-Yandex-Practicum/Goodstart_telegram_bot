@@ -19,6 +19,7 @@ class AdministratorAdmin(UserAdmin):
         (None, {
             'fields': (
                 *Administrator.REQUIRED_FIELDS,
+                Administrator.USERNAME_FIELD,
                 'password1',
                 'password2',
                 'is_staff',
