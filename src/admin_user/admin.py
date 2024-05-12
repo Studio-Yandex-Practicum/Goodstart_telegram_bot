@@ -8,6 +8,46 @@ from admin_user.models import Administrator
 class AdministratorAdmin(UserAdmin):
     """Admin panel for the Admin model in the Django admin area."""
 
+    fieldsets = (
+        (
+            None,
+            {
+                'fields': (
+                    'email',
+                    'password',
+                ),
+            },
+        ),
+        (
+            'Личная информация', {
+                'fields': (
+                    'first_name',
+                    'last_name',
+                    'phone',
+                ),
+            },
+        ),
+        (
+            'Разрешения', {
+                'fields': (
+                    'is_active',
+                    'is_staff',
+                    'is_superuser',
+                    'groups',
+                    'user_permissions',
+                ),
+            },
+        ),
+        (
+            'История активности', {
+                'fields': (
+                    'last_login',
+                    'date_joined',
+                ),
+            },
+        ),
+    )
+
     add_fieldsets = (
         (
             None,
