@@ -30,10 +30,12 @@ class Teacher(GeneralUserModel):
     """Модель преподавателя."""
 
     competence = models.ManyToManyField(
-        'Subject', verbose_name='Предмет',
+        'Subject',
+        verbose_name='Предмет',
     )
     study_classes = models.ManyToManyField(
-        'StudyClass', verbose_name='Учебный класс',
+        'StudyClass',
+        verbose_name='Учебный класс',
     )
 
     class Meta:
@@ -51,13 +53,17 @@ class Student(GeneralUserModel):
     """Модель студента."""
 
     study_class_id = models.ForeignKey(
-        'StudyClass', on_delete=models.SET_NULL,
-        verbose_name='ID учебного класса', related_name='students',
+        'StudyClass',
+        # TODO После реализации модели StudyClass проработать правило удаления
+        on_delete=models.DO_NOTHING,
+        verbose_name='ID учебного класса',
+        related_name='students',
     )
     paid_lessons = models.PositiveIntegerField('Оплаченые занятия')
     parents_contacts = models.CharField('Контакты представителей')
     subjects = models.ManyToManyField(
-        'Subject', verbose_name='Предмет',
+        'Subject',
+        verbose_name='Предмет',
     )
 
     class Meta:
@@ -69,3 +75,36 @@ class Student(GeneralUserModel):
     def __str__(self):
         """Return a student string representation."""
         return f'{self.name} {self.surname} {self.subjects}'
+
+
+class Subject(models.Model):
+    """Модель для хранения школьных предметов."""
+
+    name = models.CharField(
+        max_length=128,
+        unique=True,
+        verbose_name='Название предмета',
+    )
+    subject_key = models.CharField(
+        max_length=128,
+        unique=True,
+        blank=True,
+        null=True,
+    )
+
+    class Meta:
+        verbose_name = 'Название предмета'
+        verbose_name_plural = 'Названия предметов'
+
+    def __str__(self):
+        """Return a subject string representation."""
+        return self.name
+
+
+# TODO Доработка в следующей итерации
+class StudyClass(models.Model):
+    """Модель для хранения школьных классов."""
+
+    def __str__(self):
+        """Return a studyclass string representation."""
+        return 'StudyClass'
