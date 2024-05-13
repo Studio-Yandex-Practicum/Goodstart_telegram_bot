@@ -9,6 +9,9 @@ SHELL_GREEN = \033[32m
 SHELL_YELLOW = \033[33m
 SHELL_NC := \033[0m
 
+# Загрузка переменных окружения
+include .env
+export
 
 # Команда выполняемая по умолчанию.
 .DEFAULT_GOAL := help
@@ -48,7 +51,7 @@ makemigrations:
 
 # Создание супер-юзера.
 createsuperuser:
-	cd $(PROJECT_DIR) && $(DJANGO_RUN) createsuperuser --no-input
+	$(POETRY_RUN) $(MANAGE_DIR) createsuperuser --noinput --email=$(DJANGO_SUPERUSER_EMAIL) --first_name=$(DJANGO_SUPERUSER_FIRSTNAME) --last_name=$(DJANGO_SUPERUSER_LASTNAME) --phone=$(DJANGO_SUPERUSER_PHONE)
 
 
 create_test_admins:

@@ -6,25 +6,64 @@ from admin_user.models import Administrator
 
 @admin.register(Administrator)
 class AdministratorAdmin(UserAdmin):
-    """
-    Admin panel for the Admin model in the Django admin area.
+    """Admin panel for the Admin model in the Django admin area."""
 
-    Changes made:
-    - 'USERNAME_FIELD from the User model is used for creating a user.'
-
-    Search is available by email or username.
-    """
+    fieldsets = (
+        (
+            None,
+            {
+                'fields': (
+                    'email',
+                    'password',
+                ),
+            },
+        ),
+        (
+            'Личная информация', {
+                'fields': (
+                    'first_name',
+                    'last_name',
+                    'phone',
+                ),
+            },
+        ),
+        (
+            'Разрешения', {
+                'fields': (
+                    'is_active',
+                    'is_staff',
+                    'is_superuser',
+                    'groups',
+                    'user_permissions',
+                ),
+            },
+        ),
+        (
+            'История активности', {
+                'fields': (
+                    'last_login',
+                    'date_joined',
+                ),
+            },
+        ),
+    )
 
     add_fieldsets = (
-        (None, {
-            'fields': (
-                *Administrator.REQUIRED_FIELDS,
-                'password1',
-                'password2',
-                'is_staff',
-                'is_superuser',
-            ),
-        }),
+        (
+            None,
+            {
+                'classes': ('wide',),
+                'fields': (
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'password1',
+                    'password2',
+                    'is_staff',
+                    'is_superuser',
+                ),
+            },
+        ),
     )
 
     list_display = ('email',)

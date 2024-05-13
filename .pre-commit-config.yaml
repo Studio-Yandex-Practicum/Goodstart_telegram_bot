@@ -24,8 +24,9 @@ repos:
     hooks:
       - id: ruff
         types_or: [ python ]
-      - id: ruff-format
-        types_or: [ python ]
+        #TODO К ruff подключить одинарные кавычки
+      # - id: ruff-format
+      #   types_or: [ python ]
 
   - repo: local
     hooks:
