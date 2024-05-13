@@ -21,5 +21,5 @@ class StudentAdmin(admin.ModelAdmin):
 class SubjectAdmin(admin.ModelAdmin):
     """Управление школьными предметами."""
 
-    list_display = ("name",)
-    exclude = ("subject_key",)
+    list_display = ('name',)
+    exclude = ('subject_key',)
