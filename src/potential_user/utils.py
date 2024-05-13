@@ -1,9 +1,9 @@
 import random
 import sys
 
-from .models import ApplicationForm
+from potential_user.models import ApplicationForm
 
-
+#TODO Убрать после реализации хендлеров
 def get_telegram_id() -> int:
     """
     Получает телеграм id от бота.

@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import ApplicationForm
+from potential_user.models import ApplicationForm
 
 
 class RegistrationForm(forms.ModelForm):

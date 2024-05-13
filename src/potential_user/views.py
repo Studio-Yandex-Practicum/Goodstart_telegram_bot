@@ -1,9 +1,9 @@
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView
 
-from .forms import RegistrationForm
-from .models import ApplicationForm
-from .utils import get_telegram_id
+from potential_user.forms import RegistrationForm
+from potential_user.models import ApplicationForm
+from potential_user.utils import get_telegram_id
 
 
 class RegistrationCreateView(CreateView):
@@ -21,12 +21,4 @@ class RegistrationCreateView(CreateView):
 
     def get_success_url(self):
         """Переадресовывет на главную страницу."""
-        return reverse_lazy('registration:index')
-
-
-# TODO убрать после реализации главной страницы
-class TemplateIndex(ListView):
-    """Временная вьюха для регистрации."""
-
-    model = ApplicationForm
-    template_name = 'registration/fortest.html'
+        return reverse_lazy('registration:registration')
