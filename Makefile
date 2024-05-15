@@ -82,7 +82,10 @@ clear-db:
 		docker compose -f $(DEV_DOCK_FILE) down --volumes; \
 	fi
 
+# Запуск сервера разработки через Uvicorn
+run-dev:
+	cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_dev:application --reload
 
-# Локальный запуск сервера разработки.
-run:
-	cd $(PROJECT_DIR) && $(DJANGO_RUN) runserver
+# Запуск сервера продакшена через Uvicorn
+run-prod:
+	cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_prod:application --reload
