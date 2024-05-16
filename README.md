@@ -11,6 +11,8 @@ CMS для управления пользователями и расписан
 
    1.2. [Схема работы бота (в разработке)](https://miro.com/app/board/uXjVKTz7zLw=/)
 
+   1.3. [BPMN диаграмма](docs/bpmn/registration.jpg)
+
 2. [Используемые технологий](#technologies-project)
 
 3. [Правила работы с git](#git)
