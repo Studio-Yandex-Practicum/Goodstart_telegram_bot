@@ -1,7 +1,7 @@
-from core.logging import log_errors
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters
 
+from core.logging import log_errors
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """/start command handler."""

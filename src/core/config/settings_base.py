@@ -28,6 +28,7 @@ DEFAULT_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_bootstrap5',
 ]
 
 LOCAL_APPS = [
@@ -53,10 +54,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -101,3 +103,23 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 PHONENUMBER_DEFAULT_REGION = 'RU'
+
+# Конфигурация электронной почты
+# По умолчанию, для удобства тестирования во время разработки, все письма выводятся в консоль.
+# Для отправки реальных писем
+# EMAIL_BACKEND в .env должен быть установлен в 'django.core.mail.backends.smtp.EmailBackend'
+# Ниже приведены настройки по умолчанию, использующие переменные окружения.
+EMAIL_BACKEND = env.str(
+    'EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend',
+)
+EMAIL_TEMPLATE_NAME = 'emailing/greeting_email.html'
+EMAIL_HOST = env.str('EMAIL_HOST', default='smtp.yandex.ru')
+try:
+    EMAIL_PORT = env.int('EMAIL_PORT', default=456)
+except ValueError:
+    EMAIL_PORT = 465
+EMAIL_HOST_USER = env.str('EMAIL_ACCOUNT', default='example@yandex.ru')
+EMAIL_HOST_PASSWORD = env.str('EMAIL_PASSWORD', default='password')
+EMAIL_TIMEOUT = 5
+EMAIL_USE_SSL = True
+DEFAULT_RECEIVER = env.str('DEFAULT_EMAIL_ADDRESS', default='NOT_SET')

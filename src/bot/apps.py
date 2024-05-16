@@ -1,5 +1,8 @@
+import os
+import sys
+import signal
+
 from django.apps import AppConfig
-from django_asgi_lifespan.signals import asgi_shutdown
 
 
 class BotConfig(AppConfig):
@@ -8,21 +11,31 @@ class BotConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'bot'
 
-    def stop_bot(self, **kwargs):
-        """Stop application."""
-        self.bot.stop()
-
     def ready(self) -> None:
-        """Perform actions when the application is ready."""
-        import os
+        """Perform bot start when the Django application is fully loaded."""
+        if os.environ.get('RUN_MAIN', None) == 'true':
+            self._start_bot()
 
-        # TODO: временное решение, необходимо продумать улучшение.
-        if os.environ.get('DJANGO_MIGRATE', False):
-            if os.environ.get('RUN_MAIN', None) != 'true':
-                from bot.bot_interface import Bot
+        signal.signal(signal.SIGINT, self._handle_sigint)
 
-                self.bot = Bot()
+    def _start_bot(self):
+        """Initialize and start the Telegram bot."""
+        from bot.bot_interface import Bot
 
-                asgi_shutdown.connect(self.stop_bot)
+        self.bot = Bot()
+        self.bot.start()
 
-                self.bot.start()
+    def _stop_bot(self, **kwargs):
+        """Stop the bot if it was running."""
+        if hasattr(self, 'bot') and hasattr(self.bot, 'stop'):
+            self.bot.stop()
+
+    def _handle_sigint(self, signum, frame):
+        """
+        Handle interrupt signal (Ctrl+C).
+
+        Method is called when an interrupt signal (Ctrl+C) is received.
+        It stops the bot and exits the application gracefully.
+        """
+        self._stop_bot()
+        sys.exit(0)

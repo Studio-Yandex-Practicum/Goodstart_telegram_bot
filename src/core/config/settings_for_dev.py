@@ -6,13 +6,13 @@ DEBUG = True
 
 DATABASES = {
     'default': {
-        'ENGINE': env(
+        'ENGINE': env.str(
             'POSTGRES_ENGINE',
             default='django.db.backends.postgresql',
         ),
-        'NAME': env('POSTGRES_NAME', default='postgres'),
-        'USER': env('POSTGRES_USER', default='postgres'),
-        'PASSWORD': 'postgres',
+        'NAME': env.str('POSTGRES_NAME', default='postgres'),
+        'USER': env.str('POSTGRES_USER', default='postgres'),
+        'PASSWORD': env.str('POSTGRES_PASSWORD', default='postgres'),
         'HOST': env('POSTGRES_HOST', default='localhost'),
         'PORT': env('POSTGRES_PORT', default='5432'),
     },
