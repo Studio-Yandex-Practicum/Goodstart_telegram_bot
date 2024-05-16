@@ -46,7 +46,7 @@ migrate:
 
 # Создание новых миграций на основе сформированных моделей.
 makemigrations:
-	cd $(PROJECT_DIR) && $(DJANGO_RUN) makemigrations --no-input
+	cd $(PROJECT_DIR) && $(DJANGO_RUN) makemigrations
 
 
 # Создание супер-юзера.

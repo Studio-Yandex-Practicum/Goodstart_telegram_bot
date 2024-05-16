@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <title>Телеграм-бот для преподавателей и учеников</title>
+    {% load django_bootstrap5 %}
+    {% bootstrap_css %}
+  </head>
+  <body>
+    {% include "registration/header.html" %}
+    <div class="container pt-5" align="center">
+      {% block content %}{% endblock %}
+    </div>
+  </body>
+</html>
