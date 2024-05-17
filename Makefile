@@ -89,4 +89,4 @@ run-dev:
 
 # Запуск сервера продакшена через Uvicorn
 run-prod:
-	cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_prod:application --reload
+	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_prod:application --reload
