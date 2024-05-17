@@ -1,0 +1,16 @@
+{% extends "registration/base.html" %}
+{% load django_bootstrap5 %}
+{% block content %}
+    <div class="card col-4">
+      <div class="card-header">
+        Регистрация пользователя
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% bootstrap_form form %}
+          {% bootstrap_button button_type="submit" content="Регистрация" %}
+        </form>
+      </div>
+    </div>
+{% endblock %}

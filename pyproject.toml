@@ -16,6 +16,7 @@ poetry-plugin-export = "^1.7.1"
 django-environ= "^0.11.2"
 django-asgi-lifespan = "^0.3.1"
 django-phonenumber-field = {extras = ["phonenumbers"], version = "^7.3.0"}
+django-bootstrap5 = "^24.2"
 
 
 [tool.poetry.group.dev.dependencies]
