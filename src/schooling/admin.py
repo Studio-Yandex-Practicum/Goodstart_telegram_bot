@@ -1,6 +1,5 @@
 from django.contrib import admin
-
-from schooling.models import Student, Teacher, Subject
+from schooling.models import Student, Teacher, Subject, StudyClass
 
 
 @admin.register(Teacher)
@@ -27,3 +26,10 @@ class SubjectAdmin(admin.ModelAdmin):
 
     list_display = ('name',)
     exclude = ('subject_key',)
+
+
+@admin.register(StudyClass)
+class StudyClassAdmin(admin.ModelAdmin):
+    """Управление учебными классами."""
+
+    list_display = ('study_class_name', 'study_class_number')

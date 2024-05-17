@@ -1,6 +1,7 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
+
 MAX_LEN_NAME_SURNAME = 150
 MAX_LEN_CITY = 50
 
@@ -101,10 +102,18 @@ class Subject(models.Model):
         return self.name
 
 
-# TODO Доработка в следующей итерации
 class StudyClass(models.Model):
     """Модель для хранения школьных классов."""
 
+    study_class_name = models.CharField(
+        max_length=64,
+        unique=True,
+        verbose_name='Название учебного класса',
+    )
+    study_class_number = models.PositiveIntegerField(
+        verbose_name='Номер учебного класса',
+    )
+
     def __str__(self):
         """Return a studyclass string representation."""
-        return 'StudyClass'
+        return self.study_class_name
