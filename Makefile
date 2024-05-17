@@ -41,6 +41,7 @@ collectstatic:
 
 # Применение собранных миграций к базе данных, на основе сформированных моделей.
 migrate:
+	export RUN_BOT=false
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) migrate --no-input
 
 
@@ -82,7 +83,10 @@ clear-db:
 		docker compose -f $(DEV_DOCK_FILE) down --volumes; \
 	fi
 
+# Запуск сервера разработки через Uvicorn
+run-dev:
+	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_dev:application --reload
 
-# Локальный запуск сервера разработки.
-run:
-	cd $(PROJECT_DIR) && $(DJANGO_RUN) runserver
+# Запуск сервера продакшена через Uvicorn
+run-prod:
+	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_prod:application --reload
