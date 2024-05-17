@@ -15,9 +15,9 @@ STATIC_ROOT = os.path.join(ROOT_DIR, 'static/')
 
 DEFAULT = 'some_default_key'
 
-SECRET_KEY = env.str('SECRET_KEY', default=DEFAULT)
+SECRET_KEY = env('SECRET_KEY', default=DEFAULT)
 
-TELEGRAM_TOKEN = env.str('TELEGRAM_TOKEN')
+TELEGRAM_TOKEN = env('TELEGRAM_TOKEN')
 
 ALLOWED_HOSTS = ['*']
 

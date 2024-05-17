@@ -10,6 +10,7 @@ def create_subject_mathematics(apps, schema_editor):
         name="Математика",
     )
 
+
 def remove_subject_mathematics(apps, schema_editor):
     """Remove subject 'Mathematics' instance."""
     Subject = apps.get_model("schooling", "Subject")
