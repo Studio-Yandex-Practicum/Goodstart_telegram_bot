@@ -1,3 +1,5 @@
+import os
+
 from django.apps import AppConfig
 from django_asgi_lifespan.signals import asgi_shutdown
 
@@ -10,11 +12,12 @@ class BotConfig(AppConfig):
 
     def ready(self) -> None:
         """Perform bot start when the Django application is fully loaded."""
-        from bot.bot_interface import Bot
+        if os.getenv('RUN_BOT', 'false').lower() == 'true':
+            from bot.bot_interface import Bot
 
-        self.bot = Bot()
-        asgi_shutdown.connect(self.stop_bot)
-        self.bot.start()
+            self.bot = Bot()
+            asgi_shutdown.connect(self.stop_bot)
+            self.bot.start()
 
     def stop_bot(self, **kwargs):
         """Stop the bot if it was running."""
