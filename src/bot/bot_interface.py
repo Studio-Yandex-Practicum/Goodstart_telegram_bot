@@ -1,5 +1,6 @@
 import asyncio
 import threading
+import time
 from typing import Self
 
 from django.conf import settings
@@ -40,6 +41,7 @@ class Bot:
         """Stop the bot."""
         logger.info('Bot stopping...')
         self._stop_event.set()
+        time.sleep(1)
 
     async def _build_app(self):
         """Build the application."""
@@ -53,7 +55,12 @@ class Bot:
         """Run the bot."""
         asyncio.set_event_loop(asyncio.new_event_loop())
         logger.info('Bot event loop created and started.')
-        asyncio.get_event_loop().run_until_complete(self._start_bot())
+        loop = asyncio.get_event_loop()
+        try:
+            loop.run_until_complete(self._start_bot())
+        finally:
+            loop.close()
+            logger.info('Bot event loop closed.')
 
     async def _start_bot(self):
         """Start the bot."""
