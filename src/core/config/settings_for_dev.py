@@ -4,16 +4,20 @@ from core.config.settings_base import *  # noqa
 
 DEBUG = True
 
+# WARNING!!!
+# You will probably need to make some minor changes to the `.env` file.
+# Pull variable names have been changed for better readability.
+
 DATABASES = {
     'default': {
         'ENGINE': env.str(
-            'POSTGRES_ENGINE',
-            default='django.db.backends.postgresql',
+            'DB_ENGINE',
+            'django.db.backends.postgresql_psycopg2',
         ),
-        'NAME': env.str('POSTGRES_NAME', default='postgres'),
-        'USER': env.str('POSTGRES_USER', default='postgres'),
-        'PASSWORD': env.str('POSTGRES_PASSWORD', default='postgres'),
-        'HOST': env.int('POSTGRES_HOST', default='localhost'),
-        'PORT': env.int('POSTGRES_PORT', default='5432'),
+        'NAME': env.str('DB_NAME', 'postgres_db'),
+        'USER': env.str('DB_USERNAME', 'postgres'),
+        'PASSWORD': env.str('DB_PASSWORD', 'postgres'),
+        'HOST': env.str('DB_HOST', 'localhost'),
+        'PORT': env.int('DB_PORT', 5432),
     },
 }
