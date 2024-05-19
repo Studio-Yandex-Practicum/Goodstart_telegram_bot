@@ -26,7 +26,6 @@ DEFAULT_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_bootstrap5',
 ]
 
 LOCAL_APPS = [
@@ -36,7 +35,7 @@ LOCAL_APPS = [
     'schooling.apps.SchoolingConfig',
 ]
 
-EXTERNAL_APPS = ['phonenumber_field']
+EXTERNAL_APPS = ['django_bootstrap5','phonenumber_field',]
 
 INSTALLED_APPS = DEFAULT_APPS + EXTERNAL_APPS + LOCAL_APPS
 
