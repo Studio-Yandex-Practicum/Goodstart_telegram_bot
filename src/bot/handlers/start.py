@@ -6,6 +6,7 @@ from django.conf import settings
 from schooling.models import Teacher, Student
 from bot.utils import check_user_from_db
 
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     `/start` command handler.
