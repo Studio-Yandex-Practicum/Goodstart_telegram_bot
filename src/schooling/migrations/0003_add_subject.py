@@ -173,7 +173,7 @@ def remove_subject_information_technology(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("schooling", '0001_initial'),
+        ("schooling", '0002_add_study_classes'),
     ]
 
     operations = [

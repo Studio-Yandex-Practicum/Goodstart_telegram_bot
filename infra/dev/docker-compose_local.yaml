@@ -6,7 +6,10 @@ volumes:
 services:
   db:
     image: postgres:latest
-    env_file: ../../.env
+    environment:
+      POSTGRES_DB: postgres_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     container_name: GoodStart-DB
     volumes:
       - pg_data:/var/lib/postgresql/data

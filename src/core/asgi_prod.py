@@ -2,8 +2,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-from bot.bot_interface import Bot
-
 os.environ.setdefault(
     'DJANGO_SETTINGS_MODULE',
     'core.config.settings_for_prod',
@@ -14,6 +12,7 @@ django_asgi_app = get_asgi_application()
 
 async def application(scope, receive, send):
     """ASGI application to handle incoming ASGI events."""
+    from bot.bot_interface import Bot
     if scope['type'] == 'lifespan':
         while True:
             message = await receive()
