@@ -3,13 +3,11 @@ from pathlib import Path
 
 import environ
 
-env = environ.Env()
-
-
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ROOT_DIR = BASE_DIR.parent
-
 environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
+env = environ.Env()
+
 
 STATIC_ROOT = os.path.join(ROOT_DIR, 'static/')
 
@@ -123,3 +121,5 @@ EMAIL_HOST_PASSWORD = env.str('EMAIL_PASSWORD', default='password')
 EMAIL_TIMEOUT = 5
 EMAIL_USE_SSL = True
 DEFAULT_RECEIVER = env.str('DEFAULT_EMAIL_ADDRESS', default='NOT_SET')
+
+BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:8000')
