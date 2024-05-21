@@ -1,0 +1,12 @@
+{% extends "registration/base.html" %}
+{% load django_bootstrap5 %}
+{% block content %}
+    <div class="card col-4">
+      <div class="card-header">
+        Регистрация прошла успешно!
+      </div>
+      <div class="card-body">
+        {% bootstrap_button button_type="submit" content="Отлично" %}
+      </div>
+    </div>
+{% endblock %}

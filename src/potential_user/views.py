@@ -1,5 +1,6 @@
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
+from django.shortcuts import render
 
 from potential_user.forms import RegistrationForm
 from potential_user.models import ApplicationForm
@@ -20,5 +21,9 @@ class RegistrationCreateView(CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        """Переадресовывет на главную страницу."""
-        return reverse_lazy('registration:registration')
+        """Переадресовывет на страницу успешной регистрации."""
+        return reverse_lazy('registration:registration_success')
+
+
+def registration_success(request):
+    return render(request, 'registration/registration_success.html')
