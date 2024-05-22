@@ -5,6 +5,7 @@ DJANGO_DIR := $(PROJECT_DIR)/src
 POETRY_RUN := poetry run python
 DJANGO_RUN := $(POETRY_RUN) $(MANAGE_DIR)
 DEV_DOCK_FILE := $(PROJECT_DIR)/infra/dev/docker-compose_local.yaml
+DEV_CON_DOCK_FILE := $(PROJECT_DIR)/infra/dev/docker-compose_local_all.yaml
 SHELL_GREEN = \033[32m
 SHELL_YELLOW = \033[33m
 SHELL_NC := \033[0m
@@ -24,7 +25,7 @@ help:
 	@echo "	start-db        - $(SHELL_GREEN)Команда для запуска локального контейнера postgres.$(SHELL_NC)"
 	@echo "	stop-db         - $(SHELL_GREEN)Команда для остановки локального контейнера postgres.$(SHELL_NC)"
 	@echo "	clear-db        - $(SHELL_GREEN)Команда для очистки volume локального контейнера postgres.$(SHELL_NC)"
-	@echo "	run             - $(SHELL_GREEN)Команда для локального запуска проекта.$(SHELL_NC)"
+	@echo "	run-dev         - $(SHELL_GREEN)Команда для локального запуска проекта(разработка).$(SHELL_NC)"
 	@echo "	help            - $(SHELL_GREEN)Команда вызова справки.$(SHELL_NC)"
 	@echo "$(SHELL_YELLOW)Для запуска исполнения команд используйте данные ключи совместно с командой 'make', например 'make init-app'."
 	@echo "При запуске команды 'make' без какого либо ключа, происходит вызов справки.$(SHELL_NC)"
@@ -90,3 +91,12 @@ run-dev:
 # Запуск сервера продакшена через Uvicorn
 run-prod:
 	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_prod:application --reload
+
+
+# Запуск проекта в контейнерах
+start-app:
+	docker-compose -f $(DEV_CON_DOCK_FILE) up -d; \
+	if [ $$? -ne 0 ]; \
+    then \
+        docker compose -f $(DEV_CON_DOCK_FILE) up -d; \
+    fi
