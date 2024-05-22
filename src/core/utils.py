@@ -27,3 +27,4 @@ def create_user_from_application(sender, instance, created, **kwargs):
                 f'Пользователь с telegram_id {instance.telegram_id} '
                 'уже существует.',
             ) from err
+    # TODO: Возможно обработать сценарий, если пользователь существует.
