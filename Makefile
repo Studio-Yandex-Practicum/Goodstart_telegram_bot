@@ -85,8 +85,8 @@ clear-db:
 
 # Запуск сервера разработки через Uvicorn
 run-dev:
-	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_dev:application --reload
+	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_dev:application --reload --lifespan on
 
 # Запуск сервера продакшена через Uvicorn
 run-prod:
-	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_prod:application --reload
+	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_prod:application --reload --lifespan on
