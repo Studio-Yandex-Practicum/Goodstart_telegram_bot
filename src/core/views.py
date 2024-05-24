@@ -2,46 +2,43 @@ from admin_user.models import Administrator
 from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from django.utils.html import strip_tags
 
-from core.config.settings_base import DEFAULT_RECEIVER, EMAIL_HOST_USER
+from core.config.settings_base import EMAIL_HOST_USER
 
 
 # TODO: убрать после реализации функционала
-def send_greeting_email(request):
-    """
-    Тестовая функция для проверки отправки email.
+def send_registration_email(application_form):
+    """Отправляет админу уведомление о новой заявке на регистрацию."""
+    roles_mapping = {
+        'student': 'Ученик',
+        'teacher': 'Преподаватель',
+    }
 
-    Использует предварительно заданный DEFAULT_RECEIVER
-    из переменных окружения для определения получателя.
-    Проверяет существование пользователя с таким email в базе данных.
-    Отправляет приветственное письмо
-    с использованием шаблона 'emailing/greeting_email.html'.
-
-    """
-    user_email = DEFAULT_RECEIVER
-    if not user_email:
-        return HttpResponse(
-            'Email не задан в переменных окружения.',
-            status=400,
-        )
-    user_exists = Administrator.objects.filter(email=user_email).exists()
-    if not user_exists:
-        return HttpResponse(
-            'Сначала зарегистрируйте пользователя с данным email.',
-            status=404,
-        )
-
-    user = Administrator.objects.get(email=user_email)
-
-    subject = 'Привет!'
-    convert_to_html_content = render_to_string(
-        'emailing/greeting_email.html',
-        {'user': user.first_name},
+    subject = 'Goodstart: Новая заявка на регистрацию'
+    user_role = roles_mapping.get(application_form.role, application_form.role)
+    html_content = render_to_string(
+        'emailing/registration_notification_email.html',
+        {
+            'name': application_form.name,
+            'surname': application_form.surname,
+            'city': application_form.city,
+            'phone_number': application_form.phone_number,
+            'role': user_role,
+        },
     )
-    message = strip_tags(convert_to_html_content)
     from_email = EMAIL_HOST_USER
-    recipient_list = [user.email]
+    recipient_list = Administrator.objects.filter(
+        is_active=True,
+    ).values_list(
+        'email',
+        flat=True,
+    )
 
-    send_mail(subject, message, from_email, recipient_list)
-    return HttpResponse('Email отправлен!')
+    send_mail(
+        subject,
+        message=None,
+        from_email=from_email,
+        recipient_list=recipient_list,
+        html_message=html_content,
+    )
+    return HttpResponse('Заявка на регистрацию принята!')

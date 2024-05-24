@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 
-from core.views import send_greeting_email
+from core.views import send_registration_email
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -10,6 +10,8 @@ urlpatterns = [
         include('potential_user.urls'),
         name='registration',
     ),
-    # TODO: убрать после реализации функционала
-    path('mail/', send_greeting_email, name='send-email'),
+    path('registration_mail/',
+        send_registration_email,
+        name='send-registration-email',
+    ),
 ]
