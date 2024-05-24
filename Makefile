@@ -5,7 +5,6 @@ DJANGO_DIR := $(PROJECT_DIR)/src
 POETRY_RUN := poetry run python
 DJANGO_RUN := $(POETRY_RUN) $(MANAGE_DIR)
 DEV_DOCK_FILE := $(PROJECT_DIR)/infra/dev/docker-compose_local.yaml
-DEV_CON_DOCK_FILE := $(PROJECT_DIR)/infra/dev/docker-compose_local_all.yaml
 SHELL_GREEN = \033[32m
 SHELL_YELLOW = \033[33m
 SHELL_NC := \033[0m
@@ -91,12 +90,3 @@ run-dev:
 # Запуск сервера продакшена через Uvicorn
 run-prod:
 	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_prod:application --reload
-
-
-# Запуск проекта в контейнерах
-start-app:
-	docker-compose -f $(DEV_CON_DOCK_FILE) up -d; \
-	if [ $$? -ne 0 ]; \
-    then \
-        docker compose -f $(DEV_CON_DOCK_FILE) up -d; \
-    fi
