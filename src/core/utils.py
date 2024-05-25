@@ -33,7 +33,6 @@ def create_user_from_application(sender, instance, created, **kwargs):
                 'уже существует.',
             ) from err
     # TODO: Возможно обработать сценарий, если пользователь существует.
-    
 
 def send_registration_email(application_form):
     """Отправляет админу уведомление о новой заявке на регистрацию."""
