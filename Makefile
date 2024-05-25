@@ -87,6 +87,10 @@ clear-db:
 run-dev:
 	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_dev:application --reload --lifespan on
 
+# Запуск сервера разработки через Uvicorn по протоколу https
+run-dev-https:
+	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_dev:application --reload --ssl-keyfile=../infra/dev/key.pem --ssl-certfile=../infra/dev/cert.pem --lifespan on
+
 # Запуск сервера продакшена через Uvicorn
 run-prod:
 	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_prod:application --reload --lifespan on

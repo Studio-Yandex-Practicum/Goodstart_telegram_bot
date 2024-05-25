@@ -1,10 +1,11 @@
-from telegram import Update
+from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import CommandHandler, ContextTypes
-from django.urls import reverse
-from django.conf import settings
 
 from schooling.models import Teacher, Student
 from bot.utils import check_user_from_db
+from bot.messages_texts.constants import (
+    WELCOME_MSG, REGISTRATION_MSG
+)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -17,21 +18,21 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     telegram_id = update.effective_chat.id
     user = await check_user_from_db(telegram_id, (Teacher, Student))
 
-    #TODO перенести сообщения в отдельный файл constants
-    welcome_msg = (
-        'Привет, я бот онлайн школы GoodStart!\n\n'
-        'Здесь ты найдёшь лучших преподавателей.'
-    )
-    registration_msg = (
-        f'Привет, я бот онлайн школы GoodStart!\n\n'
-        f'Похоже, ты еще не зарегистрирован в нашей онлайн школе '
-        f'GoodStart.\nДавай зарегистрируемся прямо сейчас по ссылке '
-        f'{settings.BASE_URL}{reverse("registration:registration")}'
-    )
+    registration_buttons = ReplyKeyboardMarkup(
+        [['/registration', '/refuses']],
+        resize_keyboard=True
+        )
 
-    await context.bot.send_message(
-        chat_id=telegram_id,
-        text=welcome_msg if user else registration_msg,
-    )
+    if user:
+        await context.bot.send_message(
+            chat_id=telegram_id,
+            text=WELCOME_MSG
+        )
+    else:
+        await context.bot.send_message(
+            chat_id=telegram_id,
+            text=REGISTRATION_MSG,
+            reply_markup=registration_buttons
+        )
 
 start_handler = CommandHandler(start.__name__, start)
