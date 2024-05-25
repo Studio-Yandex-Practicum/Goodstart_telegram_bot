@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 
-from core.views import send_registration_email
+from core.utils import send_registration_email
 
 urlpatterns = [
     path('admin/', admin.site.urls),
