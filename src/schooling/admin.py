@@ -1,5 +1,6 @@
 from django.contrib import admin
-from schooling.models import Student, Teacher, Subject, StudyClass
+
+from schooling.models import Student, Teacher, Subject, StudyClass, Lesson
 
 
 @admin.register(Teacher)
@@ -33,3 +34,21 @@ class StudyClassAdmin(admin.ModelAdmin):
     """Управление учебными классами."""
 
     list_display = ('study_class_name', 'study_class_number')
+
+
+@admin.register(Lesson)
+class LessonAdmin(admin.ModelAdmin):
+    """Управление занятиями."""
+
+    list_display = (
+        'name', 'subject', 'teacher_id', 'student_id',
+        'datetime_start', 'datetime_end', 'is_passed', 'test_lesson',
+    )
+    list_filter = (
+        'subject', 'teacher_id', 'student_id',
+        'datetime_start', 'is_passed', 'test_lesson',
+    )
+    search_fields = (
+        'name', 'subject__name',
+        'teacher_id__name', 'student_id__name',
+    )

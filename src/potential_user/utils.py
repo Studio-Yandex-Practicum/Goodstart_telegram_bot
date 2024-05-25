@@ -3,7 +3,8 @@ import sys
 
 from potential_user.models import ApplicationForm
 
-#TODO Убрать после реализации хендлеров
+
+# TODO Убрать после реализации хендлеров
 def get_telegram_id() -> int:
     """
     Получает телеграм id от бота.
