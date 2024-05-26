@@ -86,7 +86,7 @@ clear-db:
 
 # Создание сертификатов SSL
 create-ssl:
-	cd $(DEV_DIR) && openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout key.pem -out cert.pem
+	cd $(DEV_DIR) && openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout key.pem -out cert.pem -subj "//C=//ST=//L=//O=//OU=//CN=//emailAddress="
 
 # Запуск сервера разработки через Uvicorn по протоколу https
 # До этого ОБЯЗАТЕЛЬНО выполнить команду "create-ssl" для создания сертификатов
