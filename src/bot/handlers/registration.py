@@ -4,15 +4,13 @@ from django.urls import reverse
 from django.conf import settings
 
 from core.logging import log_errors
-from bot.messages_texts.constants import (
-    REGISTRATION_HELP_TEXT
-)
+from bot.messages_texts.constants import REGISTRATION_HELP_TEXT
 
 
 @log_errors
-async def user_consent_to_registration(
+async def registration(
     update: Update,
-    context: ContextTypes.DEFAULT_TYPE
+    context: ContextTypes.DEFAULT_TYPE,
 ):
     """
     `/registration` command handler.
@@ -29,14 +27,14 @@ async def user_consent_to_registration(
                         url=(
                             f'{settings.BASE_URL}'
                             f'{reverse('registration:registration')}'
-                        )
-                    )
-                )
+                        ),
+                    ),
+                ),
             ]],
             resize_keyboard=True
         ),
     )
 
 registration_handler = CommandHandler(
-    'registration', user_consent_to_registration
+    registration.__name__, registration,
 )

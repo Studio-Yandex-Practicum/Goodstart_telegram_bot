@@ -8,7 +8,7 @@ from loguru import logger
 from telegram.ext import ApplicationBuilder, Application
 
 from bot.handlers import (
-    echo_handler, start_handler, registration_handler
+    echo_handler, start_handler, registration_handler,
 )
 
 

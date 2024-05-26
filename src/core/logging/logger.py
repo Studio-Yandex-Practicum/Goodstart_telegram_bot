@@ -1,6 +1,10 @@
+import functools
+
+
 def log_errors(f):
     """Log errors decorator raised by the decorated function."""
 
+    @functools.wraps(f)
     def inner(*args, **kwargs):
         try:
             return f(*args, **kwargs)
