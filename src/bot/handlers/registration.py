@@ -37,27 +37,6 @@ async def user_consent_to_registration(
         ),
     )
 
-
-@log_errors
-async def user_refuses_to_registration(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-    """
-    `/refuses` command handler.
-
-    Add description.
-    """
-    telegram_id = update.effective_chat.id
-    await context.bot.send_message(
-        chat_id=telegram_id,
-        text='Test message refuses',
-    )
-
-
 registration_handler = CommandHandler(
     'registration', user_consent_to_registration
-)
-refuses_registration_handler = CommandHandler(
-    'refuses', user_refuses_to_registration
 )

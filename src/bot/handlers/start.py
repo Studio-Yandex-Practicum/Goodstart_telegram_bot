@@ -19,9 +19,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = await check_user_from_db(telegram_id, (Teacher, Student))
 
     registration_buttons = ReplyKeyboardMarkup(
-        [['/registration', '/refuses']],
+        [['/registration']],
         resize_keyboard=True
-        )
+    )
 
     if user:
         await context.bot.send_message(
