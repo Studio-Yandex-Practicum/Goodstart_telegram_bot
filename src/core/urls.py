@@ -3,7 +3,6 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
-from core.views import send_greeting_email
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -11,9 +10,7 @@ urlpatterns = [
         'registration/',
         include('potential_user.urls'),
         name='registration',
-        ),
-    # TODO: убрать после реализации функционала
-    path('mail/', send_greeting_email, name='send-email'),
+    ),
 ]
 
 if settings.DEBUG:
