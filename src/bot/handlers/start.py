@@ -1,13 +1,17 @@
-from telegram import Update, ReplyKeyboardMarkup
+from telegram import Update, InlineKeyboardMarkup, KeyboardButton, WebAppInfo
 from telegram.ext import CommandHandler, ContextTypes
+from django.urls import reverse
+from django.conf import settings
 
+from core.logging import log_errors
 from schooling.models import Teacher, Student
 from bot.utils import check_user_from_db
 from bot.messages_texts.constants import (
-    WELCOME_MSG, REGISTRATION_MSG,
+    WELCOME_MSG, REGISTRATION_MSG
 )
 
 
+@log_errors
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     `/start` command handler.
@@ -18,21 +22,27 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     telegram_id = update.effective_chat.id
     user = await check_user_from_db(telegram_id, (Teacher, Student))
 
-    registration_buttons = ReplyKeyboardMarkup(
-        [['/registration']],
-        resize_keyboard=True,
-    )
-
     if user:
         await context.bot.send_message(
             chat_id=telegram_id,
             text=WELCOME_MSG,
         )
     else:
-        await context.bot.send_message(
-            chat_id=telegram_id,
-            text=REGISTRATION_MSG,
-            reply_markup=registration_buttons,
+        await update.message.reply_text(
+            REGISTRATION_MSG,
+            reply_markup=InlineKeyboardMarkup(
+                inline_keyboard=[[
+                    KeyboardButton(
+                        text='Открыть форму регистрации',
+                        web_app=WebAppInfo(
+                            url=(
+                                f'{settings.BASE_URL}'
+                                f'{reverse('registration:registration')}'
+                            ),
+                        ),
+                    ),
+                ]],
+            ),
         )
 
 start_handler = CommandHandler(start.__name__, start)

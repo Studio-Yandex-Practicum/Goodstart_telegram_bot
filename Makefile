@@ -4,6 +4,7 @@ MANAGE_DIR := $(PROJECT_DIR)/src/manage.py
 DJANGO_DIR := $(PROJECT_DIR)/src
 POETRY_RUN := poetry run python
 DJANGO_RUN := $(POETRY_RUN) $(MANAGE_DIR)
+DEV_DIR := $(PROJECT_DIR)/infra/dev
 DEV_DOCK_FILE := $(PROJECT_DIR)/infra/dev/docker-compose_local.yaml
 SHELL_GREEN = \033[32m
 SHELL_YELLOW = \033[33m
@@ -83,12 +84,13 @@ clear-db:
 		docker compose -f $(DEV_DOCK_FILE) down --volumes; \
 	fi
 
-# Запуск сервера разработки через Uvicorn
-run-dev:
-	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_dev:application --reload --lifespan on
+# Создание сертификатов SSL
+create-ssl:
+	cd $(DEV_DIR) && openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout key.pem -out cert.pem
 
 # Запуск сервера разработки через Uvicorn по протоколу https
-run-dev-https:
+# До этого ОБЯЗАТЕЛЬНО выполнить команду "create-ssl" для создания сертификатов
+run-dev:
 	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_dev:application --reload --ssl-keyfile=../infra/dev/key.pem --ssl-certfile=../infra/dev/cert.pem --lifespan on
 
 # Запуск сервера продакшена через Uvicorn
