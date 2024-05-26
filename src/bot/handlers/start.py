@@ -7,7 +7,7 @@ from core.logging import log_errors
 from schooling.models import Teacher, Student
 from bot.utils import check_user_from_db
 from bot.messages_texts.constants import (
-    WELCOME_MSG, REGISTRATION_MSG
+    WELCOME_MSG, REGISTRATION_MSG,
 )
 
 
