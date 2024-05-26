@@ -31,7 +31,7 @@ async def registration(
                     ),
                 ),
             ]],
-            resize_keyboard=True
+            resize_keyboard=True,
         ),
     )
 
