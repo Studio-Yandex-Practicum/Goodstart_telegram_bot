@@ -14,7 +14,7 @@ from potential_user.models import ApplicationForm
 @receiver(post_save, sender=ApplicationForm)
 def create_user_from_application(sender, instance, created, **kwargs):
     """Функция создания пользователя согласно роли в заявке."""
-    if instance.approved and created:
+    if instance.approved:
         if instance.role == 'teacher':
             user_model = Teacher
         elif instance.role == 'student':
@@ -27,6 +27,7 @@ def create_user_from_application(sender, instance, created, **kwargs):
                 city=instance.city,
                 phone_number=instance.phone_number,
             )
+            instance.delete()
         except IntegrityError as err:
             raise ValueError(
                 f'Пользователь с telegram_id {instance.telegram_id} '

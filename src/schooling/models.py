@@ -9,7 +9,7 @@ MAX_LEN_CITY = 50
 class GeneralUserModel(models.Model):
     """Базовая, абстрактная модель пользователя."""
 
-    telegram_id = models.IntegerField('Telegram ID', unique=True)
+    telegram_id = models.BigIntegerField('Telegram ID', unique=True)
     name = models.CharField('Имя', max_length=MAX_LEN_NAME_SURNAME)
     surname = models.CharField('Фамилия', max_length=MAX_LEN_NAME_SURNAME)
     city = models.CharField('Город', max_length=MAX_LEN_CITY)
@@ -59,12 +59,13 @@ class Student(GeneralUserModel):
         on_delete=models.DO_NOTHING,
         verbose_name='ID учебного класса',
         related_name='students',
-    )
-    paid_lessons = models.PositiveIntegerField('Оплаченые занятия')
+        null=True,
+        )
+    paid_lessons = models.PositiveIntegerField('Оплаченые занятия', default=0)
     parents_contacts = models.CharField(
         max_length=256,  # Переписать значение!
         verbose_name='Контакты представителей',
-    )
+        )
     subjects = models.ManyToManyField(
         'Subject',
         verbose_name='Предмет',
