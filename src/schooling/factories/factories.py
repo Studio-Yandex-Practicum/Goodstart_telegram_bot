@@ -24,8 +24,8 @@ class StudentFactory(DjangoModelFactory):
 
     telegram_id = factory.Sequence(
         lambda id_tel: FuzzyInteger(
-            START_TELEGRAM_ID_VALUE, END_TELEGRAM_ID_VALUE
-        ).fuzz()
+            START_TELEGRAM_ID_VALUE, END_TELEGRAM_ID_VALUE,
+        ).fuzz(),
     )
     name = factory.Faker('first_name')
     surname = factory.Faker('last_name')
@@ -43,7 +43,7 @@ class StudentFactory(DjangoModelFactory):
         lambda some: f'+7495{FuzzyInteger(
             START_PHONE_VALUE, END_PHONE_VALUE,
         ).fuzz()}',
-    )
+    ),
     ])
 
     @classmethod
