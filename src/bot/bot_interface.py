@@ -7,7 +7,9 @@ from django.conf import settings
 from loguru import logger
 from telegram.ext import ApplicationBuilder, Application
 
-from bot.handlers import echo_handler, start_handler
+from bot.handlers import (
+    echo_handler, start_handler,
+)
 
 
 class Bot:

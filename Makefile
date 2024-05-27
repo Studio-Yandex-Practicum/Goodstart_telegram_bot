@@ -4,6 +4,7 @@ MANAGE_DIR := $(PROJECT_DIR)/src/manage.py
 DJANGO_DIR := $(PROJECT_DIR)/src
 POETRY_RUN := poetry run python
 DJANGO_RUN := $(POETRY_RUN) $(MANAGE_DIR)
+DEV_DIR := $(PROJECT_DIR)/infra/dev
 DEV_DOCK_FILE := $(PROJECT_DIR)/infra/dev/docker-compose_local.yaml
 SHELL_GREEN = \033[32m
 SHELL_YELLOW = \033[33m
@@ -25,6 +26,7 @@ help:
 	@echo "	stop-db         - $(SHELL_GREEN)Команда для остановки локального контейнера postgres.$(SHELL_NC)"
 	@echo "	clear-db        - $(SHELL_GREEN)Команда для очистки volume локального контейнера postgres.$(SHELL_NC)"
 	@echo "	run-dev         - $(SHELL_GREEN)Команда для локального запуска проекта(разработка).$(SHELL_NC)"
+	@echo "	create-ssl      - $(SHELL_GREEN)Команда для созданиея сертификатов SSL(разработка).$(SHELL_NC)"
 	@echo "	help            - $(SHELL_GREEN)Команда вызова справки.$(SHELL_NC)"
 	@echo "$(SHELL_YELLOW)Для запуска исполнения команд используйте данные ключи совместно с командой 'make', например 'make init-app'."
 	@echo "При запуске команды 'make' без какого либо ключа, происходит вызов справки.$(SHELL_NC)"
@@ -83,9 +85,14 @@ clear-db:
 		docker compose -f $(DEV_DOCK_FILE) down --volumes; \
 	fi
 
-# Запуск сервера разработки через Uvicorn
+# Создание сертификатов SSL
+create-ssl:
+	cd $(DEV_DIR) && mkcert -key-file key.pem -cert-file cert.pem localhost 127.0.0.1
+
+# Запуск сервера разработки через Uvicorn по протоколу https
+# До этого ОБЯЗАТЕЛЬНО выполнить команду "create-ssl" для создания сертификатов
 run-dev:
-	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_dev:application --reload --lifespan on
+	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_dev:application --reload --ssl-keyfile=../infra/dev/key.pem --ssl-certfile=../infra/dev/cert.pem --lifespan on
 
 # Запуск сервера продакшена через Uvicorn
 run-prod:
