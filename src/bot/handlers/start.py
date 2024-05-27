@@ -25,7 +25,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f'Привет, я бот онлайн школы GoodStart!\n\n'
         f'Похоже, ты еще не зарегистрирован в нашей онлайн школе '
         f'GoodStart.\nДавай зарегистрируемся прямо сейчас по ссылке '
-        f'{settings.BASE_URL}{reverse("registration:registration")}'
+        f'{settings.BASE_URL}{reverse("registration:registration",
+                                      kwargs={"id": telegram_id})}'
     )
 
     await context.bot.send_message(

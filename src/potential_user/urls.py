@@ -5,7 +5,7 @@ from potential_user.views import RegistrationCreateView, registration_success
 app_name = 'registration'
 
 urlpatterns = [
-    path('',
+    path('<int:id>/',
          RegistrationCreateView.as_view(),
          name='registration'),
     path('registration_success/',

@@ -7,3 +7,7 @@ class PotentialUserConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'potential_user'
     verbose_name = 'Заявки на регистрацию'
+
+    def ready(self) -> None:
+        """Подлючает сигналы."""
+        from core import utils # noqa

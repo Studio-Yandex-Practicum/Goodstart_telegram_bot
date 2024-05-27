@@ -4,7 +4,6 @@ from django.shortcuts import render
 
 from potential_user.forms import RegistrationForm
 from potential_user.models import ApplicationForm
-from potential_user.utils import get_telegram_id
 
 
 class RegistrationCreateView(CreateView):
@@ -17,7 +16,7 @@ class RegistrationCreateView(CreateView):
     # TODO убрать после реализации получения telegram_id
     def form_valid(self, form):
         """Присваивает telegram_id."""
-        form.instance.telegram_id = get_telegram_id()
+        form.instance.telegram_id = self.kwargs.get('id')
         return super().form_valid(form)
 
     def get_success_url(self):
