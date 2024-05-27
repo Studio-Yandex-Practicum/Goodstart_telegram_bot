@@ -19,7 +19,6 @@ class RegistrationCreateView(CreateView):
         """Присваивает telegram_id."""
         form.instance.telegram_id = self.kwargs.get('id')
         return super().form_valid(form)
-        form.instance.telegram_id = get_telegram_id()
         response = super().form_valid(form)
         # TODO Добавить логгер обработки отправки письма
         send_registration_email(self.object)
