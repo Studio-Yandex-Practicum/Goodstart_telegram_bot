@@ -121,3 +121,54 @@ class StudyClass(models.Model):
     def __str__(self):
         """Return a studyclass string representation."""
         return self.study_class_name
+
+
+class Lesson(models.Model):
+    """Модель для хранения информации о занятиях."""
+
+    name = models.CharField('Название занятия', max_length=256)
+    subject = models.ForeignKey(
+        'Subject',
+        on_delete=models.CASCADE,
+        verbose_name='Предмет',
+        related_name='lessons',
+    )
+    teacher_id = models.ForeignKey(
+        'Teacher',
+        on_delete=models.CASCADE,
+        verbose_name='ID преподавателя',
+        related_name='lessons',
+    )
+    student_id = models.ForeignKey(
+        'Student',
+        on_delete=models.CASCADE,
+        verbose_name='ID студента',
+        related_name='lessons',
+    )
+    datetime_start = models.DateTimeField('Время начала занятия')
+    datetime_end = models.DateTimeField('Время окончания занятия')
+    is_passed = models.BooleanField('Занятие прошло', default=False)
+    test_lesson = models.BooleanField('Тестовое занятие', default=False)
+
+    class Meta:
+        """Meta class of LessonModel."""
+
+        verbose_name = 'Занятие'
+        verbose_name_plural = 'Занятия'
+        constraints = [
+            models.UniqueConstraint(
+                fields=[
+                    'name',
+                    'subject',
+                    'teacher_id',
+                    'student_id',
+                    'datetime_start',
+                    'datetime_end',
+                ],
+                name='unique_lesson',
+            ),
+        ]
+
+    def __str__(self):
+        """Return a lesson string representation."""
+        return f'{self.name} {self.subject.name}'

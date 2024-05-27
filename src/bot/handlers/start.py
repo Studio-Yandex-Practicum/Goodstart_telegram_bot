@@ -17,6 +17,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     telegram_id = update.effective_chat.id
     user = await check_user_from_db(telegram_id, (Teacher, Student))
 
+    #TODO перенести сообщения в отдельный файл constants
     welcome_msg = (
         'Привет, я бот онлайн школы GoodStart!\n\n'
         'Здесь ты найдёшь лучших преподавателей.'

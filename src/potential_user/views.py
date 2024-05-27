@@ -4,6 +4,7 @@ from django.shortcuts import render
 
 from potential_user.forms import RegistrationForm
 from potential_user.models import ApplicationForm
+from core.utils import send_registration_email
 
 
 class RegistrationCreateView(CreateView):
@@ -18,6 +19,11 @@ class RegistrationCreateView(CreateView):
         """Присваивает telegram_id."""
         form.instance.telegram_id = self.kwargs.get('id')
         return super().form_valid(form)
+        form.instance.telegram_id = get_telegram_id()
+        response = super().form_valid(form)
+        # TODO Добавить логгер обработки отправки письма
+        send_registration_email(self.object)
+        return response
 
     def get_success_url(self):
         """Переадресовывет на страницу успешной регистрации."""
