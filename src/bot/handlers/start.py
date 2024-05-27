@@ -37,7 +37,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         web_app=WebAppInfo(
                             url=(
                                 f'{settings.BASE_URL}'
-                                f'{reverse('registration:registration')}'
+                                f'{reverse(
+                                    'registration:registration',
+                                    kwargs={"id": telegram_id},
+                                    )
+                                }'
                             ),
                         ),
                     ),
