@@ -10,4 +10,4 @@ class RegistrationForm(forms.ModelForm):
         """Form meta class."""
 
         model = ApplicationForm
-        fields = {'name', 'role', 'surname', 'phone_number', 'city', }
+        fields = ('name', 'surname', 'role', 'city', 'phone_number',)
