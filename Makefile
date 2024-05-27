@@ -26,6 +26,7 @@ help:
 	@echo "	stop-db         - $(SHELL_GREEN)Команда для остановки локального контейнера postgres.$(SHELL_NC)"
 	@echo "	clear-db        - $(SHELL_GREEN)Команда для очистки volume локального контейнера postgres.$(SHELL_NC)"
 	@echo "	run-dev         - $(SHELL_GREEN)Команда для локального запуска проекта(разработка).$(SHELL_NC)"
+	@echo "	create-ssl      - $(SHELL_GREEN)Команда для созданиея сертификатов SSL(разработка).$(SHELL_NC)"
 	@echo "	help            - $(SHELL_GREEN)Команда вызова справки.$(SHELL_NC)"
 	@echo "$(SHELL_YELLOW)Для запуска исполнения команд используйте данные ключи совместно с командой 'make', например 'make init-app'."
 	@echo "При запуске команды 'make' без какого либо ключа, происходит вызов справки.$(SHELL_NC)"
