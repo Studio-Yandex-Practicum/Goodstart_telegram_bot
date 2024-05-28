@@ -13,6 +13,7 @@ from .constants import (
     END_TELEGRAM_ID_VALUE,
     START_RANDOM_VALUE,
     STOP_RANDOM_VALUE,
+    LOCALE,
 )
 
 
@@ -27,9 +28,9 @@ class StudentFactory(DjangoModelFactory):
             START_TELEGRAM_ID_VALUE, END_TELEGRAM_ID_VALUE,
         ).fuzz(),
     )
-    name = factory.Faker('first_name')
-    surname = factory.Faker('last_name')
-    city = factory.Faker('city')
+    name = factory.Faker('first_name', locale=LOCALE)
+    surname = factory.Faker('last_name', locale=LOCALE)
+    city = factory.Faker('city', locale=LOCALE)
     phone_number = factory.Sequence(
         lambda some: f'+7495{FuzzyInteger(
             START_PHONE_VALUE, END_PHONE_VALUE,
@@ -38,7 +39,7 @@ class StudentFactory(DjangoModelFactory):
     study_class_id = factory.Iterator(StudyClass.objects.all())
     paid_lessons = FuzzyInteger(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
     parents_contacts = factory.List([
-        factory.Faker('name'),
+        factory.Faker('name', locale=LOCALE),
         factory.Sequence(
         lambda some: f'+7495{FuzzyInteger(
             START_PHONE_VALUE, END_PHONE_VALUE,
