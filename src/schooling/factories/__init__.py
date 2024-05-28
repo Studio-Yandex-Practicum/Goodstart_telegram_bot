@@ -1,0 +1,1 @@
+from .factories import create_students  # noqa

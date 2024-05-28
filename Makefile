@@ -60,6 +60,9 @@ createsuperuser:
 create_test_admins:
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) create_test_admins
 
+# Создание тестовых объектов класса Student
+create_test_students:
+	cd $(PROJECT_DIR) && $(DJANGO_RUN) create_test_students
 
 # Запуск локального контейнера Postgres
 start-db:
