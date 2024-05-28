@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0dxh3w9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="17.6.2">
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0dxh3w9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="17.6.4">
   <bpmn:collaboration id="Collaboration_111skrt">
     <bpmn:participant id="Participant_1gisy3q" name="Процесс регистрации в ТГ боте GoodStart" processRef="Process_0k2ve41" />
     <bpmn:textAnnotation id="TextAnnotation_09h9aq7">
@@ -16,12 +16,10 @@
         <bpmn:flowNodeRef>Gateway_0zgx4ws</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_19i7sdu</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1kvd9yx</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_0nddrc2</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_11wwdc5</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_12vv9bl</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_1m0ujf4</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_08fikee</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_05la44t</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_12vv9bl</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="Lane_1xf9m1v" name="User">
         <bpmn:flowNodeRef>Event_1evnw97</bpmn:flowNodeRef>
@@ -86,19 +84,6 @@
       <bpmn:outgoing>Flow_0axqtbf</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_178xp83" />
     </bpmn:intermediateCatchEvent>
-    <bpmn:exclusiveGateway id="Gateway_0nddrc2">
-      <bpmn:incoming>Flow_0axqtbf</bpmn:incoming>
-      <bpmn:outgoing>Flow_1up8ylc</bpmn:outgoing>
-      <bpmn:outgoing>Flow_1qivjcw</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:intermediateThrowEvent id="Event_11wwdc5" name="Отправка приветственного сообщения и возврат в главное меню">
-      <bpmn:incoming>Flow_1up8ylc</bpmn:incoming>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0704otw" />
-    </bpmn:intermediateThrowEvent>
-    <bpmn:scriptTask id="Activity_12vv9bl" name="Запуск webapp с формой регистрации">
-      <bpmn:incoming>Flow_1qivjcw</bpmn:incoming>
-      <bpmn:outgoing>Flow_0keqk3j</bpmn:outgoing>
-    </bpmn:scriptTask>
     <bpmn:parallelGateway id="Gateway_1m0ujf4">
       <bpmn:incoming>Flow_1684zrw</bpmn:incoming>
       <bpmn:outgoing>Flow_096wo0f</bpmn:outgoing>
@@ -128,13 +113,15 @@
     <bpmn:sequenceFlow id="Flow_1ddtkjc" name="telegram ID нет" sourceRef="Gateway_0zgx4ws" targetRef="Event_19i7sdu" />
     <bpmn:sequenceFlow id="Flow_1vqr9zy" sourceRef="Event_19i7sdu" targetRef="Event_192na3q" />
     <bpmn:sequenceFlow id="Flow_11ytjnq" sourceRef="Event_192na3q" targetRef="Event_1kvd9yx" />
-    <bpmn:sequenceFlow id="Flow_0axqtbf" sourceRef="Event_1kvd9yx" targetRef="Gateway_0nddrc2" />
-    <bpmn:sequenceFlow id="Flow_1up8ylc" name="Отказ от регистрации" sourceRef="Gateway_0nddrc2" targetRef="Event_11wwdc5" />
-    <bpmn:sequenceFlow id="Flow_1qivjcw" name="Согласие на регистрацию" sourceRef="Gateway_0nddrc2" targetRef="Activity_12vv9bl" />
+    <bpmn:sequenceFlow id="Flow_0axqtbf" sourceRef="Event_1kvd9yx" targetRef="Activity_12vv9bl" />
     <bpmn:sequenceFlow id="Flow_0keqk3j" sourceRef="Activity_12vv9bl" targetRef="Activity_0b8lr7k" />
     <bpmn:sequenceFlow id="Flow_1684zrw" sourceRef="Activity_0b8lr7k" targetRef="Gateway_1m0ujf4" />
     <bpmn:sequenceFlow id="Flow_096wo0f" sourceRef="Gateway_1m0ujf4" targetRef="Event_08fikee" />
     <bpmn:sequenceFlow id="Flow_1a9v6ci" sourceRef="Gateway_1m0ujf4" targetRef="Event_05la44t" />
+    <bpmn:scriptTask id="Activity_12vv9bl" name="Запуск webapp с формой регистрации">
+      <bpmn:incoming>Flow_0axqtbf</bpmn:incoming>
+      <bpmn:outgoing>Flow_0keqk3j</bpmn:outgoing>
+    </bpmn:scriptTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_111skrt">
@@ -206,19 +193,6 @@
           <dc:Bounds x="1018" y="585" width="85" height="66" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_0nddrc2_di" bpmnElement="Gateway_0nddrc2" isMarkerVisible="true" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
-        <dc:Bounds x="1265" y="535" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_11wwdc5_di" bpmnElement="Event_11wwdc5" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
-        <dc:Bounds x="1152" y="462" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1127" y="380" width="86" height="66" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_12vv9bl_di" bpmnElement="Activity_12vv9bl" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
-        <dc:Bounds x="1430" y="520" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1m0ujf4_di" bpmnElement="Gateway_1m0ujf4" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
         <dc:Bounds x="1875" y="535" width="50" height="50" />
       </bpmndi:BPMNShape>
@@ -236,6 +210,10 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0b8lr7k_di" bpmnElement="Activity_0b8lr7k" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
         <dc:Bounds x="1660" y="160" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_12vv9bl_di" bpmnElement="Activity_12vv9bl" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="1290" y="520" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_15q51ei_di" bpmnElement="Flow_15q51ei">
@@ -288,25 +266,10 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0axqtbf_di" bpmnElement="Flow_0axqtbf">
         <di:waypoint x="1078" y="560" />
-        <di:waypoint x="1265" y="560" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1up8ylc_di" bpmnElement="Flow_1up8ylc">
-        <di:waypoint x="1290" y="535" />
-        <di:waypoint x="1290" y="480" />
-        <di:waypoint x="1188" y="480" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1218" y="446" width="64" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1qivjcw_di" bpmnElement="Flow_1qivjcw">
-        <di:waypoint x="1315" y="560" />
-        <di:waypoint x="1430" y="560" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1340" y="526" width="66" height="27" />
-        </bpmndi:BPMNLabel>
+        <di:waypoint x="1290" y="560" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0keqk3j_di" bpmnElement="Flow_0keqk3j">
-        <di:waypoint x="1530" y="560" />
+        <di:waypoint x="1390" y="560" />
         <di:waypoint x="1595" y="560" />
         <di:waypoint x="1595" y="200" />
         <di:waypoint x="1660" y="200" />
@@ -337,10 +300,10 @@
           <dc:Bounds x="1669" y="832" width="63" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_09h9aq7_di" bpmnElement="TextAnnotation_09h9aq7">
-        <dc:Bounds x="1430" y="370" width="99.99305040770942" height="112.67605633802818" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1daitpl_di" bpmnElement="Association_1daitpl">
+        <di:waypoint x="1340" y="520" />
+        <di:waypoint x="1340" y="483" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="DataInputAssociation_1dxkvte_di" bpmnElement="DataInputAssociation_1dxkvte">
         <di:waypoint x="540" y="785" />
         <di:waypoint x="540" y="490" />
@@ -353,10 +316,10 @@
         <di:waypoint x="1709" y="240" />
         <di:waypoint x="1700" y="775" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Association_1daitpl_di" bpmnElement="Association_1daitpl">
-        <di:waypoint x="1480" y="520" />
-        <di:waypoint x="1480" y="483" />
-      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_09h9aq7_di" bpmnElement="TextAnnotation_09h9aq7">
+        <dc:Bounds x="1290" y="370" width="100" height="113" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

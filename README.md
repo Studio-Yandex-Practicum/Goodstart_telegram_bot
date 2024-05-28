@@ -17,6 +17,8 @@ CMS для управления пользователями и расписан
 
 3. [Правила работы с git](#git)
 
+4. [Получение SSL сертификатов для разработки](#ssl)
+
 ## Используемые технологии<a id="technologies-project"></a>:
 
 ![Python 3.12](https://img.shields.io/badge/Python-3.12-brightgreen.svg?style=flat&logo=python&logoColor=white)
@@ -55,15 +57,11 @@ CMS для управления пользователями и расписан
 - вкладка <b>Pull requests</b> репозитория на <b>GitHub</b> -> <b>New pull request</b>.
 - необходимо указать целевую ветку и исходную ветку для изменений.
 
-## Авторы проекта
 
-**Константин Райхерт** - Тимлид - [GitHub](https://github.com/KonstantinRaikhert)
+## Получение SSL сертификатов для разработки<a id="ssl"></a>:
 
-Команда разработки:
-- **Антон Браун** - [GitHub](https://github.com/merkme)
-- **Александр Быньков** - [GitHub](https://github.com/BIXBER)
-- **Дмитрий Братков** - [GitHub](https://github.com/dbratkov)
-- **Николай Мельников** - [GitHub](https://github.com/mitsushidu)
-- **Павел Нестеров** - [GitHub](https://github.com/nesterovv89)
-- **Диана Ким** - [GitHub](https://github.com/DianaKim9319)
-- **Евгений Фастунов** - [GitHub](https://github.com/evgeny-fastunov)
+Для начала нужно убедиться, что в `.env` задана переменная `BASE_URL=https://127.0.0.1:8000`
+
+1. Установить [mkcert](https://github.com/FiloSottile/mkcert). Для прльзователей Windows используется `choco`.
+2.  Командой `make create-ssl` создать сертификаты.
+3. Теперь локальный сервер имеет доверенный сертификат и никаких ошибок и предупреждений о "мошеннических" действиях не появляется.
