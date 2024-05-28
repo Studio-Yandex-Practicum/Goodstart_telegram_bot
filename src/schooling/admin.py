@@ -9,9 +9,10 @@ class TeacherAdmin(admin.ModelAdmin):
 
     list_display = ('name', 'surname', 'get_competences')
 
+    @admin.display(description='Предмет')
     def get_competences(self, obj):
         """Return competences."""
-        return '\n'.join([c.competence for c in obj.competence.all()])
+        return '\n'.join([c.name for c in obj.competence.all()])
 
 
 @admin.register(Student)
