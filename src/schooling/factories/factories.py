@@ -71,9 +71,7 @@ class TeacherFactory(PersonFactory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        """
-        Override default `_create` method to set competence and study classes.
-        """
+        """Override `_create` method to set competence and study classes."""
         competence = Subject.objects.order_by('?')[
             :random.randint(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
         ]
