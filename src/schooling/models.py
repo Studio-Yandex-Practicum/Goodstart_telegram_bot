@@ -64,7 +64,7 @@ class Student(GeneralUserModel):
         )
     paid_lessons = models.PositiveIntegerField(
         'Оплаченые занятия',
-        default=0
+        default=0,
     )
     parents_contacts = models.CharField(
         max_length=256,  # Переписать значение!
