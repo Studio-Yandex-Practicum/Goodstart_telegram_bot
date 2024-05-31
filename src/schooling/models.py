@@ -60,11 +60,16 @@ class Student(GeneralUserModel):
         verbose_name='ID учебного класса',
         related_name='students',
         null=True,
+        # Установить либо значение по умолчанию, либо blank=True
         )
-    paid_lessons = models.PositiveIntegerField('Оплаченые занятия', default=0)
+    paid_lessons = models.PositiveIntegerField(
+        'Оплаченые занятия',
+        default=0
+    )
     parents_contacts = models.CharField(
         max_length=256,  # Переписать значение!
         verbose_name='Контакты представителей',
+        # Установить либо значение по умолчанию, либо blank=True
         )
     subjects = models.ManyToManyField(
         'Subject',

@@ -8,7 +8,7 @@ from loguru import logger
 from telegram.ext import ApplicationBuilder, Application
 
 from bot.handlers import (
-    echo_handler, start_handler,
+    echo_handler, start_handler, help_handler,
 )
 
 
@@ -49,6 +49,7 @@ class Bot:
         """Build the application."""
         app = ApplicationBuilder().token(settings.TELEGRAM_TOKEN).build()
         app.add_handler(start_handler)
+        app.add_handler(help_handler)
         app.add_handler(echo_handler)
         logger.info('Bot application built with handlers.')
         return app
