@@ -26,8 +26,6 @@ def create_user_from_application(sender, instance, created, **kwargs):
                 surname=instance.surname,
                 city=instance.city,
                 phone_number=instance.phone_number,
-                # study_class_id=StudyClass.objects.get(id=1),
-                # parents_contacts='null',
             )
             instance.delete()
         except IntegrityError as err:
