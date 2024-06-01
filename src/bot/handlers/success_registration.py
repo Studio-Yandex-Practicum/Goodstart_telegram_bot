@@ -5,12 +5,13 @@ from bot.messages_texts.constants import REGISTRATION_SUCCESS_MSG
 
 
 async def success_registration_webapp(
-        update: Update,
-        context: ContextTypes.DEFAULT_TYPE,
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
 ):
     """
     Выводит сообщение об успешной отправке данных из формы, убирает кнопку
     открытия webapp и удаляет сообщение с просьбой зарегистрироваться.
+
     """
     telegram_id = update.effective_chat.id
     registration_message_id = update.effective_message.message_id - 1
