@@ -33,8 +33,8 @@ async def check_user_from_db(
 
 
 async def check_user_application_exists(
-    telegram_id: int
+    telegram_id: int,
 ) -> bool:
     return await ApplicationForm.objects.filter(
-        telegram_id=telegram_id
+        telegram_id=telegram_id,
     ).aexists()
