@@ -28,7 +28,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=telegram_id,
             text=WELCOME_MSG,
-            reply_markup=await get_root_markup()
+            reply_markup=await get_root_markup(),
         )
     else:
         await update.message.reply_text(

@@ -93,7 +93,7 @@ async def build_main_handler():
     return ConversationHandler(
         entry_points=[start_handler],
         persistent=True,
-        name="main_handler",
+        name='main_handler',
         states={
             States.START: [
                 CallbackQueryHandler(help,
