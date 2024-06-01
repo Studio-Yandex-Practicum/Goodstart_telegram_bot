@@ -9,6 +9,8 @@ from bot.utils import check_user_from_db
 from bot.messages_texts.constants import (
     WELCOME_MSG, REGISTRATION_MSG,
 )
+from bot.keyboards import get_root_markup
+from bot.states import States
 
 
 @log_errors
@@ -26,6 +28,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=telegram_id,
             text=WELCOME_MSG,
+            reply_markup=await get_root_markup()
         )
     else:
         await update.message.reply_text(
@@ -48,5 +51,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ]],
             ),
         )
+    return States.START
 
 start_handler = CommandHandler(start.__name__, start)
