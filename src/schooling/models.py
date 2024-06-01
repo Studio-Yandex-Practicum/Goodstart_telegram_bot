@@ -61,7 +61,10 @@ class Student(GeneralUserModel):
         related_name='students',
         null=True,
         )
-    paid_lessons = models.PositiveIntegerField('Оплаченые занятия', default=0)
+    paid_lessons = models.PositiveIntegerField(
+        'Оплаченые занятия',
+        default=0,
+    )
     parents_contacts = models.CharField(
         max_length=256,  # Переписать значение!
         verbose_name='Контакты представителей',

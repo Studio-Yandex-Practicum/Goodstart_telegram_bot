@@ -15,6 +15,7 @@ from bot.handlers.conversation import help, schedule
 from bot.states import States
 
 
+
 class Bot:
     """A singleton-class representing a Telegram bot."""
 
@@ -60,6 +61,7 @@ class Bot:
             start_handler,
             echo_handler,
             ])
+
         logger.info('Bot application built with handlers.')
         return app
 
