@@ -9,6 +9,7 @@ from telegram.ext import ApplicationBuilder, Application
 
 from bot.handlers import (
     echo_handler, start_handler, help_handler,
+    success_registration_webapp_handler,
 )
 
 
@@ -48,9 +49,10 @@ class Bot:
     async def _build_app(self):
         """Build the application."""
         app = ApplicationBuilder().token(settings.TELEGRAM_TOKEN).build()
-        app.add_handler(start_handler)
-        app.add_handler(help_handler)
-        app.add_handler(echo_handler)
+        app.add_handlers([
+            start_handler, success_registration_webapp_handler,
+            help_handler, echo_handler,
+        ])
         logger.info('Bot application built with handlers.')
         return app
 
