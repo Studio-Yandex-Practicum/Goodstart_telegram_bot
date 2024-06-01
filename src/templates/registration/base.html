@@ -5,6 +5,12 @@
     <title>Телеграм-бот для преподавателей и учеников</title>
     {% load django_bootstrap5 %}
     {% bootstrap_css %}
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+      function webviewClose() {
+        window.Telegram.WebApp.close();
+      }
+    </script>
   </head>
   <body>
     {% include "registration/header.html" %}

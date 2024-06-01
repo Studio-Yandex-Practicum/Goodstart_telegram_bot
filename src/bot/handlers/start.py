@@ -1,4 +1,6 @@
-from telegram import Update, InlineKeyboardMarkup, KeyboardButton, WebAppInfo
+from telegram import (
+    Update, InlineKeyboardMarkup, KeyboardButton, WebAppInfo,
+)
 from telegram.ext import CommandHandler, ContextTypes
 from django.urls import reverse
 from django.conf import settings
@@ -40,9 +42,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         web_app=WebAppInfo(
                             url=(
                                 f'{settings.BASE_URL}'
-                                f'{reverse(
-                                    'registration:registration',
-                                    kwargs={"id": telegram_id},
+                                f'{
+                                    reverse(
+                                        'registration:registration',
+                                        kwargs={'id': telegram_id},
                                     )
                                 }'
                             ),
