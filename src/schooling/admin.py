@@ -28,13 +28,15 @@ class SubjectAdmin(admin.ModelAdmin):
 
     list_display = ('name',)
     exclude = ('subject_key',)
+    ordering = ('name',)
 
 
 @admin.register(StudyClass)
 class StudyClassAdmin(admin.ModelAdmin):
     """Управление учебными классами."""
 
-    list_display = ('study_class_name', 'study_class_number')
+    list_display = ('study_class_name', 'study_class_number',)
+    list_filter = ('study_class_number',)
 
 
 @admin.register(Lesson)

@@ -66,7 +66,7 @@ class AdministratorAdmin(UserAdmin):
         ),
     )
 
-    list_display = ('email',)
+    list_display = ('first_name', 'last_name', 'email', 'last_login',)
     search_fields = ('email',)
     list_filter = ('is_staff',)
     search_help_text = 'Поиск по почте или имени пользователя.'
