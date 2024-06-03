@@ -20,7 +20,7 @@ TELEGRAM_TOKEN = env('TELEGRAM_TOKEN')
 ALLOWED_HOSTS = ['*']
 
 DEFAULT_APPS = [
-    'django.contrib.admin',
+    'core.apps.GoodStartAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
