@@ -1,2 +1,4 @@
-from .factories import create_students  # noqa
-from .factories import create_teachers  # noqa
+__all__ = ['create_students', 'create_teachers']
+
+from .factories import create_students
+from .factories import create_teachers
