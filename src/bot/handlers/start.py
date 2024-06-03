@@ -35,6 +35,7 @@ async def start(
             text=WELCOME_MSG,
             reply_markup=await get_root_markup(),
         )
+        return States.START
 
     else:
         if await check_user_application_exists(telegram_id):
@@ -63,7 +64,5 @@ async def start(
                     resize_keyboard=True,
                 ),
             )
-
-    return States.START
 
 start_handler = CommandHandler(start.__name__, start,)
