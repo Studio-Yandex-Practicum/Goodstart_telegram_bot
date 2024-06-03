@@ -169,3 +169,5 @@ static/
 
 #SSL certificates
 *.pem
+
+/persistence_data
