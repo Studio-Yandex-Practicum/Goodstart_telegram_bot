@@ -11,6 +11,8 @@ from bot.utils import check_user_from_db, check_user_application_exists
 from bot.messages_texts.constants import (
     WELCOME_MSG, REGISTRATION_MSG, APPLICATION_EXISTS_MSG,
 )
+from bot.keyboards import get_root_markup
+from bot.states import States
 
 
 @log_errors
@@ -31,6 +33,7 @@ async def start(
         await context.bot.send_message(
             chat_id=telegram_id,
             text=WELCOME_MSG,
+            reply_markup=await get_root_markup(),
         )
 
     else:
@@ -60,5 +63,7 @@ async def start(
                     resize_keyboard=True,
                 ),
             )
+
+    return States.START
 
 start_handler = CommandHandler(start.__name__, start,)

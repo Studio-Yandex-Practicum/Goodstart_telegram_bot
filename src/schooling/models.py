@@ -121,6 +121,10 @@ class StudyClass(models.Model):
         verbose_name='Номер учебного класса',
     )
 
+    class Meta:
+        verbose_name = 'Учебный класс'
+        verbose_name_plural = 'Учебные классы'
+
     def __str__(self):
         """Return a studyclass string representation."""
         return self.study_class_name
