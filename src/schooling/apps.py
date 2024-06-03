@@ -6,3 +6,7 @@ class SchoolingConfig(AppConfig):
 
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'schooling'
+
+    def ready(self) -> None:
+        """Подлючает сигналы."""
+        from schooling import utils # noqa

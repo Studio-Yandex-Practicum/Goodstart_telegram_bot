@@ -13,6 +13,3 @@ RUN poetry install
 WORKDIR ./src
 
 CMD ["poetry", "run", "uvicorn", "core.asgi_prod:application", "--reload", "--lifespan", "on", "--host", "0.0.0.0", "--port", "8000"]
-
-
-

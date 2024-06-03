@@ -5,11 +5,15 @@ from typing import Self
 
 from django.conf import settings
 from loguru import logger
-from telegram.ext import ApplicationBuilder, Application
+from telegram import Update
+from telegram.ext import (Application, ApplicationBuilder,
+                          CallbackQueryHandler, ConversationHandler,
+                          PicklePersistence)
 
-from bot.handlers import (
-    echo_handler, start_handler, help_handler,
-)
+from bot.handlers import echo_handler, start_handler
+from bot.handlers.conversation import help, schedule
+from bot.states import States
+
 
 
 class Bot:
@@ -47,10 +51,17 @@ class Bot:
 
     async def _build_app(self):
         """Build the application."""
-        app = ApplicationBuilder().token(settings.TELEGRAM_TOKEN).build()
-        app.add_handler(start_handler)
-        app.add_handler(help_handler)
-        app.add_handler(echo_handler)
+        persistence = PicklePersistence(filepath=settings.PERSISTENCE_PATH)
+        app = ApplicationBuilder().token(
+            settings.TELEGRAM_TOKEN).persistence(
+                persistence).build()
+        main_handler = await build_main_handler()
+        app.add_handlers([
+            main_handler,
+            start_handler,
+            echo_handler,
+            ])
+
         logger.info('Bot application built with handlers.')
         return app
 
@@ -69,7 +80,7 @@ class Bot:
         """Start the bot."""
         self._app = await self._build_app()
         await self._app.initialize()
-        await self._app.updater.start_polling()
+        await self._app.updater.start_polling(allowed_updates=Update.ALL_TYPES)
         await self._app.start()
         logger.info('Bot is running.')
         while not self._stop_event.is_set():
@@ -77,3 +88,21 @@ class Bot:
 
         await self._app.stop()
         logger.info('Bot stopped.')
+
+
+async def build_main_handler():
+    """Функция создания главного обработчика."""
+    return ConversationHandler(
+        entry_points=[start_handler],
+        persistent=True,
+        name='main_handler',
+        states={
+            States.START: [
+                CallbackQueryHandler(help,
+                                     pattern=f'^{States.HELP.value}$'),
+                CallbackQueryHandler(schedule,
+                                     pattern=f'^{States.SCHEDULE.value}$'),
+            ],
+        },
+        fallbacks=[start_handler],
+        )

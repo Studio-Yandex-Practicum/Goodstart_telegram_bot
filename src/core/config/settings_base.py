@@ -125,3 +125,6 @@ EMAIL_USE_SSL = True
 DEFAULT_RECEIVER = env.str('DEFAULT_EMAIL_ADDRESS', default='NOT_SET')
 
 BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:8000')
+
+PERSISTENCE_DIR = ROOT_DIR / 'persistence_data'
+PERSISTENCE_PATH = PERSISTENCE_DIR / 'persistence_file'
