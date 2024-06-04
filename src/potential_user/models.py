@@ -1,5 +1,8 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+
+from schooling.models import StudyClass
 
 
 class ApplicationForm(models.Model):
@@ -37,6 +40,22 @@ class ApplicationForm(models.Model):
         'Номер телефона',
         help_text='Формат +7XXXXXXXXXX',
     )
+    study_class_id = models.ForeignKey(
+        StudyClass,
+        # TODO После реализации модели StudyClass проработать правило удаления
+        on_delete=models.DO_NOTHING,
+        verbose_name='ID учебного класса',
+        related_name='potential_user',
+        blank=True,
+        null=True,
+        )
+    parents_contacts = models.CharField(
+        max_length=256,  # Переписать значение!
+        verbose_name='Контакты представителей',
+        blank=True,
+        null=True,
+        )
+
     approved = models.BooleanField(default=False)
 
     class Meta:
@@ -48,3 +67,12 @@ class ApplicationForm(models.Model):
     def __str__(self):
         """Return a string representation."""
         return f'{self.name} {self.surname} {self.role}'
+
+    def validate_constraints(self, exclude) -> None:
+        """Валидатор для роли Студента."""
+        if self.role == 'student' and (not self.parents_contacts
+                                       or not self.study_class_id):
+            raise ValidationError('Для роли Студент поля "ID учебного класса" '
+                                  'и "Контакты представителей должны быть'
+                                  ' заполнены!"')
+        return super().validate_constraints(exclude)
