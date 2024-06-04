@@ -1,4 +1,6 @@
-from telegram import Update, InlineKeyboardMarkup, KeyboardButton, WebAppInfo
+from telegram import (
+    Update, InlineKeyboardMarkup, KeyboardButton, WebAppInfo,
+)
 from telegram.ext import CommandHandler, ContextTypes
 from django.urls import reverse
 from django.conf import settings
@@ -9,6 +11,8 @@ from bot.utils import check_user_from_db
 from bot.messages_texts.constants import (
     WELCOME_MSG, REGISTRATION_MSG,
 )
+from bot.keyboards import get_root_markup
+from bot.states import States
 
 
 @log_errors
@@ -26,6 +30,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=telegram_id,
             text=WELCOME_MSG,
+            reply_markup=await get_root_markup(),
         )
     else:
         await update.message.reply_text(
@@ -37,9 +42,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         web_app=WebAppInfo(
                             url=(
                                 f'{settings.BASE_URL}'
-                                f'{reverse(
-                                    'registration:registration',
-                                    kwargs={"id": telegram_id},
+                                f'{
+                                    reverse(
+                                        'registration:registration',
+                                        kwargs={'id': telegram_id},
                                     )
                                 }'
                             ),
@@ -48,5 +54,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ]],
             ),
         )
+    return States.START
 
 start_handler = CommandHandler(start.__name__, start)

@@ -24,6 +24,7 @@ DEFAULT_APPS = [
     'material',
     'material.admin',
     # 'django.contrib.admin',
+    'core.apps.GoodStartAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -150,3 +151,5 @@ MATERIAL_ADMIN_SITE = {
     #     'site': 'contact_mail',
     # }
 }
+PERSISTENCE_DIR = ROOT_DIR / 'persistence_data'
+PERSISTENCE_PATH = PERSISTENCE_DIR / 'persistence_file'

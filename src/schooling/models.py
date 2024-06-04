@@ -61,7 +61,10 @@ class Student(GeneralUserModel):
         related_name='students',
         null=True,
         )
-    paid_lessons = models.PositiveIntegerField('Оплаченые занятия', default=0)
+    paid_lessons = models.PositiveIntegerField(
+        'Оплаченые занятия',
+        default=0,
+    )
     parents_contacts = models.CharField(
         max_length=256,  # Переписать значение!
         verbose_name='Контакты представителей',
@@ -117,6 +120,10 @@ class StudyClass(models.Model):
     study_class_number = models.PositiveIntegerField(
         verbose_name='Номер учебного класса',
     )
+
+    class Meta:
+        verbose_name = 'Учебный класс'
+        verbose_name_plural = 'Учебные классы'
 
     def __str__(self):
         """Return a studyclass string representation."""
