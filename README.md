@@ -15,6 +15,8 @@ CMS для управления пользователями и расписан
 
    1.4. [BPMN диаграмма (кейс взаимодействия с преподавателем)](docs/bpmn/teacher_interaction.jpg)
 
+   1.5. [BPMN диаграмма (кейс взаимодействия с учеником)](docs/bpmn/student_interaction.jpg)
+
 2. [Используемые технологий](#technologies-project)
 
 3. [Правила работы с git](#git)
@@ -22,6 +24,8 @@ CMS для управления пользователями и расписан
 4. [Получение SSL сертификатов для разработки](#ssl)
 
 5. [Добавление конечного автомата (Finite State Machine)](#fsm)
+
+6. [Конфигурация админ панели на основе django-admin-material](#dma)
 
 ## Используемые технологии<a id="technologies-project"></a>:
 
@@ -73,13 +77,13 @@ CMS для управления пользователями и расписан
 
 ## Добавление конечного автомата (Finite State Machine)<a id="fsm"></a>:
 
-Для хранения состояния пользователя в диалоге с ботом на случай перезагрузки сервера или других случаев обрыва диалога необходимо внедрение конечных автоматов (Finite State Machine, далее FSM). Состояние предлагается хранить в Postgres. 
+Для хранения состояния пользователя в диалоге с ботом на случай перезагрузки сервера или других случаев обрыва диалога необходимо внедрение конечных автоматов (Finite State Machine, далее FSM). Состояние предлагается хранить в Postgres.
 
 Для организации работы FSM выбрана библиотека [viewflow.fsm](https://docs.viewflow.io/fsm), которая обеспечивает логику работы автомата и интеграцию в Django ORM.
 
 Для ее внедрения понадобится
 
-1. Класс с состояниями примерно такого вида 
+1. Класс с состояниями примерно такого вида
 
 ```
 from django.db.models import TextChoices:
@@ -105,7 +109,7 @@ from viewflow.fsm import State
 
 class UserFlow:
     state = State(UserState, default=UserState.START)
-    
+
     # Класс принимает объект пользователя при инициализации
     def __init__(self, user):
         self.user = user
@@ -117,13 +121,13 @@ class UserFlow:
     @state.getter()
     def _get_user_stage(self):
         return self.user.state
-    
+
     # Автоматическое сохранение изменений поля state в объекте пользователя
     @state.on_success()
     def _on_transition_success(self, descriptor, source, target):
         self.user.save()
-    
-    # Пример перехода из состояния в состояние. 
+
+    # Пример перехода из состояния в состояние.
     # state.ANY в поле source отвечает за любое положение.
     # source может принимать несколько объектов (напр. кортеж)
     @state.transition(source=UserState.START, target=UserState.CANCEL)
@@ -132,9 +136,9 @@ class UserFlow:
 ```
 Подробнее про wrapper @transition можно [прочитать](https://docs.viewflow.io/fsm/options.html) в документации
 
-4. Для подключения FSM к боту необходимо в хэндлере создать объект из класса UserFlow, передав в него объект пользователя. С помощью этого объекта провести необходимые манипуляции с состоянием и вернуть состояние в конце работы хэндлера. 
+4. Для подключения FSM к боту необходимо в хэндлере создать объект из класса UserFlow, передав в него объект пользователя. С помощью этого объекта провести необходимые манипуляции с состоянием и вернуть состояние в конце работы хэндлера.
 
-Например: 
+Например:
 ```
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     telegram_id = update.effective_chat.id
@@ -145,3 +149,33 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_flow.cancel()
     return user_flow.state
 ```
+
+## Конфигурация админ панели на основе django-admin-material<a id="dma"></a>:
+
+Cписок всех настроек.
+
+```
+MATERIAL_ADMIN_SITE = {
+'HEADER': _('Your site header'), # Admin site header
+'TITLE': _('Your site title'), # Admin site title
+'FAVICON': 'path/to/favicon', # Admin site favicon (path to static should be specified)
+'MAIN_BG_COLOR': 'color', # Admin site main color, css color should be specified
+'MAIN_HOVER_COLOR': 'color', # Admin site main hover color, css color should be specified
+'PROFILE_PICTURE': 'path/to/image', # Admin site profile picture (path to static should be specified)
+'PROFILE_BG': 'path/to/image', # Admin site profile background (path to static should be specified)
+'LOGIN_LOGO': 'path/to/image', # Admin site logo on login page (path to static should be specified)
+'LOGOUT_BG': 'path/to/image', # Admin site background on login/logout pages (path to static should be specified)
+'SHOW_THEMES': True, # Show default admin themes button
+'TRAY_REVERSE': True, # Hide object-tools and additional-submit-line by default
+'NAVBAR_REVERSE': True, # Hide side navbar by default
+'SHOW_COUNTS': True, # Show instances counts for each model
+'APP_ICONS': { # Set icons for applications(lowercase), including 3rd party apps, {'application_name': 'material_icon_name', ...}
+'sites': 'send',
+},
+'MODEL_ICONS': { # Set icons for models(lowercase), including 3rd party models, {'model_name': 'material_icon_name', ...}
+'site': 'contact_mail',
+}
+}
+```
+Вот тут подробно показаны:
+https://www.youtube.com/watch?v=_ifWi-a1z6M&ab_channel=AntonMaistrenko

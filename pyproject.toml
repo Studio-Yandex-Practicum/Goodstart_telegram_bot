@@ -18,6 +18,7 @@ django-asgi-lifespan = "^0.3.1"
 django-phonenumber-field = {extras = ["phonenumbers"], version = "^7.3.0"}
 django-bootstrap5 = "^24.2"
 psycopg2-binary = "^2.9.9"
+django-material-admin = "^1.8.6"
 
 
 [tool.poetry.group.dev.dependencies]
