@@ -71,6 +71,10 @@ create_test_students:
 create_test_teachers:
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) create_test_teachers
 
+# Создание тестовых объектов класса Lesson
+create_test_lessons:
+	cd $(PROJECT_DIR) && $(DJANGO_RUN) create_test_lessons
+
 # Запуск локального контейнера Postgres
 start-db:
 	docker-compose -f $(DEV_DOCK_FILE) up -d; \
