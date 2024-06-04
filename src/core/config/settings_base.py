@@ -131,22 +131,22 @@ BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:8000')
 
 MATERIAL_ADMIN_SITE = {
     'HEADER':  _('Административная панель'),  # Admin site header
-    'TITLE':  _('Your site title'),  # Admin site title
-    'FAVICON':  'base/icons8-favicon-16.png',  # Admin site favicon (path to static should be specified)
+    'TITLE':  _('Административная панель'),  # Admin site title
+    # 'FAVICON':  'base/icons8-favicon-16.png',  # Admin site favicon (path to static should be specified)
     # 'MAIN_BG_COLOR':  'color',  # Admin site main color, css color should be specified
     # 'MAIN_HOVER_COLOR':  'color',  # Admin site main hover color, css color should be specified
     # 'PROFILE_PICTURE':  'font.jpg',  # Admin site profile picture (path to static should be specified)
     # 'PROFILE_BG':  'font.jpg',  # Admin site profile background (path to static should be specified)
     # 'LOGIN_LOGO':  'font.jpg',  # Admin site logo on login page (path to static should be specified)
-    'LOGOUT_BG':  'font.jpg',  # Admin site background on login/logout pages (path to static should be specified)
-    'SHOW_THEMES':  True,  #  Show default admin themes button
+    # 'LOGOUT_BG':  'font.jpg',  # Admin site background on login/logout pages (path to static should be specified)
+    'SHOW_THEMES':  True,  # Show default admin themes button
     # 'TRAY_REVERSE': True,  # Hide object-tools and additional-submit-line by default
     'NAVBAR_REVERSE': True,  # Hide side navbar by default
-    'SHOW_COUNTS': True, # Show instances counts for each model
-    'APP_ICONS': {  # Set icons for applications(lowercase), including 3rd party apps, {'application_name': 'material_icon_name', ...}
-        'sites': 'send',
-    },
-    'MODEL_ICONS': {  # Set icons for models(lowercase), including 3rd party models, {'model_name': 'material_icon_name', ...}
-        'site': 'contact_mail',
-    }
+    'SHOW_COUNTS': True,  # Show instances counts for each model
+    # 'APP_ICONS': {  # Set icons for applications(lowercase), including 3rd party apps, {'application_name': 'material_icon_name', ...}
+    #     'sites': 'send',
+    # },
+    # 'MODEL_ICONS': {  # Set icons for models(lowercase), including 3rd party models, {'model_name': 'material_icon_name', ...}
+    #     'site': 'contact_mail',
+    # }
 }
