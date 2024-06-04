@@ -21,15 +21,11 @@ TELEGRAM_TOKEN = env('TELEGRAM_TOKEN')
 ALLOWED_HOSTS = ['*']
 
 DEFAULT_APPS = [
-    'material',
-    'material.admin',
-    'core.apps.GoodStartAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_bootstrap5',
 ]
 
 LOCAL_APPS = [
@@ -39,7 +35,12 @@ LOCAL_APPS = [
     'schooling.apps.SchoolingConfig',
 ]
 
-EXTERNAL_APPS = ['phonenumber_field']
+EXTERNAL_APPS = [
+    'material',
+    'material.admin',
+    'phonenumber_field',
+    'django_bootstrap5',
+]
 
 INSTALLED_APPS = DEFAULT_APPS + EXTERNAL_APPS + LOCAL_APPS
 
@@ -130,8 +131,8 @@ DEFAULT_RECEIVER = env.str('DEFAULT_EMAIL_ADDRESS', default='NOT_SET')
 BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:8000')
 
 MATERIAL_ADMIN_SITE = {
-    'HEADER':  _('Административная панель'),  # Admin site header
-    'TITLE':  _('Административная панель'),  # Admin site title
+    'HEADER':  _('GoodStart школа'),  # Admin site header
+    'TITLE':  _('Администрирование'),  # Admin site title
     'SHOW_THEMES':  True,  # Show default admin themes button
     'NAVBAR_REVERSE': True,  # Hide side navbar by default
     'SHOW_COUNTS': True,  # Show instances counts for each model
