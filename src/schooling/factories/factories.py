@@ -1,10 +1,13 @@
 import random
+from datetime import timedelta
 
 import factory
+from django.utils import timezone
+from django.db.models.signals import post_save
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyInteger
 
-from schooling.models import Student, StudyClass, Subject, Teacher
+from schooling.models import Lesson, Student, StudyClass, Subject, Teacher
 from .constants import (
     START_PHONE_VALUE,
     END_PHONE_VALUE,
@@ -34,6 +37,7 @@ class PersonFactory(DjangoModelFactory):
     )
 
 
+@factory.django.mute_signals(post_save)
 class StudentFactory(PersonFactory):
     """Factory of `Student` for the project testing."""
 
@@ -63,6 +67,7 @@ class StudentFactory(PersonFactory):
         return student
 
 
+@factory.django.mute_signals(post_save)
 class TeacherFactory(PersonFactory):
     """Factory of `Teacher` for the project testing."""
 
@@ -85,11 +90,48 @@ class TeacherFactory(PersonFactory):
         return teacher
 
 
+class LessonFactory(DjangoModelFactory):
+    """Factory of `Lesson` for the project testing."""
+
+    class Meta:
+        model = Lesson
+
+    name = factory.Faker('sentence', nb_words=1, locale='ru_RU')
+    teacher_id = factory.SubFactory(TeacherFactory)
+    student_id = factory.SubFactory(StudentFactory)
+    is_passed = factory.LazyAttribute(lambda o: random.choice([True, False]))
+    test_lesson = factory.LazyAttribute(lambda o: random.choice([True, False]))
+
+    @factory.post_generation
+    def datetime_start_and_end(self, create, extracted, **kwargs):
+        """Добавляет дату и время урока и его продолжительность."""
+        if create:
+            if self.is_passed:
+                self.datetime_start = timezone.now() - timedelta(days=365)
+                self.datetime_end = self.datetime_start + timedelta(hours=1)
+            else:
+                self.datetime_start = timezone.now() + timedelta(days=365)
+                self.datetime_end = self.datetime_start + timedelta(hours=1)
+
+    @factory.lazy_attribute
+    def subject(self):
+        """Получить случайный учебный предмет."""
+        subject = Subject.objects.order_by('name')[
+            random.randint(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
+        ]
+        return subject
+
+
 def create_students():
     """Create `Student` instances for the project tests."""
     StudentFactory.create_batch(size=CREATION_COUNT)
 
 
 def create_teachers():
-    """Create `Student` instances for the project tests."""
+    """Create `Teacher` instances for the project tests."""
     TeacherFactory.create_batch(size=CREATION_COUNT)
+
+
+def create_lessons():
+    """Create `Lesson` instances for the project tests."""
+    LessonFactory.create_batch(size=CREATION_COUNT)

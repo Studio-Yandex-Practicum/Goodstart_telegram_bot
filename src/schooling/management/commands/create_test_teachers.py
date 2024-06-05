@@ -12,3 +12,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Call the method `_generate` for the test Teacher creation."""
         self._generate()
+        return self.stdout.write(
+                self.style.SUCCESS(
+                    'Фикстуры для таблицы Teacher созданы!',
+                ),
+        )
