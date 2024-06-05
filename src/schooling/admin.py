@@ -8,6 +8,7 @@ class TeacherAdmin(admin.ModelAdmin):
     """Управление преподавателями."""
 
     list_display = ('name', 'surname', 'get_competences')
+    icon_name = 'edit'
 
     @admin.display(description='Предмет')
     def get_competences(self, obj):
@@ -20,7 +21,7 @@ class StudentAdmin(admin.ModelAdmin):
     """Управление студентами."""
 
     list_display = ('name', 'surname', 'paid_lessons')
-
+    icon_name = 'school'
 
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
@@ -28,6 +29,7 @@ class SubjectAdmin(admin.ModelAdmin):
 
     list_display = ('name',)
     exclude = ('subject_key',)
+    icon_name = 'subject'
     ordering = ('name',)
 
 
@@ -35,6 +37,7 @@ class SubjectAdmin(admin.ModelAdmin):
 class StudyClassAdmin(admin.ModelAdmin):
     """Управление учебными классами."""
 
+    icon_name = 'groups'
     list_display = ('study_class_name', 'study_class_number',)
     list_filter = ('study_class_number',)
 
@@ -55,3 +58,4 @@ class LessonAdmin(admin.ModelAdmin):
         'name', 'subject__name',
         'teacher_id__name', 'student_id__name',
     )
+    icon_name = 'access_time'
