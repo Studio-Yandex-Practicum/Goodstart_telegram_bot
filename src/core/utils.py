@@ -16,10 +16,11 @@ from schooling.utils import send_message_to_user
 
 @receiver(pre_delete, sender=Teacher)
 def delete_teacher_and_send_msg(sender, instance, *args, **kwargs):
+    """Удалить и отправить выбранным учителям прощальное сообщение."""
     send_message_to_user(
         settings.TELEGRAM_TOKEN,
         instance.telegram_id,
-        message_text=FAREWELL_TEACHER_MESSAGE
+        message_text=FAREWELL_TEACHER_MESSAGE,
     )
 
 

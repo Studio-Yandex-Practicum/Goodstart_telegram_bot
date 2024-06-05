@@ -6,10 +6,13 @@ from bot.messages_texts.constants import FAREWELL_TEACHER_MESSAGE
 from schooling.models import Student, Teacher, Subject, StudyClass, Lesson
 
 
-class CustomModelAdmin(admin.ModelAdmin):
+class CustomModelAdminForTeacher(admin.ModelAdmin):
+    """Переопределение класса ModelAdmin для модели Учителя."""
+
     actions = ['delete_and_send_message']
 
     def get_actions(self, request):
+        """Удаление опции 'delete_selected' из админ-панели."""
         actions = super().get_actions(request)
         if 'delete_selected' in actions:
             del actions['delete_selected']
@@ -17,17 +20,18 @@ class CustomModelAdmin(admin.ModelAdmin):
 
     @admin.action(description='Удалить и отправить сообщение')
     def delete_and_send_message(self, request, queryset):
+        """Удалить и отправить выбранным учителям прощальное сообщение."""
         for query in queryset:
             send_message_to_user(
                 settings.TELEGRAM_TOKEN,
                 query.telegram_id,
-                message_text=FAREWELL_TEACHER_MESSAGE
+                message_text=FAREWELL_TEACHER_MESSAGE,
             )
             query.delete()
 
 
 @admin.register(Teacher)
-class TeacherAdmin(CustomModelAdmin):
+class TeacherAdmin(CustomModelAdminForTeacher):
     """Управление преподавателями."""
 
     list_display = ('name', 'surname', 'get_competences')
@@ -37,12 +41,6 @@ class TeacherAdmin(CustomModelAdmin):
     def get_competences(self, obj):
         """Return competences."""
         return '\n'.join([c.name for c in obj.competence.all()])
-
-    @admin.action(description='Подтвердить выбранные заявки')
-    def approve_applications(self, request, queryset):
-        for query in queryset:
-            query.approved = True
-            query.save()
 
 
 @admin.register(Student)
