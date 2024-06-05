@@ -7,20 +7,27 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 
 from admin_user.models import Administrator
-from bot.messages_texts.constants import FAREWELL_TEACHER_MESSAGE
+from bot.messages_texts.constants import (
+    FAREWELL_TEACHER_MESSAGE, FAREWELL_STUDENT_MESSAGE,
+)
 from core.config.settings_base import EMAIL_HOST_USER
 from potential_user.models import ApplicationForm
 from schooling.models import Student, Teacher
 from schooling.utils import send_message_to_user
 
 
+@receiver(pre_delete, sender=Student)
 @receiver(pre_delete, sender=Teacher)
-def delete_teacher_and_send_msg(sender, instance, *args, **kwargs):
-    """Удалить и отправить выбранным учителям прощальное сообщение."""
+def delete_person_and_send_msg(sender, instance, *args, **kwargs):
+    """Удалить и отправить выбранным пользователям прощальное сообщение."""
     send_message_to_user(
         settings.TELEGRAM_TOKEN,
         instance.telegram_id,
-        message_text=FAREWELL_TEACHER_MESSAGE,
+        message_text=(
+            FAREWELL_TEACHER_MESSAGE
+            if instance.__class__.__name__ == 'Teacher'
+            else FAREWELL_STUDENT_MESSAGE
+        ),
     )
 
 

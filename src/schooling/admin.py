@@ -1,37 +1,10 @@
 from django.contrib import admin
-from django.conf import settings
 
-from .utils import send_message_to_user
-from bot.messages_texts.constants import FAREWELL_TEACHER_MESSAGE
 from schooling.models import Student, Teacher, Subject, StudyClass, Lesson
 
 
-class CustomModelAdminForTeacher(admin.ModelAdmin):
-    """Переопределение класса ModelAdmin для модели Учителя."""
-
-    actions = ['delete_and_send_message']
-
-    def get_actions(self, request):
-        """Удаление опции 'delete_selected' из админ-панели."""
-        actions = super().get_actions(request)
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
-
-    @admin.action(description='Удалить и отправить сообщение')
-    def delete_and_send_message(self, request, queryset):
-        """Удалить и отправить выбранным учителям прощальное сообщение."""
-        for query in queryset:
-            send_message_to_user(
-                settings.TELEGRAM_TOKEN,
-                query.telegram_id,
-                message_text=FAREWELL_TEACHER_MESSAGE,
-            )
-        queryset.delete()
-
-
 @admin.register(Teacher)
-class TeacherAdmin(CustomModelAdminForTeacher):
+class TeacherAdmin(admin.ModelAdmin):
     """Управление преподавателями."""
 
     list_display = ('name', 'surname', 'get_competences')
