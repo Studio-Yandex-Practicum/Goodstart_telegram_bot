@@ -27,7 +27,7 @@ class CustomModelAdminForTeacher(admin.ModelAdmin):
                 query.telegram_id,
                 message_text=FAREWELL_TEACHER_MESSAGE,
             )
-            query.delete()
+        queryset.delete()
 
 
 @admin.register(Teacher)
