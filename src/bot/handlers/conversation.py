@@ -12,14 +12,14 @@ from core.logging import log_errors
 @log_errors
 async def help(
     update: Update,
-    context: CallbackContext
+    context: CallbackContext,
 ) -> Optional[UserStates]:
     """Обработчик кнопки "help"."""
     query = update.callback_query
     if query:
         user = await check_user_from_db(
             telegram_id=query.from_user.id,
-            from_models=(Teacher, Student)
+            from_models=(Teacher, Student),
         )
         user_flow = UserFlow(user)
         await user_flow.help()
@@ -38,7 +38,7 @@ async def schedule(update: Update,
     if query:
         user = await check_user_from_db(
             telegram_id=query.from_user.id,
-            from_models=(Teacher, Student)
+            from_models=(Teacher, Student),
         )
         user_flow = UserFlow(user)
         await user_flow.schedule()

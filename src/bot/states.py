@@ -13,9 +13,11 @@ class UserStates(TextChoices):
 
 class UserFlow:
     """
-    Finite State Machine определяет механику переходов
-    из состояния в состояние и обеспечивает 
-    асинхонное взаимодействие с Django ORM. 
+    Finite State Machine базе Postgres.
+
+    Определяет механику переходов
+    из состояния в состояние и обеспечивает
+    асинхонное взаимодействие с Django ORM.
     """
 
     state = State(UserStates, default=UserStates.START)
