@@ -23,7 +23,7 @@ class GeneralUserModel(models.Model):
         'Состояние пользователя',
         max_length=MAX_LEN_STATE,
         choices=UserStates.choices,
-        default=UserStates.START
+        default=UserStates.START,
     )
 
     class Meta:

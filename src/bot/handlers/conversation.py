@@ -10,7 +10,10 @@ from core.logging import log_errors
 
 
 @log_errors
-async def help(update: Update, context: CallbackContext) -> Optional[UserStates]:
+async def help(
+    update: Update,
+    context: CallbackContext
+) -> Optional[UserStates]:
     """Обработчик кнопки "help"."""
     query = update.callback_query
     if query:
