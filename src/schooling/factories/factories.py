@@ -3,6 +3,7 @@ from datetime import timedelta
 
 import factory
 from django.utils import timezone
+from django.db.models.signals import post_save
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyInteger
 
@@ -36,6 +37,7 @@ class PersonFactory(DjangoModelFactory):
     )
 
 
+@factory.django.mute_signals(post_save)
 class StudentFactory(PersonFactory):
     """Factory of `Student` for the project testing."""
 
@@ -65,6 +67,7 @@ class StudentFactory(PersonFactory):
         return student
 
 
+@factory.django.mute_signals(post_save)
 class TeacherFactory(PersonFactory):
     """Factory of `Teacher` for the project testing."""
 
@@ -93,6 +96,7 @@ class LessonFactory(DjangoModelFactory):
     class Meta:
         model = Lesson
 
+    name = factory.Faker('sentence', nb_words=1, locale='ru_RU')
     teacher_id = factory.SubFactory(TeacherFactory)
     student_id = factory.SubFactory(StudentFactory)
     is_passed = factory.LazyAttribute(lambda o: random.choice([True, False]))
@@ -104,18 +108,24 @@ class LessonFactory(DjangoModelFactory):
         datetime_start = timezone.now() + timedelta(days=365)
         datetime_end = datetime_start + timedelta(hours=1)
 
-    @classmethod
-    def _create(cls, model_class, *args, **kwargs):
-        """Override `_create` method to set subject and name."""
-        subject = Subject.objects.order_by('?')[
-            :random.randint(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
+    @factory.post_generation
+    def datetime_start_and_end(self, create, extracted, **kwargs):
+        """Добавляет дату и время урока и его продолжительность."""
+        if create:
+            if self.is_passed:
+                self.datetime_start = timezone.now() - timedelta(days=365)
+                self.datetime_end = self.datetime_start + timedelta(hours=1)
+            else:
+                self.datetime_start = timezone.now() + timedelta(days=365)
+                self.datetime_end = self.datetime_start + timedelta(hours=1)
+
+    @factory.lazy_attribute
+    def subject(self):
+        """Получить случайный учебный предмет."""
+        subject = Subject.objects.order_by('name')[
+            random.randint(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
         ]
-        name = subject.name
-        lesson = super()._create(model_class, *args, **kwargs)
-        lesson.name.set(name)
-        lesson.subject.set(subject)
-        lesson.save()
-        return lesson
+        return subject
 
 
 def create_students():
