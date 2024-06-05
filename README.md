@@ -122,21 +122,27 @@ class UserFlow:
     def _get_user_stage(self):
         return self.user.state
 
-    # Автоматическое сохранение изменений поля state в объекте пользователя
-    @state.on_success()
-    def _on_transition_success(self, descriptor, source, target):
+    def _sync_save(self):
         self.user.save()
 
     # Пример перехода из состояния в состояние.
     # state.ANY в поле source отвечает за любое положение.
     # source может принимать несколько объектов (напр. кортеж)
     @state.transition(source=UserState.START, target=UserState.CANCEL)
-    def cancel(self):
-        pass  
+    def _cancel(self):
+        pass
 ```
 Подробнее про wrapper @transition можно [прочитать](https://docs.viewflow.io/fsm/options.html) в документации
 
-4. Для подключения FSM к боту необходимо в хэндлере создать объект из класса UserFlow, передав в него объект пользователя. С помощью этого объекта провести необходимые манипуляции с состоянием и вернуть состояние в конце работы хэндлера.
+4. Асинхронность реализуется через отдельный метод класса FSM, который затем и вызывается в логике бота с помощью await: 
+
+```
+async def cancel(self):
+        self._cancel()
+        await sync_to_async(self._sync_save)()
+```
+
+5. Для подключения FSM к боту необходимо в хэндлере создать объект из класса UserFlow, передав в него объект пользователя. С помощью этого объекта провести необходимые манипуляции с состоянием и вернуть состояние в конце работы хэндлера.
 
 Например:
 ```
@@ -146,7 +152,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Создаем объект FSM
     user_flow = UserState(state)
     ...
-    user_flow.cancel()
+    await user_flow.cancel()
     return user_flow.state
 ```
 

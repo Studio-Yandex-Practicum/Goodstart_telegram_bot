@@ -7,15 +7,14 @@ from django.conf import settings
 from loguru import logger
 from telegram import Update
 from telegram.ext import (Application, ApplicationBuilder,
-                          CallbackQueryHandler, ConversationHandler,
-                          PicklePersistence)
+                          CallbackQueryHandler, ConversationHandler)
 
 from bot.handlers import (
     echo_handler, start_handler, help_handler,
     success_registration_webapp_handler,
 )
 from bot.handlers.conversation import help, schedule
-from bot.states import States
+from bot.states import UserStates
 
 
 class Bot:
@@ -53,10 +52,8 @@ class Bot:
 
     async def _build_app(self):
         """Build the application."""
-        persistence = PicklePersistence(filepath=settings.PERSISTENCE_PATH)
         app = ApplicationBuilder().token(
-            settings.TELEGRAM_TOKEN).persistence(
-                persistence).build()
+            settings.TELEGRAM_TOKEN).build()
         main_handler = await build_main_handler()
         app.add_handlers([
             main_handler,
@@ -97,14 +94,13 @@ async def build_main_handler():
     """Функция создания главного обработчика."""
     return ConversationHandler(
         entry_points=[start_handler],
-        persistent=True,
         name='main_handler',
         states={
-            States.START: [
+            UserStates.START: [
                 CallbackQueryHandler(help,
-                                     pattern=f'^{States.HELP.value}$'),
+                                     pattern=f'^{UserStates.HELP.value}$'),
                 CallbackQueryHandler(schedule,
-                                     pattern=f'^{States.SCHEDULE.value}$'),
+                                     pattern=f'^{UserStates.SCHEDULE.value}$'),
             ],
         },
         fallbacks=[start_handler],

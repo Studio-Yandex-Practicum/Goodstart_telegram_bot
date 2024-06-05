@@ -12,7 +12,7 @@ from bot.messages_texts.constants import (
     WELCOME_MSG, REGISTRATION_MSG, APPLICATION_EXISTS_MSG,
 )
 from bot.keyboards import get_root_markup
-from bot.states import States
+from bot.states import UserFlow
 
 
 @log_errors
@@ -30,12 +30,14 @@ async def start(
     user = await check_user_from_db(telegram_id, (Teacher, Student))
 
     if user:
+        user_flow = UserFlow(user)
+        await user_flow.start()
         await context.bot.send_message(
             chat_id=telegram_id,
             text=WELCOME_MSG,
             reply_markup=await get_root_markup(),
         )
-        return States.START
+        return user_flow.state
 
     else:
         if await check_user_application_exists(telegram_id):
