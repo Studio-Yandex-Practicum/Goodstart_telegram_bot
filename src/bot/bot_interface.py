@@ -7,7 +7,7 @@ from django.conf import settings
 from loguru import logger
 from telegram import Update
 from telegram.ext import (Application, ApplicationBuilder,
-                          CallbackQueryHandler, ConversationHandler)
+                          CallbackQueryHandler, ConversationHandler, PersistenceInput)
 
 from bot.handlers import (
     echo_handler, start_handler, help_handler,
@@ -15,6 +15,7 @@ from bot.handlers import (
 )
 from bot.handlers.conversation import help, schedule
 from bot.states import UserStates
+from bot.persistence import DjangoPersistence
 
 
 class Bot:
@@ -52,8 +53,14 @@ class Bot:
 
     async def _build_app(self):
         """Build the application."""
+        persistence = DjangoPersistence(PersistenceInput(
+            bot_data=False,
+            chat_data=False,
+            user_data=False,
+            callback_data=False
+        ))
         app = ApplicationBuilder().token(
-            settings.TELEGRAM_TOKEN).build()
+            settings.TELEGRAM_TOKEN).persistence(persistence).build()
         main_handler = await build_main_handler()
         app.add_handlers([
             main_handler,
@@ -95,6 +102,7 @@ async def build_main_handler():
     return ConversationHandler(
         entry_points=[start_handler],
         name='main_handler',
+        persistent=True,
         states={
             UserStates.START: [
                 CallbackQueryHandler(help,
@@ -102,6 +110,18 @@ async def build_main_handler():
                 CallbackQueryHandler(schedule,
                                      pattern=f'^{UserStates.SCHEDULE.value}$'),
             ],
+            UserStates.HELP: [
+                CallbackQueryHandler(
+                    start_handler,
+                    pattern=f'^{UserStates.START.value}$'
+                ),
+            ],
+            UserStates.SCHEDULE: [
+                CallbackQueryHandler(
+                    start_handler,
+                    pattern=f'^{UserStates.START.value}$'
+                ),
+            ],
         },
         fallbacks=[start_handler],
-        )
+    )
