@@ -6,8 +6,11 @@ from typing import Self
 from django.conf import settings
 from loguru import logger
 from telegram import Update
-from telegram.ext import (Application, ApplicationBuilder,
-                          CallbackQueryHandler, ConversationHandler, PersistenceInput)
+from telegram.ext import (
+    Application, ApplicationBuilder,
+    CallbackQueryHandler, ConversationHandler,
+    PersistenceInput
+)
 
 from bot.handlers import (
     echo_handler, start_handler, help_handler,
