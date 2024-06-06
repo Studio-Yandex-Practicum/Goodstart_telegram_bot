@@ -23,6 +23,7 @@ class StudentAdmin(admin.ModelAdmin):
     list_display = ('name', 'surname', 'paid_lessons')
     icon_name = 'school'
 
+
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
     """Управление школьными предметами."""

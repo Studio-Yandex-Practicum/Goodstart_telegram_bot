@@ -27,6 +27,7 @@ help:
 	@echo "	clear-db             - $(SHELL_GREEN)Команда для очистки volume локального контейнера postgres.$(SHELL_NC)"
 	@echo "	run-dev              - $(SHELL_GREEN)Команда для локального запуска проекта(разработка).$(SHELL_NC)"
 	@echo "	create-ssl           - $(SHELL_GREEN)Команда для созданиея сертификатов SSL(разработка).$(SHELL_NC)"
+	@echo "	fill-db              - $(SHELL_GREEN)Команда для наполнения БД тестовыми данными.$(SHELL_NC)"
 	@echo "	create_test_admins   - $(SHELL_GREEN)Команда для созданиея тестовых администраторов(разработка).$(SHELL_NC)"
 	@echo "	create_test_students - $(SHELL_GREEN)Команда для созданиея тестовых учеников(разработка).$(SHELL_NC)"
 	@echo "	create_test_teachers - $(SHELL_GREEN)Команда для созданиея тестовых преподавателей(разработка).$(SHELL_NC)"
@@ -71,6 +72,10 @@ create_test_students:
 create_test_teachers:
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) create_test_teachers
 
+# Создание тестовых объектов класса Lesson
+create_test_lessons:
+	cd $(PROJECT_DIR) && $(DJANGO_RUN) create_test_lessons
+
 # Запуск локального контейнера Postgres
 start-db:
 	docker-compose -f $(DEV_DOCK_FILE) up -d; \
@@ -94,6 +99,9 @@ clear-db:
     then \
 		docker compose -f $(DEV_DOCK_FILE) down --volumes; \
 	fi
+
+# Наполнение БД тестовыми данными
+fill-db: create_test_admins create_test_students create_test_teachers create_test_lessons
 
 # Создание сертификатов SSL
 create-ssl:
