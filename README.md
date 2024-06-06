@@ -121,9 +121,7 @@ class UserFlow:
     @state.getter()
     def _get_user_stage(self):
         return self.user.state
-
-    def _sync_save(self):
-        self.user.save()
+```
 
     # Пример перехода из состояния в состояние.
     # state.ANY в поле source отвечает за любое положение.
@@ -139,7 +137,7 @@ class UserFlow:
 ```
 async def cancel(self):
         self._cancel()
-        await sync_to_async(self._sync_save)()
+        await self.user.asave()
 ```
 
 5. Для подключения FSM к боту необходимо в хэндлере создать объект из класса UserFlow, передав в него объект пользователя. С помощью этого объекта провести необходимые манипуляции с состоянием и вернуть состояние в конце работы хэндлера.

@@ -1,5 +1,4 @@
 from django.db.models import TextChoices
-from asgiref.sync import sync_to_async
 from viewflow.fsm import State
 
 
@@ -46,20 +45,17 @@ class UserFlow:
     def _help(self):
         pass
 
-    def _sync_save(self):
-        self.user.save()
-
     async def schedule(self):
         """Переход в положение 'Расписание'. Асинхронный метод."""
         self._schedule()
-        await sync_to_async(self._sync_save)()
+        await self.user.asave()
 
     async def start(self):
         """Переход в положение 'Старт'. Асинхронный метод."""
         self._start()
-        await sync_to_async(self._sync_save)()
+        await self.user.asave()
 
     async def help(self):
         """Переход в положение 'Помощь'. Асинхронный метод."""
         self._help()
-        await sync_to_async(self._sync_save)()
+        await self.user.asave()
