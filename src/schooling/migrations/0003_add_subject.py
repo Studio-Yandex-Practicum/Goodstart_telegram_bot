@@ -84,7 +84,7 @@ def create_subject_spanish(apps, schema_editor):
 def remove_subject_spanish(apps, schema_editor):
     """Remove subject 'Spanish' instance."""
     Subject = apps.get_model("schooling", "Subject")
-    remove_subject = Subject.objects.get(name="Испанскийй язык")
+    remove_subject = Subject.objects.get(name="Испанский язык")
     remove_subject.delete()
 
 
