@@ -35,10 +35,3 @@ class ApplicationFormAdmin(admin.ModelAdmin):
         for query in queryset:
             query.approved = True
             query.save()
-
-    @admin.action(description='Подтвердить выбранные заявки')
-    def approve_applications(self, request, queryset):
-        """Перевести все выбранные заявки в статус 'Подтверждено'."""
-        for query in queryset:
-            query.approved = True
-            query.save()
