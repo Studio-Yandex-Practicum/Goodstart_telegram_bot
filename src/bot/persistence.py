@@ -14,6 +14,7 @@ class DjangoPersistence(BasePersistence):
         return list(teachers) + list(students)
 
     async def get_conversations(self, name):
+        """Получение состояний пользователей."""
         conversations = {}
         users = await sync_to_async(self._get_all_users)()
         for user in users:
@@ -22,60 +23,60 @@ class DjangoPersistence(BasePersistence):
 
     async def get_bot_data(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa
 
     async def update_bot_data(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa
 
     async def refresh_bot_data(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa
 
     async def get_chat_data(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa
 
     async def update_chat_data(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa
 
     async def refresh_chat_data(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa
 
     async def drop_chat_data(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa
 
     async def get_user_data(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa
 
     async def update_user_data(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa
 
     async def refresh_user_data(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa
 
     async def drop_user_data(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa
 
     async def get_callback_data(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa
 
     async def update_callback_data(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa
 
     async def update_conversation(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa
 
     async def flush(self):
         """Заглушка для неиспользуемого метода."""
-        ...
+        ... # noqa

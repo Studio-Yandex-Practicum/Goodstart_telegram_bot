@@ -9,7 +9,7 @@ from telegram import Update
 from telegram.ext import (
     Application, ApplicationBuilder,
     CallbackQueryHandler, ConversationHandler,
-    PersistenceInput
+    PersistenceInput,
 )
 
 from bot.handlers import (
@@ -60,7 +60,7 @@ class Bot:
             bot_data=False,
             chat_data=False,
             user_data=False,
-            callback_data=False
+            callback_data=False,
         ))
         app = ApplicationBuilder().token(
             settings.TELEGRAM_TOKEN).persistence(persistence).build()
@@ -116,13 +116,13 @@ async def build_main_handler():
             UserStates.HELP: [
                 CallbackQueryHandler(
                     start_handler,
-                    pattern=f'^{UserStates.START.value}$'
+                    pattern=f'^{UserStates.START.value}$',
                 ),
             ],
             UserStates.SCHEDULE: [
                 CallbackQueryHandler(
                     start_handler,
-                    pattern=f'^{UserStates.START.value}$'
+                    pattern=f'^{UserStates.START.value}$',
                 ),
             ],
         },
