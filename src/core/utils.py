@@ -32,21 +32,28 @@ def delete_person_and_send_msg(sender, instance, *args, **kwargs):
 
 
 @receiver(post_save, sender=ApplicationForm)
-def create_user_from_application(sender, instance, created, **kwargs):
+def create_user_from_application(sender,
+                                 instance: ApplicationForm,
+                                 created,
+                                 **kwargs):
     """Функция создания пользователя согласно роли в заявке."""
     if instance.approved:
         if instance.role == 'teacher':
-            user_model = Teacher
+            user = Teacher(telegram_id=instance.telegram_id,
+                           name=instance.name,
+                           surname=instance.surname,
+                           city=instance.city,
+                           phone_number=instance.phone_number, )
         elif instance.role == 'student':
-            user_model = Student
+            user = Student(telegram_id=instance.telegram_id,
+                           name=instance.name,
+                           surname=instance.surname,
+                           city=instance.city,
+                           phone_number=instance.phone_number,
+                           study_class_id=instance.study_class_id,
+                           parents_contacts=instance.parents_contacts, )
         try:
-            user_model.objects.create(
-                telegram_id=instance.telegram_id,
-                name=instance.name,
-                surname=instance.surname,
-                city=instance.city,
-                phone_number=instance.phone_number,
-            )
+            user.save()
             instance.delete()
         except IntegrityError as err:
             raise ValueError(

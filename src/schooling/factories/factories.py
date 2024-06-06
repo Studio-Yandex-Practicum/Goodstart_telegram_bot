@@ -101,6 +101,8 @@ class LessonFactory(DjangoModelFactory):
     student_id = factory.SubFactory(StudentFactory)
     is_passed = factory.LazyAttribute(lambda o: random.choice([True, False]))
     test_lesson = factory.LazyAttribute(lambda o: random.choice([True, False]))
+    datetime_start = timezone.now()
+    datetime_end = timezone.now()
 
     @factory.post_generation
     def datetime_start_and_end(self, create, extracted, **kwargs):
