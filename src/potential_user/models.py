@@ -42,7 +42,6 @@ class ApplicationForm(models.Model):
     )
     study_class_id = models.ForeignKey(
         StudyClass,
-        # TODO После реализации модели StudyClass проработать правило удаления
         on_delete=models.DO_NOTHING,
         verbose_name='ID учебного класса',
         related_name='potential_user',
@@ -70,9 +69,11 @@ class ApplicationForm(models.Model):
 
     def validate_constraints(self, exclude) -> None:
         """Валидатор для роли Студента."""
-        if self.role == 'student' and (not self.parents_contacts
-                                       or not self.study_class_id):
+        if (self.role == 'student'
+            and self.approved
+            and (not self.parents_contacts
+                 or not self.study_class_id)):
             raise ValidationError('Для роли Студент поля "ID учебного класса" '
                                   'и "Контакты представителей должны быть'
-                                  ' заполнены!"')
+                                  ' заполнены перед одобрением заявки!"')
         return super().validate_constraints(exclude)
