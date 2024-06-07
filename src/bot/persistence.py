@@ -2,6 +2,7 @@ from telegram.ext import BasePersistence
 from asgiref.sync import sync_to_async
 
 from schooling.models import Teacher, Student
+from bot.utils import check_user_from_db
 
 
 class DjangoPersistence(BasePersistence):
@@ -20,6 +21,22 @@ class DjangoPersistence(BasePersistence):
         for user in users:
             conversations[user.telegram_id] = user.state
         return {name: conversations}
+
+    async def update_conversation(self, name, key, new_state) -> None:
+        """
+        Обновление поля state в объекте пользователя.
+
+        Python-telegram-bot по умолчанию хранит два параметра
+        в кортеже key: user_id и chat_id. Goodstart использует только
+        telegram_id, поэтому в кортеже хранятся два одинаковых id.
+        """
+        user = await check_user_from_db(
+            telegram_id=key[0],
+            from_models=[Teacher, Student]
+        )
+        if user:
+            user.state = new_state
+            await user.asave()
 
     async def get_bot_data(self):
         """Заглушка для неиспользуемого метода."""
@@ -70,10 +87,6 @@ class DjangoPersistence(BasePersistence):
         ... # noqa
 
     async def update_callback_data(self):
-        """Заглушка для неиспользуемого метода."""
-        ... # noqa
-
-    async def update_conversation(self):
         """Заглушка для неиспользуемого метода."""
         ... # noqa
 

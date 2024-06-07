@@ -21,6 +21,9 @@ from bot.states import UserStates
 from bot.persistence import DjangoPersistence
 
 
+PERSISTENCE_UPDATE_DELAY = 5
+
+
 class Bot:
     """A singleton-class representing a Telegram bot."""
 
@@ -56,12 +59,15 @@ class Bot:
 
     async def _build_app(self):
         """Build the application."""
-        persistence = DjangoPersistence(PersistenceInput(
-            bot_data=False,
-            chat_data=False,
-            user_data=False,
-            callback_data=False,
-        ))
+        persistence = DjangoPersistence(
+            PersistenceInput(
+                bot_data=False,
+                chat_data=False,
+                user_data=False,
+                callback_data=False,
+            ),
+            update_interval=PERSISTENCE_UPDATE_DELAY,
+        )
         app = ApplicationBuilder().token(
             settings.TELEGRAM_TOKEN).persistence(persistence).build()
         main_handler = await build_main_handler()
