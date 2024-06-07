@@ -1,7 +1,7 @@
 {% extends "registration/base.html" %}
 {% load django_bootstrap5 %}
 {% block content %}
-    <div class="card mb-1" style="max-width: 550px">
+    <!-- <div class="card mb-1" style="max-width: 550px">
       <div class="card-header">
         Регистрация пользователя
       </div>
@@ -14,7 +14,86 @@
           <input type="checkbox" onchange="document.getElementById('submit').disabled = !this.checked" /> Я ознакомлен(-а) с <a href="https://goodstart-education.ru/privacy" target="_blank">Политикой конфиденциальности</a>
         </form>
       </div>
-    </div>
+    </div> -->
+        <thead class="table-primary">
+          <tr>
+            <th colspan="7" class="p-3 header-title h2">Расписание уроков</th>
+          </tr>
+          <tr>
+            <th scope="col" class="p-2 text-nowrap">Дни недели</th>
+            <th scope="col" class="p-2">Понедельник</th>
+            <th scope="col" class="p-2">Вторник</th>
+            <th scope="col" class="p-2">Среда</th>
+            <th scope="col" class="p-2">Четверг</th>
+            <th scope="col" class="p-2">Пятница</th>
+            <th scope="col" class="p-2">Суббота</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" class="text-nowrap">8.15 - 8.55</th>
+            <td>Русский язык (Киселёва И.А.) каб.психологии</td>
+            <td>Русский язык (Киселёва И.А.) каб.психологии</td>
+            <td>Русский язык (Киселёва И.А.) каб.психологии</td>
+            <td>Русский язык (Киселёва И.А.) каб.психологии</td>
+            <td>Русский язык (Киселёва И.А.) каб.психологии</td>
+            <td>Русский язык (Киселёва И.А.) каб.психологии</td>
+          </tr>
+          <tr>
+            <th scope="row" class="text-nowrap">9.15 - 9.55</th>
+            <td>Литература (Киселёва И.А.) каб.психологии</td>
+            <td>Литература (Киселёва И.А.) каб.психологии</td>
+            <td>Литература (Киселёва И.А.) каб.психологии</td>
+            <td>Литература (Киселёва И.А.) каб.психологии</td>
+            <td>Литература (Киселёва И.А.) каб.психологии</td>
+            <td>Литература (Киселёва И.А.) каб.психологии</td>
+          </tr>
+          <tr>
+            <th scope="row" class="text-nowrap">10.15 - 10.55</th>
+            <td>Физкультура (Киселёва И.А.) каб.психологии</td>
+            <td>Физкультура (Киселёва И.А.) каб.психологии</td>
+            <td>Физкультура (Киселёва И.А.) каб.психологии</td>
+            <td>Физкультура (Киселёва И.А.) каб.психологии</td>
+            <td>Физкультура (Киселёва И.А.) каб.психологии</td>
+            <td>Физкультура (Киселёва И.А.) каб.психологии</td>
+          </tr>
+          <tr class="table-info">
+            <th scope="row" class="text-nowrap">10.55 - 11.05</th>
+            <td colspan="6" class="text-center">Перерыв на завтрак</td>
+          </tr>
+          <tr>
+            <th scope="row" class="text-nowrap">11.05 - 11.45</th>
+            <td>Математика (Киселёва И.А.) каб.психологии</td>
+            <td>Математика (Киселёва И.А.) каб.психологии</td>
+            <td>Математика (Киселёва И.А.) каб.психологии</td>
+            <td>Математика (Киселёва И.А.) каб.психологии</td>
+            <td>Математика (Киселёва И.А.) каб.психологии</td>
+            <td>Математика (Киселёва И.А.) каб.психологии</td>
+          </tr>
+          <tr>
+            <th scope="row" class="text-nowrap">11.55 - 12.35</th>
+            <td>Занятие 5</td>
+            <td>Занятие 5</td>
+            <td>Занятие 5</td>
+            <td>Занятие 5</td>
+            <td>Занятие 5</td>
+            <td>Занятие 5</td>
+          </tr>
+          <tr>
+            <th scope="row" class="text-nowrap">12.45 - 13.25</th>
+            <td>Занятие 6</td>
+            <td>Занятие 6</td>
+            <td>Занятие 6</td>
+            <td>Занятие 6</td>
+            <td>Занятие 6</td>
+            <td>Занятие 6</td>
+          </tr>
+          <tr class="table-info">
+            <th scope="row" class="text-nowrap">13.25 - 13.45</th>
+            <td colspan="6" class="text-center">Перерыв на обед</td>
+          </tr>
+        </tbody>
+      
 {% endblock %}
 
 
