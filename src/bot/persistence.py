@@ -32,7 +32,7 @@ class DjangoPersistence(BasePersistence):
         """
         user = await check_user_from_db(
             telegram_id=key[0],
-            from_models=[Teacher, Student]
+            from_models=[Teacher, Student],
         )
         if user:
             user.state = new_state
