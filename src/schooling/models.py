@@ -1,9 +1,12 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
+from bot.states import UserStates
+
 
 MAX_LEN_NAME_SURNAME = 150
 MAX_LEN_CITY = 50
+MAX_LEN_STATE = 50
 
 
 class GeneralUserModel(models.Model):
@@ -16,6 +19,12 @@ class GeneralUserModel(models.Model):
     phone_number = PhoneNumberField('Номер телефона')
     last_login_date = models.DateField('Последнее посещение', auto_now=True)
     registration_date = models.DateField('Дата регистрации', auto_now_add=True)
+    state = models.CharField(
+        'Состояние пользователя',
+        max_length=MAX_LEN_STATE,
+        choices=UserStates.choices,
+        default=UserStates.START,
+    )
 
     class Meta:
         """Meta class of GeneralUserModel."""
