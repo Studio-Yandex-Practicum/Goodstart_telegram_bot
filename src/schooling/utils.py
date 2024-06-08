@@ -6,7 +6,7 @@ from telegram import Bot
 from telegram.error import BadRequest
 
 from bot.keyboards import get_root_markup
-from schooling.models import Student, Teacher
+from schooling.models import Student, Teacher, Lesson
 
 
 @async_to_sync
@@ -33,3 +33,21 @@ def start_chat(sender, instance, created, **kwargs):
                              instance.telegram_id,
                              message_text='Ваша заявка одобрена!',
                              reply_markup=reply_markup)
+
+
+@receiver(post_save, sender=Lesson)
+def notify_about_lesson(sender, instance, created, **kwargs):
+    """Отправляет уведомление о времени занятия."""
+    if created:
+        message_text = f"""Ваше занятие назначено с {instance.datetime_start}
+                           до {instance.datetime_end}.
+                           Тема: {instance.name}"""
+        reply_markup = async_to_sync(get_root_markup)()
+        send_message_to_user(settings.TELEGRAM_TOKEN,
+                             instance.teacher_id,
+                             message_text,
+                             reply_markup)
+        send_message_to_user(settings.TELEGRAM_TOKEN,
+                             instance.student_id,
+                             message_text,
+                             reply_markup)
