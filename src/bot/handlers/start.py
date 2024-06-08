@@ -12,7 +12,7 @@ from bot.messages_texts.constants import (
     WELCOME_MSG, REGISTRATION_MSG, APPLICATION_EXISTS_MSG,
 )
 from bot.keyboards import get_root_markup
-from bot.states import States
+from bot.states import UserStates
 
 
 @log_errors
@@ -35,7 +35,7 @@ async def start(
             text=WELCOME_MSG,
             reply_markup=await get_root_markup(),
         )
-        return States.START
+        return UserStates.START
 
     else:
         if await check_user_application_exists(telegram_id):
