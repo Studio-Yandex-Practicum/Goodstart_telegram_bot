@@ -1,16 +1,33 @@
 <!DOCTYPE html>
 <html lang="ru">
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Телеграм-бот для преподавателей и учеников</title>
-    {% load django_bootstrap5 %}
-    {% bootstrap_css %}
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    {% load django_bootstrap5 %} {% bootstrap_css %}
+    <style>
+      .accordion-button {
+        background-color: #fff;
+        box-shadow: none;
+      }
+
+      .accordion-button:hover,
+      .accordion-button:focus {
+        box-shadow: none;
+      }
+    </style>
   </head>
   <body>
-    {% include "registration/header.html" %}
-    <table class="table table-bordered text-center align-middle mt-4" align="center" style="max-width: 850px;">
+    <header>
+      <h1 class="text-center mx-auto mb-4" style="max-width: 550px">
+        Телеграм-бот <br />
+        для преподавателей и учеников
+      </h1>
+    </header>
+    <main class="mx-auto p-2" style="max-width: 550px">
       {% block content %}{% endblock %}
-    </table>
+    </main>
+    <footer class="footer"></footer>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    {% bootstrap_javascript %}
   </body>
 </html>
