@@ -10,10 +10,9 @@ from telegram.ext import (Application, ApplicationBuilder,
                           CallbackQueryHandler, ConversationHandler,
                           PicklePersistence)
 
-from bot.handlers import echo_handler, start_handler
+from bot.handlers import echo_handler, start_handler, schedule_handler
 from bot.handlers.conversation import help, schedule
 from bot.states import States
-
 
 
 class Bot:
@@ -60,6 +59,7 @@ class Bot:
             main_handler,
             start_handler,
             echo_handler,
+            schedule_handler,
             ])
 
         logger.info('Bot application built with handlers.')
