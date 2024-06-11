@@ -7,12 +7,9 @@ WORKDIR /app
 COPY pyproject.toml poetry.lock /app/
 
 # Copy source code
-COPY src /app/src
+COPY /src /app/
 
 RUN poetry install
-WORKDIR ./src
+WORKDIR /app
 
 CMD ["poetry", "run", "uvicorn", "core.asgi_dev:application", "--reload", "--lifespan", "on", "--host", "0.0.0.0", "--port", "8000"]
-
-
-

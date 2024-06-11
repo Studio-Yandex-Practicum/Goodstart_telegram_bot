@@ -1,0 +1,33 @@
+
+version: '3'
+
+volumes:
+  pg_data:
+  static_volume:
+
+services:
+  db:
+    image: postgres:latest
+    env_file: .env
+    container_name: GoodStart-DB
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+  backend:
+    # build: .
+    image: ghcr.io/${ REGISTRY }/${{ IMAGE_NAME }}
+    env_file: .env
+    depends_on:
+      - db
+    volumes:
+      - static_volume:/app/static/
+    ports:
+      - 8002:8000
+  gateway:
+    build: ./infra/
+    env_file: .env
+    volumes:
+      - static_volume:/static/
+    ports:
+      - 8001:80
+    depends_on:
+      - backend

@@ -17,11 +17,18 @@ services:
     ports:
       - "5432:5432"
   backend:
-    build: ./
-    env_file: ../../.env
+    build: .
+    env_file: .env
     depends_on:
       - db
     volumes:
+      - static_volume:/app/static/
+    ports:
+      - 8002:8000
+  gateway:
+    build: ./infra/
+    env_file: .env
+    volumes:
       - static_volume:/static/
     ports:
-      - 8002:8002
+      - 80:80
