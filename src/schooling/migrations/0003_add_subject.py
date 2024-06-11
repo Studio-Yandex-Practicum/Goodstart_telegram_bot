@@ -78,13 +78,13 @@ def create_subject_spanish(apps, schema_editor):
     """Create name of subject 'Spanish'."""
     Subject = apps.get_model("schooling", "Subject")
     Subject.objects.create(
-        name="Испанскийй язык",
+        name="Испанский язык",
     )
 
 def remove_subject_spanish(apps, schema_editor):
     """Remove subject 'Spanish' instance."""
     Subject = apps.get_model("schooling", "Subject")
-    remove_subject = Subject.objects.get(name="Испанскийй язык")
+    remove_subject = Subject.objects.get(name="Испанский язык")
     remove_subject.delete()
 
 

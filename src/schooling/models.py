@@ -1,9 +1,12 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
+from bot.states import UserStates
+
 
 MAX_LEN_NAME_SURNAME = 150
 MAX_LEN_CITY = 50
+MAX_LEN_STATE = 50
 
 
 class GeneralUserModel(models.Model):
@@ -16,6 +19,12 @@ class GeneralUserModel(models.Model):
     phone_number = PhoneNumberField('Номер телефона')
     last_login_date = models.DateField('Последнее посещение', auto_now=True)
     registration_date = models.DateField('Дата регистрации', auto_now_add=True)
+    state = models.CharField(
+        'Состояние пользователя',
+        max_length=MAX_LEN_STATE,
+        choices=UserStates.choices,
+        default=UserStates.START,
+    )
 
     class Meta:
         """Meta class of GeneralUserModel."""
@@ -42,12 +51,12 @@ class Teacher(GeneralUserModel):
     class Meta:
         """Meta class of TeacherModel."""
 
-        verbose_name = 'Преподаватель'
+        verbose_name = 'преподаватель'
         verbose_name_plural = 'Преподаватели'
 
     def __str__(self):
         """Return a teacher string representation."""
-        return f'{self.name} {self.surname} {self.competence}'
+        return f'{self.name} {self.surname}'
 
 
 class Student(GeneralUserModel):
@@ -77,12 +86,12 @@ class Student(GeneralUserModel):
     class Meta:
         """Meta class of StudentModel."""
 
-        verbose_name = 'Студент'
+        verbose_name = 'студент'
         verbose_name_plural = 'Студенты'
 
     def __str__(self):
         """Return a student string representation."""
-        return f'{self.name} {self.surname} {self.subjects}'
+        return f'{self.name} {self.surname}'
 
 
 class Subject(models.Model):
@@ -101,7 +110,7 @@ class Subject(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Название предмета'
+        verbose_name = 'название предмета'
         verbose_name_plural = 'Названия предметов'
 
     def __str__(self):
@@ -122,7 +131,7 @@ class StudyClass(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Учебный класс'
+        verbose_name = 'учебный класс'
         verbose_name_plural = 'Учебные классы'
 
     def __str__(self):
@@ -143,13 +152,13 @@ class Lesson(models.Model):
     teacher_id = models.ForeignKey(
         'Teacher',
         on_delete=models.CASCADE,
-        verbose_name='ID преподавателя',
+        verbose_name='Преподаватель',
         related_name='lessons',
     )
     student_id = models.ForeignKey(
         'Student',
         on_delete=models.CASCADE,
-        verbose_name='ID студента',
+        verbose_name='Студент',
         related_name='lessons',
     )
     datetime_start = models.DateTimeField('Время начала занятия')
@@ -160,7 +169,7 @@ class Lesson(models.Model):
     class Meta:
         """Meta class of LessonModel."""
 
-        verbose_name = 'Занятие'
+        verbose_name = 'занятие'
         verbose_name_plural = 'Занятия'
         constraints = [
             models.UniqueConstraint(
