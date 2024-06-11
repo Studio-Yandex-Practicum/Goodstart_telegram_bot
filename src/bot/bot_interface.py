@@ -132,13 +132,13 @@ async def build_main_handler():
                     pattern=f'^{UserStates.START.value}$',
                 ),
             ],
-            UserStates.FEEDBACK_SUBJECT_MSG: [
+            UserStates.FEEDBACK_SUBJECT: [
                 MessageHandler(
                     filters.TEXT & ~filters.COMMAND,
                     subject
                 )
             ],
-            UserStates.FEEDBACK_BODY_MSG: [
+            UserStates.FEEDBACK_BODY: [
                 MessageHandler(
                     filters.TEXT & ~filters.COMMAND,
                     body

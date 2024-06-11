@@ -1,5 +1,6 @@
 from telegram.ext import BasePersistence
 from asgiref.sync import sync_to_async
+from django.db.utils import IntegrityError
 
 from schooling.models import Teacher, Student
 from bot.utils import check_user_from_db
@@ -20,6 +21,7 @@ class DjangoPersistence(BasePersistence):
         users = await sync_to_async(self._get_all_users)()
         for user in users:
             conversations[user.telegram_id] = user.state
+        print('Все состояния пользователей:', {name: conversations})
         return {name: conversations}
 
     async def update_conversation(self, name, key, new_state) -> None:
@@ -34,9 +36,16 @@ class DjangoPersistence(BasePersistence):
             telegram_id=key[0],
             from_models=[Teacher, Student],
         )
+        # вот тут очень долго выполняется изменение состояния пользователя
+        # из-за чего, если быстро написать ответное сообщение боту, его
+        # перехватывает echo_handler
+        print('Обновление состояния пользователя:', user.name, user.state)
         if user:
-            user.state = new_state
-            await user.asave()
+            try:
+                user.state = new_state
+                await user.asave()
+            except IntegrityError as error:
+                print(f'Возникла ошибка при сохранении состояния: {error}')
 
     async def get_bot_data(self):
         """Заглушка для неиспользуемого метода."""

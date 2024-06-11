@@ -1,13 +1,17 @@
 from telegram import Update
 from telegram.ext import (
-    CommandHandler, CallbackContext, ConversationHandler, filters,
-    MessageHandler,
+    CommandHandler, CallbackContext, ConversationHandler,
 )
 
 from core.logging import log_errors
+from core.utils import send_feedback_email
 from schooling.models import Teacher, Student
 from bot.utils import check_user_from_db
 from bot.states import UserStates
+from bot.messages_texts.constants import (
+    FEEDBACK_SUBJECT_REQUEST_MSG, FEEDBACK_SUBJECT_REQUEST_MSG_ERROR,
+    FEEDBACK_BODY_REQUEST_MSG, FEEDBACK_SUCCESS_MSG,
+)
 
 
 @log_errors
@@ -24,23 +28,18 @@ async def feedback(
     user = await check_user_from_db(telegram_id, (Teacher, Student))
 
     if user:
-        await update.message.reply_text(
-            'Пожалуйста, напишите тему обращения:'
-        )
-        return UserStates.FEEDBACK_SUBJECT_MSG
+        context.user_data['current_user'] = user
+        await update.message.reply_text(FEEDBACK_SUBJECT_REQUEST_MSG)
+        return UserStates.FEEDBACK_SUBJECT
     else:
-        await update.message.reply_text(
-            'У вас нет доступа к этой команде.'
-        )
-        return ConversationHandler.END
+        await update.message.reply_text(FEEDBACK_SUBJECT_REQUEST_MSG_ERROR)
+        return ConversationHandler.END  # Временная заглушка, без состояния
 
 
 async def subject(update: Update, context: CallbackContext) -> int:
     context.user_data['subject'] = update.message.text
-    await update.message.reply_text(
-        'Теперь напишите тело обращения:'
-    )
-    return UserStates.FEEDBACK_BODY_MSG
+    await update.message.reply_text(FEEDBACK_BODY_REQUEST_MSG)
+    return UserStates.FEEDBACK_BODY
 
 
 async def body(update: Update, context: CallbackContext) -> int:
@@ -48,13 +47,11 @@ async def body(update: Update, context: CallbackContext) -> int:
 
     subject = context.user_data['subject']
     body = context.user_data['body']
+    user = context.user_data['current_user']
 
-    print(subject)
-    print(body)
+    await send_feedback_email(subject, body, user)
 
-    await update.message.reply_text(
-        'Спасибо за ваше обращение!'
-    )
-    return UserStates.START
+    await update.message.reply_text(FEEDBACK_SUCCESS_MSG)
+    return ConversationHandler.END  # Временная заглушка, без состояния
 
 feedback_handler = CommandHandler(feedback.__name__, feedback)
