@@ -6,6 +6,8 @@ from schooling.models import Lesson, Teacher, Student
 from schooling.utils import check_role_user_from_db
 
 
+#TODO 2очереди. Посмотреть и отрефакторить вьюху.
+#Возможно в асинхронном представлении
 def schedule_page(request, id):
     """Обрабатывает запрос на получение расписания занятий."""
     today = datetime.date.today()
