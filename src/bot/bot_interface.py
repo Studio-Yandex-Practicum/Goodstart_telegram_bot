@@ -14,7 +14,7 @@ from telegram.ext import (
 
 from bot.handlers import (
     echo_handler, start_handler, help_handler,
-    success_registration_webapp_handler,
+    success_registration_webapp_handler, schedule_handler,
 )
 from bot.handlers.conversation import help, schedule
 from bot.states import UserStates
