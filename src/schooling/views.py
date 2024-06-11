@@ -37,8 +37,8 @@ def schedule_page(request, id):
     schedule_sun = schedule.filter(datetime_start__date=end_week)
 
     context = {
-		'start_week': start_week,
-		'end_week': end_week,
+        'start_week': start_week,
+        'end_week': end_week,
         'schedule_mon': schedule_mon,
         'schedule_tue': schedule_tue,
         'schedule_wed': schedule_wed,
@@ -47,6 +47,6 @@ def schedule_page(request, id):
         'schedule_sat': schedule_sat,
         'schedule_sun': schedule_sun,
         'role': user.__class__.__name__,
-	}
+    }
 
     return render(request, 'schedule/schedule_lessons.html', context)
