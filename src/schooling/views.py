@@ -8,7 +8,6 @@ from schooling.utils import check_role_user_from_db
 
 def schedule_page(request, id):
     """Обрабатывает запрос на получение расписания занятий."""
-
     today = datetime.date.today()
     start_week = today - datetime.timedelta(days=today.weekday())
     end_week = start_week + datetime.timedelta(days=6)
@@ -21,19 +20,19 @@ def schedule_page(request, id):
 
     schedule_mon = schedule.filter(datetime_start__date=start_week)
     schedule_tue = schedule.filter(
-        datetime_start__date=start_week + datetime.timedelta(days=1)
+        datetime_start__date=start_week + datetime.timedelta(days=1),
     )
     schedule_wed = schedule.filter(
-        datetime_start__date=start_week + datetime.timedelta(days=2)
+        datetime_start__date=start_week + datetime.timedelta(days=2),
     )
     schedule_thu = schedule.filter(
-        datetime_start__date=start_week + datetime.timedelta(days=3)
+        datetime_start__date=start_week + datetime.timedelta(days=3),
     )
     schedule_fri = schedule.filter(
-        datetime_start__date=start_week + datetime.timedelta(days=4)
+        datetime_start__date=start_week + datetime.timedelta(days=4),
     )
     schedule_sat = schedule.filter(
-        datetime_start__date=start_week + datetime.timedelta(days=5)
+        datetime_start__date=start_week + datetime.timedelta(days=5),
     )
     schedule_sun = schedule.filter(datetime_start__date=end_week)
 

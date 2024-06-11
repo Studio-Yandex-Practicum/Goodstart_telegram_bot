@@ -10,7 +10,7 @@ from schooling.models import Teacher, Student
 from bot.utils import check_user_from_db
 from bot.states import States
 from bot.messages_texts.constants import (
-    UNKNOWN_USER_HELP_MSG
+    UNKNOWN_USER_HELP_MSG,
 )
 
 
