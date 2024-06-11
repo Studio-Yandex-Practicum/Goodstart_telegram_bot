@@ -135,14 +135,14 @@ async def build_main_handler():
             UserStates.FEEDBACK_SUBJECT: [
                 MessageHandler(
                     filters.TEXT & ~filters.COMMAND,
-                    subject
-                )
+                    subject,
+                ),
             ],
             UserStates.FEEDBACK_BODY: [
                 MessageHandler(
                     filters.TEXT & ~filters.COMMAND,
-                    body
-                )
+                    body,
+                ),
             ],
         },
         fallbacks=[start_handler],

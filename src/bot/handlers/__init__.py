@@ -8,5 +8,5 @@ from bot.handlers.feedback import feedback_handler
 
 __all__ = [
     'echo_handler', 'start_handler', 'help_handler',
-    'success_registration_webapp_handler', 'feedback_handler'
+    'success_registration_webapp_handler', 'feedback_handler',
 ]

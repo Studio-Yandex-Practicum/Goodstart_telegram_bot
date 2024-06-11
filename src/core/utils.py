@@ -104,7 +104,6 @@ def send_registration_email(application_form):
 @sync_to_async
 def send_feedback_email(subject, body, user):
     """Отправляет админу сообщение от зарегистрированного пользователя."""
-
     html_content = render_to_string(
         'emailing/feedback_email.html',
         {
