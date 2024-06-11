@@ -14,7 +14,7 @@ services:
       - pg_data:/var/lib/postgresql/data
   backend:
     # build: .
-    image: ghcr.io/${ REGISTRY }/${{ IMAGE_NAME }}
+    image: ghcr.io/${REGISTRY}/${{IMAGE_NAME}}
     env_file: .env
     depends_on:
       - db
