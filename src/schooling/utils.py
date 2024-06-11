@@ -6,6 +6,7 @@ from django.db.models import Model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from telegram import Bot
+from telegram.error import BadRequest
 
 from bot.keyboards import get_root_markup
 from schooling.models import Student, Teacher
@@ -17,9 +18,12 @@ async def send_message_to_user(bot_token, user_id,
                                reply_markup=None):
     """Инициативно отправляет сообщение."""
     bot = Bot(token=bot_token)
-    await bot.send_message(chat_id=user_id,
-                           text=message_text,
-                           reply_markup=reply_markup)
+    try:
+        await bot.send_message(chat_id=user_id,
+                               text=message_text,
+                               reply_markup=reply_markup)
+    except BadRequest:
+        print('Такой чат не найден!')
 
 
 @receiver(post_save, sender=Teacher)

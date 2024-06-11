@@ -20,6 +20,7 @@ from bot.handlers.conversation import help, schedule
 from bot.states import UserStates
 from bot.persistence import DjangoPersistence
 
+PERSISTENCE_UPDATE_DELAY = 5
 
 PERSISTENCE_UPDATE_DELAY = 5
 

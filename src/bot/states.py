@@ -1,8 +1,8 @@
-from enum import Enum
+from django.db.models import TextChoices
 
 
-class States(str, Enum):
-    """Класс, описывающий состояния бота."""
+class UserStates(TextChoices):
+    """Класс, описывающий состояние пользователя при общении с ботом."""
 
     START = 'start'
     HELP = 'help'
