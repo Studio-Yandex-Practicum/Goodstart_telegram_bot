@@ -21,7 +21,6 @@ class DjangoPersistence(BasePersistence):
         users = await sync_to_async(self._get_all_users)()
         for user in users:
             conversations[user.telegram_id] = user.state
-        print('Все состояния пользователей:', {name: conversations})
         return {name: conversations}
 
     async def update_conversation(self, name, key, new_state) -> None:
@@ -36,7 +35,6 @@ class DjangoPersistence(BasePersistence):
             telegram_id=key[0],
             from_models=[Teacher, Student],
         )
-        print('Обновление состояния пользователя:', user.name, user.state)
         if user:
             try:
                 user.state = new_state

@@ -15,10 +15,7 @@ from bot.messages_texts.constants import (
 
 
 @log_errors
-async def feedback(
-    update: Update,
-    context: CallbackContext,
-):
+async def feedback(update: Update, context: CallbackContext):
     """
     `/feedback` command handler.
 
@@ -33,16 +30,16 @@ async def feedback(
         return UserStates.FEEDBACK_SUBJECT
     else:
         await update.message.reply_text(FEEDBACK_SUBJECT_REQUEST_MSG_ERROR)
-        return ConversationHandler.END  # Временная заглушка, без состояния
+        return ConversationHandler.END
 
 
-async def subject(update: Update, context: CallbackContext) -> int:
+async def subject(update: Update, context: CallbackContext):
     context.user_data['subject'] = update.message.text
     await update.message.reply_text(FEEDBACK_BODY_REQUEST_MSG)
     return UserStates.FEEDBACK_BODY
 
 
-async def body(update: Update, context: CallbackContext) -> int:
+async def body(update: Update, context: CallbackContext):
     context.user_data['body'] = update.message.text
 
     subject = context.user_data['subject']
@@ -52,6 +49,6 @@ async def body(update: Update, context: CallbackContext) -> int:
     await send_feedback_email(subject, body, user)
 
     await update.message.reply_text(FEEDBACK_SUCCESS_MSG)
-    return ConversationHandler.END  # Временная заглушка, без состояния
+    return UserStates.START
 
 feedback_handler = CommandHandler(feedback.__name__, feedback)

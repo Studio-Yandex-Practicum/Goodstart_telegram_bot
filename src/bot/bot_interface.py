@@ -115,6 +115,7 @@ async def build_main_handler():
         persistent=True,
         states={
             UserStates.START: [
+                feedback_handler,
                 CallbackQueryHandler(help,
                                      pattern=f'^{UserStates.HELP.value}$'),
                 CallbackQueryHandler(schedule,
