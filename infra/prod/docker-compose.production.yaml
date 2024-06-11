@@ -24,7 +24,7 @@ services:
     ports:
       - 8002:8000
   gateway:
-    build: ./infra/
+    build: ../
     restart: always
     volumes:
       - static_volume:/static/
