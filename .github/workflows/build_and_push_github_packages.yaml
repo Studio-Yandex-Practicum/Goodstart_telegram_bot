@@ -5,7 +5,7 @@ on:
     branches:
       - master
       - dev
-      - id-116-deploy
+      - feature/id-116-deploy
 
 env:
   REGISTRY: ghcr.io
