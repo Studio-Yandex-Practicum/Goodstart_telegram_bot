@@ -20,6 +20,9 @@ TELEGRAM_TOKEN = env('TELEGRAM_TOKEN')
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=['http://127.0.0.1:8000'])
+
+
 DEFAULT_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
