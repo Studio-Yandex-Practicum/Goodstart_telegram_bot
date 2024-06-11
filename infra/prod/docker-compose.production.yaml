@@ -8,14 +8,14 @@ volumes:
 services:
   db:
     image: postgres:latest
-    env_file: .env
+    env_file: ../../.env
     container_name: GoodStart-DB
     volumes:
       - pg_data:/var/lib/postgresql/data
   backend:
     # build: .
     image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:feature-id-116-deploy
-    env_file: .env
+    env_file: ../../.env
     depends_on:
       - db
     volumes:
@@ -24,7 +24,6 @@ services:
       - 8002:8000
   gateway:
     build: ./infra/
-    env_file: .env
     volumes:
       - static_volume:/static/
     ports:
