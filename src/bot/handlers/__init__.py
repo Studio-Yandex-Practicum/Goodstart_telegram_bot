@@ -5,8 +5,10 @@ from bot.handlers.success_registration import (
 )
 from bot.handlers.help import help_handler
 from bot.handlers.feedback import feedback_handler
+from bot.handlers.schedule import schedule_handler
 
 __all__ = [
     'echo_handler', 'start_handler', 'help_handler',
     'success_registration_webapp_handler', 'feedback_handler',
+    'schedule_handler',
 ]
