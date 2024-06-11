@@ -2,9 +2,10 @@ name: CD
 
 on:
     workflow_run:
-      workflows: ["Build and push Docker image"]
-      types:
-        - completed
+      workflows:
+        - Build and push Docker image
+    #   types:
+    #     - completed
 
 env:
   REGISTRY: ghcr.io
