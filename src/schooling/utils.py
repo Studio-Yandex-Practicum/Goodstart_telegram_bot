@@ -1,5 +1,8 @@
+from typing import Sequence
+
 from asgiref.sync import async_to_sync
 from django.conf import settings
+from django.db.models import Model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from telegram import Bot
@@ -51,3 +54,17 @@ def notify_about_lesson(sender, instance, created, **kwargs):
                              instance.student_id.telegram_id,
                              message_text,
                              reply_markup=reply_markup)
+
+
+def check_role_user_from_db(
+    telegram_id: int,
+    from_models: Sequence[Model],
+) -> Model:
+    """Получает пользователя из БД по telegram_id."""
+    for model in from_models:
+        try:
+            user = model.objects.get(telegram_id=telegram_id)
+            return user
+        except model.DoesNotExist:
+            continue
+    return None
