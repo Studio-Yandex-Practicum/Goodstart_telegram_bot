@@ -8,7 +8,7 @@ from django.conf import settings
 from core.logging import log_errors
 from schooling.models import Teacher, Student
 from bot.utils import check_user_from_db
-from bot.states import States
+from bot.states import UserStates
 from bot.messages_texts.constants import (
     UNKNOWN_USER_HELP_MSG,
 )
@@ -50,6 +50,6 @@ async def schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ]],
             ),
         )
-    return States.SCHEDULE
+    return UserStates.SCHEDULE
 
 schedule_handler = CommandHandler(schedule.__name__, schedule)
