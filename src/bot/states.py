@@ -7,3 +7,6 @@ class UserStates(TextChoices):
     START = 'start'
     HELP = 'help'
     SCHEDULE = 'schedule'
+    FEEDBACK = 'feedback'
+    FEEDBACK_SUBJECT_MSG = 'subject'
+    FEEDBACK_BODY_MSG = 'body'
