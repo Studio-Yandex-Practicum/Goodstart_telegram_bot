@@ -23,7 +23,7 @@ services:
     ports:
       - 8002:8000
   gateway:
-    build: .
+    build: ./infra/
     env_file: .env
     volumes:
       - static_volume:/static/

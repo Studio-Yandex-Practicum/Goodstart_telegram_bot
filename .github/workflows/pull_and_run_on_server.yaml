@@ -85,7 +85,7 @@ jobs:
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         timeout: 120s
         script: |
-          cd Goodstart_telegram_bot
+          cd Goodstart_telegram_bot/infra/prod
           # Выполняет pull образов с Docker Hub
           sudo docker compose -f docker-compose.production.yaml pull
           # Перезапускает все контейнеры в Docker Compose
