@@ -36,9 +36,6 @@ class DjangoPersistence(BasePersistence):
             telegram_id=key[0],
             from_models=[Teacher, Student],
         )
-        # вот тут очень долго выполняется изменение состояния пользователя
-        # из-за чего, если быстро написать ответное сообщение боту, его
-        # перехватывает echo_handler
         print('Обновление состояния пользователя:', user.name, user.state)
         if user:
             try:
