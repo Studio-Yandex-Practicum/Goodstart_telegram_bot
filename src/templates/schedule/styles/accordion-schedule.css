@@ -1,0 +1,17 @@
+.accordion-button {
+  background-color: #fff;
+  box-shadow: none;
+}
+
+.accordion-button:hover,
+.accordion-button:focus {
+  box-shadow: none;
+}
+
+.accordion-title {
+  font-size: 1.5rem;
+  padding: 1rem 1.25rem;
+  background-color: #cfe2ff;
+  border-top-right-radius: 0.375rem;
+  border-top-left-radius: 0.375rem;
+}

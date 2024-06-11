@@ -5,105 +5,24 @@
     <title>Телеграм-бот для преподавателей и учеников</title>
     {% load django_bootstrap5 %} {% bootstrap_css %}
     <style>
-      .accordion-button {
-        background-color: #fff;
-        box-shadow: none;
-      }
-
-      .accordion-button:hover,
-      .accordion-button:focus {
-        box-shadow: none;
-      }
-
-      .accordion-title {
+      .card-header {
         font-size: 1.5rem;
         padding: 1rem 1.25rem;
         background-color: #cfe2ff;
-        border-top-right-radius: 0.375rem;
-        border-top-left-radius: 0.375rem;
       }
     </style>
   </head>
   <body>
     <header>
       <h1 class="text-center mx-auto mb-4" style="max-width: 550px">
-        Телеграм-бот <br />
-        для преподавателей и учеников
+        Телеграм-бот <br> для преподавателей и учеников
       </h1>
     </header>
-    <main class="mx-auto p-2" style="max-width: 550px">
+    <main class="mx-auto p-2" align="center" style="max-width: 550px">
       {% block content %}{% endblock %}
     </main>
     <footer class="footer"></footer>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     {% bootstrap_javascript %}
-    <script>
-      // Когда весь HTML-документ загружен...
-      document.addEventListener("DOMContentLoaded", function () {
-        const days = [
-          "Понедельник",
-          "Вторник",
-          "Среда",
-          "Четверг",
-          "Пятница",
-          "Суббота",
-        ];
-        const months = [
-          "января",
-          "февраля",
-          "марта",
-          "апреля",
-          "мая",
-          "июня",
-          "июля",
-          "августа",
-          "сентября",
-          "октября",
-          "ноября",
-          "декабря",
-        ];
-        const accordionItems = document.querySelectorAll(".accordion-item");
-        const today = new Date();
-        // Вычисляем индекс текущего дня недели (Понедельник = 0, Вторник = 1, ..., Суббота = 5)
-        let dayIndex = today.getDay() - 1;
-
-        // Если сегодня воскресенье (dayIndex < 0), устанавливаем индекс дня на понедельник следующей недели
-        if (dayIndex < 0) {
-          dayIndex = 0;
-          today.setDate(today.getDate() + 1);
-        }
-
-        const date = today.getDate();
-        const month = months[today.getMonth()];
-
-        // Устанавливаем номера для каждого дня в аккордеоне
-        accordionItems.forEach((item, index) => {
-          const headerButton = item.querySelector(
-            ".accordion-header .accordion-button"
-          );
-          const dayName = days[index];
-          const newDate = new Date(
-            today.getFullYear(),
-            today.getMonth(),
-            date - dayIndex + index
-          );
-          headerButton.innerHTML = `${dayName}, ${newDate.getDate()} ${
-            months[newDate.getMonth()]
-          }`;
-        });
-
-        // Открываем текущий день в аккордеоне
-        if (dayIndex >= 0 && dayIndex < accordionItems.length) {
-          const currentDayAccordion = accordionItems[dayIndex].querySelector(
-            ".accordion-collapse"
-          );
-          currentDayAccordion.classList.add("show");
-          const currentDayButton = accordionItems[dayIndex].querySelector(
-            ".accordion-header .accordion-button"
-          );
-          currentDayButton.setAttribute("aria-expanded", "true");
-        }
-      });
-    </script>
   </body>
 </html>
