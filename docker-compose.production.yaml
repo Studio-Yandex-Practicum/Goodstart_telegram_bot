@@ -14,7 +14,7 @@ services:
       - pg_data:/var/lib/postgresql/data
   backend:
     # build: .
-    image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:dev
+    image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:feature-id-116-deploy
     env_file: .env
     depends_on:
       - db
