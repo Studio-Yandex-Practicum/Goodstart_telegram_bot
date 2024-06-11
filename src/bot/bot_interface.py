@@ -12,17 +12,17 @@ from telegram.ext import (
     PersistenceInput, MessageHandler, filters,
 )
 from bot.handlers import (
-    echo_handler, start_handler, help_handler,
-    success_registration_webapp_handler, feedback_handler,
+    echo_handler, start_handler, help_handler,feedback_handler,
+    success_registration_webapp_handler, schedule_handler,
 )
 from bot.handlers.feedback import subject, body
 from bot.handlers.conversation import help, schedule
 from bot.states import UserStates
 from bot.persistence import DjangoPersistence
 
-
 PERSISTENCE_UPDATE_DELAY = 5
 
+PERSISTENCE_UPDATE_DELAY = 5
 
 class Bot:
     """A singleton-class representing a Telegram bot."""
@@ -78,6 +78,7 @@ class Bot:
             success_registration_webapp_handler,
             echo_handler,
             feedback_handler,
+            schedule_handler,
             ])
         logger.info('Bot application built with handlers.')
         return app

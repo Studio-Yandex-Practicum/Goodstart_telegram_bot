@@ -1,20 +1,19 @@
 {% extends "registration/base.html" %}
 {% load django_bootstrap5 %}
+
 {% block content %}
-    <div class="card mb-1" style="max-width: 550px">
-      <div class="card-header">
-        Регистрация пользователя
-      </div>
-      <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
-          {% csrf_token %}
-          {% bootstrap_form form %}
-          <button type="submit" value="Зарегистрироваться" id="submit" disabled class="btn btn-lg btn-primary mb-3">Зарегистрироваться</button>
-          <br>
-          <input type="checkbox" onchange="document.getElementById('submit').disabled = !this.checked" /> Я ознакомлен(-а) с <a href="https://goodstart-education.ru/privacy" target="_blank">Политикой конфиденциальности</a>
-        </form>
-      </div>
+  <div class="card mb-1">
+    <h2 class="card-header">
+      Регистрация пользователя
+    </h2>
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" value="Зарегистрироваться" id="submit" disabled class="btn btn-lg btn-primary mb-3">Зарегистрироваться</button>
+        <br>
+        <input type="checkbox" onchange="document.getElementById('submit').disabled = !this.checked" /> Я ознакомлен(-а) с <a href="https://goodstart-education.ru/privacy" target="_blank">Политикой конфиденциальности</a>
+      </form>
     </div>
+  </div>
 {% endblock %}
-
-
