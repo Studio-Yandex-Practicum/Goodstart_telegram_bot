@@ -8,5 +8,5 @@ class UserStates(TextChoices):
     HELP = 'help'
     SCHEDULE = 'schedule'
     FEEDBACK = 'feedback'
-    FEEDBACK_SUBJECT_MSG = 'subject'
-    FEEDBACK_BODY_MSG = 'body'
+    FEEDBACK_SUBJECT_MSG = 'feedback_subject_msg'
+    FEEDBACK_BODY_MSG = 'feedback_body_msg'

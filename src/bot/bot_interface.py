@@ -9,13 +9,13 @@ from telegram import Update
 from telegram.ext import (
     Application, ApplicationBuilder,
     CallbackQueryHandler, ConversationHandler,
-    PersistenceInput,
+    PersistenceInput, MessageHandler, filters,
 )
-
 from bot.handlers import (
     echo_handler, start_handler, help_handler,
     success_registration_webapp_handler, feedback_handler,
 )
+from bot.handlers.feedback import subject, body
 from bot.handlers.conversation import help, schedule
 from bot.states import UserStates
 from bot.persistence import DjangoPersistence
@@ -76,7 +76,7 @@ class Bot:
             start_handler,
             help_handler,
             success_registration_webapp_handler,
-            # echo_handler,
+            echo_handler,
             feedback_handler,
             ])
         logger.info('Bot application built with handlers.')
@@ -110,7 +110,7 @@ class Bot:
 async def build_main_handler():
     """Функция создания главного обработчика."""
     return ConversationHandler(
-        entry_points=[start_handler],
+        entry_points=[start_handler, feedback_handler],
         name='main_handler',
         persistent=True,
         states={
@@ -131,6 +131,18 @@ async def build_main_handler():
                     start_handler,
                     pattern=f'^{UserStates.START.value}$',
                 ),
+            ],
+            UserStates.FEEDBACK_SUBJECT_MSG: [
+                MessageHandler(
+                    filters.TEXT & ~filters.COMMAND,
+                    subject
+                )
+            ],
+            UserStates.FEEDBACK_BODY_MSG: [
+                MessageHandler(
+                    filters.TEXT & ~filters.COMMAND,
+                    body
+                )
             ],
         },
         fallbacks=[start_handler],

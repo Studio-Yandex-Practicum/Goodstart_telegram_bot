@@ -9,8 +9,6 @@ from schooling.models import Teacher, Student
 from bot.utils import check_user_from_db
 from bot.states import UserStates
 
-THEME, BODY = range(2)
-
 
 @log_errors
 async def feedback(
@@ -57,30 +55,6 @@ async def body(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text(
         'Спасибо за ваше обращение!'
     )
-    return ConversationHandler.END
+    return UserStates.START
 
-
-@log_errors
-async def cancel(update: Update, context: CallbackContext) -> int:
-    await update.message.reply_text('Обращение отменено.')
-    return ConversationHandler.END
-
-
-feedback_handler = ConversationHandler(
-    entry_points=[CommandHandler(feedback.__name__, feedback)],
-    states={
-        UserStates.FEEDBACK_SUBJECT_MSG: [
-            MessageHandler(
-                filters.TEXT & ~filters.COMMAND,
-                subject
-            )
-        ],
-        UserStates.FEEDBACK_BODY_MSG: [
-            MessageHandler(
-                filters.TEXT & ~filters.COMMAND,
-                body
-            )
-        ],
-    },
-    fallbacks=[CommandHandler('cancel', cancel)],
-)
+feedback_handler = CommandHandler(feedback.__name__, feedback)
