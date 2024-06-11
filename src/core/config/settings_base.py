@@ -18,7 +18,7 @@ SECRET_KEY = env('SECRET_KEY', default=DEFAULT)
 
 TELEGRAM_TOKEN = env('TELEGRAM_TOKEN')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['http://127.0.0.1:8000'])
 
 CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=['http://127.0.0.1:8000'])
 

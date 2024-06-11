@@ -8,7 +8,7 @@ COPY pyproject.toml poetry.lock /app/
 
 # Copy source code
 COPY /src /app/
-COPY entrypoint.sh .
+COPY infra/entrypoint.sh .
 
 RUN poetry config virtualenvs.create false \
     && poetry install --without dev --no-root
