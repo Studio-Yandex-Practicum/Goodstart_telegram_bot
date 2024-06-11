@@ -17,8 +17,11 @@ from bot.handlers import (
     success_registration_webapp_handler,
 )
 from bot.handlers.conversation import help, schedule
-from bot.states import States
+from bot.states import UserStates
+from bot.persistence import DjangoPersistence
 
+
+PERSISTENCE_UPDATE_DELAY = 5
 
 class Bot:
     """A singleton-class representing a Telegram bot."""
@@ -55,18 +58,26 @@ class Bot:
 
     async def _build_app(self):
         """Build the application."""
-        persistence = PicklePersistence(filepath=settings.PERSISTENCE_PATH)
+        persistence = DjangoPersistence(
+            PersistenceInput(
+                bot_data=False,
+                chat_data=False,
+                user_data=False,
+                callback_data=False,
+            ),
+            update_interval=PERSISTENCE_UPDATE_DELAY,
+        )
         app = ApplicationBuilder().token(
-            settings.TELEGRAM_TOKEN).persistence(
-                persistence).build()
+            settings.TELEGRAM_TOKEN).persistence(persistence).build()
         main_handler = await build_main_handler()
         app.add_handlers([
             main_handler,
             start_handler,
+            help_handler,
+            success_registration_webapp_handler,
             echo_handler,
             schedule_handler,
             ])
-
         logger.info('Bot application built with handlers.')
         return app
 
@@ -99,15 +110,27 @@ async def build_main_handler():
     """Функция создания главного обработчика."""
     return ConversationHandler(
         entry_points=[start_handler],
-        persistent=True,
         name='main_handler',
+        persistent=True,
         states={
-            States.START: [
+            UserStates.START: [
                 CallbackQueryHandler(help,
-                                     pattern=f'^{States.HELP.value}$'),
+                                     pattern=f'^{UserStates.HELP.value}$'),
                 CallbackQueryHandler(schedule,
-                                     pattern=f'^{States.SCHEDULE.value}$'),
+                                     pattern=f'^{UserStates.SCHEDULE.value}$'),
+            ],
+            UserStates.HELP: [
+                CallbackQueryHandler(
+                    start_handler,
+                    pattern=f'^{UserStates.START.value}$',
+                ),
+            ],
+            UserStates.SCHEDULE: [
+                CallbackQueryHandler(
+                    start_handler,
+                    pattern=f'^{UserStates.START.value}$',
+                ),
             ],
         },
         fallbacks=[start_handler],
-        )
+    )
