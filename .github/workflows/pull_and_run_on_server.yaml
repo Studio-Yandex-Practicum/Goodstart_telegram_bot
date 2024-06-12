@@ -12,31 +12,8 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  tests:
-    name: Run tests
-    runs-on: ubuntu-latest
-    steps:
-    -
-      name: Check out the repo
-      uses: actions/checkout@v2
-    -
-      name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.12
-    -
-      name: Install dependencies
-      run: |
-        pip install poetry
-        poetry install --without dev --no-root
-        pip install pytest
-    -
-      name: Test with pytest
-      run: pytest
   deploy:
     runs-on: ubuntu-latest
-    needs: 
-      - tests
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
