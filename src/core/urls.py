@@ -10,6 +10,11 @@ urlpatterns = [
         include('potential_user.urls'),
         name='registration',
     ),
+    path(
+        'schedule/',
+        include('schooling.urls'),
+        name='schedule',
+    ),
 ]
 
 if settings.DEBUG:
