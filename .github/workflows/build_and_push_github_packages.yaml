@@ -1,11 +1,10 @@
-name: "Build and push Docker image"
+name: Build and push Docker image
 
 on:
   push:
     branches:
       - master
       - dev
-      - feature/id-116-deploy
 
 env:
   REGISTRY: ghcr.io
@@ -31,7 +30,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Build and push Docker image for Production
-        if: github.ref == 'refs/heads/feature/id-116-deploy'
+        if: github.ref == 'refs/heads/master'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -41,7 +40,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
       
       - name: Build and push Docker image for Stage
-        if: github.ref == 'refs/heads/feature/id-116-deploy'
+        if: github.ref == 'refs/heads/dev'
         uses: docker/build-push-action@v5
         with:
           context: . 
