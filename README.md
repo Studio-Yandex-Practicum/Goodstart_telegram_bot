@@ -102,3 +102,29 @@ MATERIAL_ADMIN_SITE = {
 ```
 Вот тут подробно показаны:
 https://www.youtube.com/watch?v=_ifWi-a1z6M&ab_channel=AntonMaistrenko
+
+## Деплой на сервер
+1. Создать на сервере папку /home/username/Goodstart_telegram_bot
+2. В папку Goodstart_telegram_bot положить: 
+- заполненый файл .env (см. .env.example)
+- файл docker-compose.dev.yaml
+- папку infra\dev (с сохранением иерархии)
+3. Запуск проекта
+```
+sudo docker compose -f docker-compose.dev.yaml up -d```
+```
+4. Остановка контейнера
+```
+sudo docker compose -f docker-compose.dev.yaml down
+```
+5. Создать суперпользователя
+```
+sudo docker compose -f docker-compose.dev.yaml exec backend export RUN_BOT=false
+sudo docker compose -f docker-compose.dev.yaml exec backend python manage.py createsuperuser
+```
+## Настройка CD
+В настройках репозитория (settings->secrets and variables->Actions->Repository secrets) настроить следующие переменные
+- HOST - ip вашего сервера
+- SSH_KEY - private key (полное содержание файла id_rsa)
+- SSH_PASSPHRASE - кодовая фраза вашего private key
+- USER - имя пользователя

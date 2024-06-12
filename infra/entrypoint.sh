@@ -1,6 +1,5 @@
 #!/bin/bash
 
-python manage.py makemigrations
 python manage.py collectstatic --noinput
 export PYTHONPATH=${PWD}
 python manage.py migrate --check

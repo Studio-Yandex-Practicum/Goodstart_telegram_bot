@@ -17,14 +17,14 @@ jobs:
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
-    - name: Copy docker-compose.production.yaml via ssh
+    - name: Copy docker-compose.dev.yaml via ssh
       uses: appleboy/scp-action@v0.1.3
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        source: "infra/dev/docker-compose.production.yaml"
+        source: "infra/dev/docker-compose.dev.yaml"
         target: "Goodstart_telegram_bot"
     - name: Copy Dockerfile via ssh
       uses: appleboy/scp-action@v0.1.3
@@ -55,9 +55,9 @@ jobs:
         script: |
           cd Goodstart_telegram_bot/infra/dev
           # Выполняет pull образов с Docker Hub
-          sudo docker compose -f docker-compose.production.yaml pull
+          sudo docker compose -f docker-compose.dev.yaml pull
           # Перезапускает все контейнеры в Docker Compose
-          sudo docker compose -f docker-compose.production.yaml down
-          sudo docker compose -f docker-compose.production.yaml up -d
+          sudo docker compose -f docker-compose.dev.yaml down
+          sudo docker compose -f docker-compose.dev.yaml up -d
           # Выполняет удаление старых образов
           sudo docker image prune -f
