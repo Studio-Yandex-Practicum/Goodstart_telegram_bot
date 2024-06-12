@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
     "Четверг",
     "Пятница",
     "Суббота",
-    "Воскресенье"
   ];
   const months = [
     "января",

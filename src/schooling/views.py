@@ -18,15 +18,15 @@ async def schedule_page(request, id):
 
     if user.__class__.__name__ == 'Teacher':
         schedule = await sync_to_async(Lesson.objects.filter)(
-            teacher_id=user.id
+            teacher_id=user.id,
         )
     else:
         schedule = await sync_to_async(Lesson.objects.filter)(
-            student_id=user.id
+            student_id=user.id,
         )
 
     schedule_mon = await sync_to_async(schedule.filter)(
-        datetime_start__date=start_week
+        datetime_start__date=start_week,
     )
     schedule_tue = await sync_to_async(schedule.filter)(
         datetime_start__date=start_week + datetime.timedelta(days=1),
@@ -44,7 +44,7 @@ async def schedule_page(request, id):
         datetime_start__date=start_week + datetime.timedelta(days=5),
     )
     schedule_sun = await sync_to_async(schedule.filter)(
-        datetime_start__date=end_week
+        datetime_start__date=end_week,
     )
 
     context = {
@@ -61,5 +61,5 @@ async def schedule_page(request, id):
     }
 
     return await sync_to_async(render)(
-        request, 'schedule/schedule.html', context
+        request, 'schedule/schedule.html', context,
     )
