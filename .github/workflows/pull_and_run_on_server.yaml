@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: ["Build and push Docker image"]
     types:
-      - completed
+      - in_progress
 
 env:
   REGISTRY: ghcr.io
