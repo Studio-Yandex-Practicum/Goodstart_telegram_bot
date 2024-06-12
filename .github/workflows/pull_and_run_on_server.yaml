@@ -6,6 +6,11 @@ on:
       - Build and push Docker image
     types:
       - completed
+  push:
+    branches:
+      - master
+      - dev
+      - feature/id-116-deploy
 
 env:
   REGISTRY: ghcr.io
