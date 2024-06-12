@@ -2,8 +2,7 @@ name: Pull and run on server
 
 on:
   workflow_run:
-    workflows:
-      - Build and push Docker image
+    workflows: ["Build and push Docker image"]
     types:
       - completed
 
