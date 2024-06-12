@@ -2,7 +2,7 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-  <div class="card mb-1">
+  <!-- <div class="card mb-1">
     <h2 class="card-header">
       Регистрация пользователя
     </h2>
@@ -14,6 +14,18 @@
         <br>
         <input type="checkbox" onchange="document.getElementById('submit').disabled = !this.checked" /> Я ознакомлен(-а) с <a href="https://goodstart-education.ru/privacy" target="_blank">Политикой конфиденциальности</a>
       </form>
+    </div>
+  </div> -->
+  <div class="card">
+    <h2 class="card-header">
+      Тригонометрические функции
+    </h2>
+    <div class="card-body">
+      <p class="card-text"><strong>Предмет:</strong> Математика</p>
+      <p class="card-text"><strong>Преподаватель:</strong> Иванов И.И.</p>
+      <p class="card-text"><strong>Время и дата:</strong> 12 июня 2024, 10:00</p>
+      <button type="button" class="btn btn-outline-primary" style="width: 50%;">Перенести</button>
+      <button type="button" class="btn btn-outline-danger">Отменить</button>
     </div>
   </div>
 {% endblock %}
