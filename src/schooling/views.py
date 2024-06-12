@@ -51,4 +51,4 @@ def schedule_page(request, id):
         'role': user.__class__.__name__,
     }
 
-    return render(request, 'schedule/schedule_lessons.html', context)
+    return render(request, 'schedule/schedule.html', context)
