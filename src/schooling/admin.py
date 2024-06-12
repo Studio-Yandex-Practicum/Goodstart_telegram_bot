@@ -1,10 +1,6 @@
 from django.contrib import admin
-from django.contrib.auth.models import Group
 
 from schooling.models import Student, Teacher, Subject, StudyClass, Lesson
-
-
-admin.site.unregister(Group)
 
 
 @admin.register(Teacher)
