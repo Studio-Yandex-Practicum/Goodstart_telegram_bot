@@ -1,11 +1,11 @@
-name: CD
+name: Bot stage deploy
 
 on:
-    workflow_run:
-      workflows:
-        - Build and push Docker image
-    #   types:
-    #     - completed
+  workflow_run:
+    workflows:
+      - Build and push Docker image
+    types:
+      - completed
 
 env:
   REGISTRY: ghcr.io
