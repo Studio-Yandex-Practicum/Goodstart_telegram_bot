@@ -145,13 +145,13 @@ ADMIN_REORDER = (
     'admin_user',
     {
         'app': 'schooling',
-        'models': ('schooling.Teacher', 'schooling.Student', 'schooling.Lesson')
+        'models': ('schooling.Teacher', 'schooling.Student', 'schooling.Lesson'),
     },
     {
         'app': 'schooling',
         'label': 'Предметы и классы',
-        'models': ('schooling.Subject', 'schooling.StudyClass')
-    }
+        'models': ('schooling.Subject', 'schooling.StudyClass'),
+    },
 )
 
 PERSISTENCE_DIR = ROOT_DIR / 'persistence_data'
