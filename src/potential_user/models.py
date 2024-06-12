@@ -55,7 +55,7 @@ class ApplicationForm(models.Model):
         null=True,
         )
 
-    approved = models.BooleanField(default=False)
+    approved = models.BooleanField('Принять заявку', default=False)
 
     class Meta:
         """Meta class of ApplicationForm."""

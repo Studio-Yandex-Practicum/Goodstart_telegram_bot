@@ -1,6 +1,10 @@
 from django.contrib import admin
+from django.contrib.auth.models import Group
 
 from schooling.models import Student, Teacher, Subject, StudyClass, Lesson
+
+
+admin.site.unregister(Group)
 
 
 @admin.register(Teacher)
@@ -9,6 +13,7 @@ class TeacherAdmin(admin.ModelAdmin):
 
     list_display = ('name', 'surname', 'get_competences')
     icon_name = 'edit'
+    exclude = ('state',)
 
     @admin.display(description='Предмет')
     def get_competences(self, obj):
@@ -22,6 +27,7 @@ class StudentAdmin(admin.ModelAdmin):
 
     list_display = ('name', 'surname', 'paid_lessons')
     icon_name = 'school'
+    exclude = ('state',)
 
 
 @admin.register(Subject)

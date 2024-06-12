@@ -13,6 +13,7 @@ class ApplicationFormAdmin(admin.ModelAdmin):
 
     icon_name = 'priority_high'
     actions = ['approve_applications']
+    exclude = ('telegram_id',)
 
     def get_fields(self,
                    request: HttpRequest,

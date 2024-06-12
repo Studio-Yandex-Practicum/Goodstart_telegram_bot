@@ -40,6 +40,7 @@ EXTERNAL_APPS = [
     'material.admin',
     'phonenumber_field',
     'django_bootstrap5',
+    'admin_reorder',
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + EXTERNAL_APPS + LOCAL_APPS
@@ -52,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'admin_reorder.middleware.ModelAdminReorder',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -137,5 +139,20 @@ MATERIAL_ADMIN_SITE = {
     'NAVBAR_REVERSE': True,  # Hide side navbar by default
     'SHOW_COUNTS': True,  # Show instances counts for each model
 }
+
+ADMIN_REORDER = (
+    'potential_user',
+    'admin_user',
+    {
+        'app': 'schooling',
+        'models': ('schooling.Teacher', 'schooling.Student', 'schooling.Lesson')
+    },
+    {
+        'app': 'schooling',
+        'label': 'Предметы и классы',
+        'models': ('schooling.Subject', 'schooling.StudyClass')
+    }
+)
+
 PERSISTENCE_DIR = ROOT_DIR / 'persistence_data'
 PERSISTENCE_PATH = PERSISTENCE_DIR / 'persistence_file'
