@@ -1,4 +1,4 @@
-name: Bot stage deploy
+name: Pull and run on server
 
 on:
   workflow_run:
@@ -6,11 +6,6 @@ on:
       - Build and push Docker image
     types:
       - completed
-  push:
-    branches:
-      - master
-      - dev
-      - feature/id-116-deploy
 
 env:
   REGISTRY: ghcr.io
