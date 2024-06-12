@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>Телеграм-бот для преподавателей и учеников</title>
     {% load django_bootstrap5 %} {% bootstrap_css %}
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
       .card-header {
         font-size: 1.5rem;
@@ -22,7 +23,6 @@
       {% block content %}{% endblock %}
     </main>
     <footer class="footer"></footer>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     {% bootstrap_javascript %}
   </body>
 </html>
