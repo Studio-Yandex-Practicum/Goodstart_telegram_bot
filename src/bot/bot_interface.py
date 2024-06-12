@@ -9,13 +9,13 @@ from telegram import Update
 from telegram.ext import (
     Application, ApplicationBuilder,
     CallbackQueryHandler, ConversationHandler,
-    PersistenceInput,
+    PersistenceInput, MessageHandler, filters,
 )
-
 from bot.handlers import (
-    echo_handler, start_handler, help_handler,
+    echo_handler, start_handler, help_handler,feedback_handler,
     success_registration_webapp_handler, schedule_handler,
 )
+from bot.handlers.feedback import subject, body
 from bot.handlers.conversation import help, schedule
 from bot.states import UserStates
 from bot.persistence import DjangoPersistence
@@ -77,6 +77,7 @@ class Bot:
             help_handler,
             success_registration_webapp_handler,
             echo_handler,
+            feedback_handler,
             schedule_handler,
             ])
         logger.info('Bot application built with handlers.')
@@ -110,11 +111,12 @@ class Bot:
 async def build_main_handler():
     """Функция создания главного обработчика."""
     return ConversationHandler(
-        entry_points=[start_handler],
+        entry_points=[start_handler, feedback_handler],
         name='main_handler',
         persistent=True,
         states={
             UserStates.START: [
+                feedback_handler,
                 CallbackQueryHandler(help,
                                      pattern=f'^{UserStates.HELP.value}$'),
                 CallbackQueryHandler(schedule,
@@ -130,6 +132,18 @@ async def build_main_handler():
                 CallbackQueryHandler(
                     start_handler,
                     pattern=f'^{UserStates.START.value}$',
+                ),
+            ],
+            UserStates.FEEDBACK_SUBJECT: [
+                MessageHandler(
+                    filters.TEXT & ~filters.COMMAND,
+                    subject,
+                ),
+            ],
+            UserStates.FEEDBACK_BODY: [
+                MessageHandler(
+                    filters.TEXT & ~filters.COMMAND,
+                    body,
                 ),
             ],
         },
