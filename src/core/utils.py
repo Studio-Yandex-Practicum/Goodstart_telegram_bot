@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.mail import send_mail
-from django.db.models.signals import pre_delete
+from django.db import IntegrityError
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -10,6 +11,7 @@ from bot.messages_texts.constants import (
     FAREWELL_TEACHER_MESSAGE, FAREWELL_STUDENT_MESSAGE,
 )
 from core.config.settings_base import EMAIL_HOST_USER
+from potential_user.models import ApplicationForm
 from schooling.models import Student, Teacher
 from schooling.utils import send_message_to_user
 
@@ -27,6 +29,38 @@ def delete_person_and_send_msg(sender, instance, *args, **kwargs):
             else FAREWELL_STUDENT_MESSAGE
         ),
     )
+
+
+@receiver(post_save, sender=ApplicationForm)
+def create_user_from_application(sender,
+                                 instance: ApplicationForm,
+                                 created,
+                                 **kwargs):
+    """Функция создания пользователя согласно роли в заявке."""
+    if instance.approved:
+        if instance.role == 'teacher':
+            user = Teacher(telegram_id=instance.telegram_id,
+                           name=instance.name,
+                           surname=instance.surname,
+                           city=instance.city,
+                           phone_number=instance.phone_number, )
+        elif instance.role == 'student':
+            user = Student(telegram_id=instance.telegram_id,
+                           name=instance.name,
+                           surname=instance.surname,
+                           city=instance.city,
+                           phone_number=instance.phone_number,
+                           study_class_id=instance.study_class_id,
+                           parents_contacts=instance.parents_contacts, )
+        try:
+            user.save()
+            instance.delete()
+        except IntegrityError as err:
+            raise ValueError(
+                f'Пользователь с telegram_id {instance.telegram_id} '
+                'уже существует.',
+            ) from err
+    # TODO: Возможно обработать сценарий, если пользователь существует.
 
 
 def send_registration_email(application_form):
