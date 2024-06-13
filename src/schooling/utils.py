@@ -1,4 +1,7 @@
-from asgiref.sync import async_to_sync
+import asyncio
+from datetime import timedelta
+
+from asgiref.sync import async_to_sync, sync_to_async
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -51,3 +54,39 @@ def notify_about_lesson(sender, instance, created, **kwargs):
                              instance.student_id.telegram_id,
                              message_text,
                              reply_markup=reply_markup)
+
+
+async def get_schedule_for_role(user):
+    """Получение расписания пользователя в зависимости от роли."""
+    if user.__class__.__name__ == 'Teacher':
+        schedule = await sync_to_async(Lesson.objects.filter)(
+            teacher_id=user.id,
+        )
+    else:
+        schedule = await sync_to_async(Lesson.objects.filter)(
+            student_id=user.id,
+        )
+
+    return schedule
+
+
+async def get_schedule_for_day(schedule, start_week, day_offset):
+    """Получение расписания пользователя в зависимости от дня."""
+    target_date = start_week + timedelta(days=day_offset)
+
+    return await sync_to_async(schedule.filter)(
+        datetime_start__date=target_date,
+    )
+
+
+async def get_schedule_week_tasks(schedule, start_week):
+    tasks = (
+        get_schedule_for_day(schedule, start_week, 0),
+        get_schedule_for_day(schedule, start_week, 1),
+        get_schedule_for_day(schedule, start_week, 2),
+        get_schedule_for_day(schedule, start_week, 3),
+        get_schedule_for_day(schedule, start_week, 4),
+        get_schedule_for_day(schedule, start_week, 5),
+        get_schedule_for_day(schedule, start_week, 6),
+    )
+    return await asyncio.gather(*tasks)

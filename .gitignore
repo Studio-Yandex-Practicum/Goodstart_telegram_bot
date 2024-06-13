@@ -165,8 +165,7 @@ wenv/
 .DS_Store
 # Django equipments
 
-admin/
-material/
+static/
 
 #SSL certificates
 *.pem
