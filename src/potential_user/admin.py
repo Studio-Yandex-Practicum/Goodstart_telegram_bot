@@ -19,7 +19,7 @@ class ApplicationFormAdmin(admin.ModelAdmin):
                    obj: ApplicationForm) -> Sequence[Callable[..., Any] | str]:
         """
         Прячет поле telegram_id.
-  
+
         Для роли Учителя возвращает не весь набор полей.
         """
         if obj and obj.role == 'teacher':
