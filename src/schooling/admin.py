@@ -66,10 +66,8 @@ class LessonAdmin(admin.ModelAdmin):
     @admin.display(description='Длительность')
     def duration(self, obj):
         """Возвращает длительность занятия."""
-        if obj.datetime_end:
-            return obj.datetime_end - obj.datetime_start
-        return None
-
+        return obj.datetime_end - obj.datetime_start
+  
     @admin.display(description='Начало', ordering='datetime_start')
     def start_time(self, obj):
         """Обрабатывает поле datetime_start."""
