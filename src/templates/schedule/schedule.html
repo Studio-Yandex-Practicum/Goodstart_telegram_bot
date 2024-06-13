@@ -1,0 +1,68 @@
+{% extends "schedule/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<main class="mx-auto p-2" style="max-width: 550px">
+  <div class="accordion" id="accordionExample">
+    <h2 class="accordion-header accordion-title" align="center">
+      Расписание уроков
+    </h2>
+    <div class="accordion-item" style="border-radius: 0">
+      <h3 class="accordion-header">
+        <button class="accordion-button collapsed" style="border-radius: 0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+          Понедельник
+        </button>
+      </h3>
+      {% include "schedule/includes/schedule_day_card.html" with schedule_day=schedule_mon id="collapseOne" %}
+    </div>
+    <div class="accordion-item">
+      <h3 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          Вторник
+        </button>
+      </h3>
+      {% include "schedule/includes/schedule_day_card.html" with schedule_day=schedule_tue id="collapseTwo" %}
+    </div>
+    <div class="accordion-item">
+      <h3 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+          Среда
+        </button>
+      </h3>
+      {% include "schedule/includes/schedule_day_card.html" with schedule_day=schedule_wed id="collapseThree" %}
+    </div>
+    <div class="accordion-item">
+      <h3 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+          Четверг
+        </button>
+      </h3>
+      {% include "schedule/includes/schedule_day_card.html" with schedule_day=schedule_thu id="collapseFour" %}
+    </div>
+    <div class="accordion-item">
+      <h3 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+          Пятница
+        </button>
+      </h3>
+      {% include "schedule/includes/schedule_day_card.html" with schedule_day=schedule_fri id="collapseFive" %}
+    </div>
+    <div class="accordion-item">
+      <h3 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+          Суббота
+        </button>
+      </h3>
+      {% include "schedule/includes/schedule_day_card.html" with schedule_day=schedule_sat id="collapseSix" %}
+    </div>
+  </div>
+  <script type="text/javascript">
+    Telegram.WebApp.ready();
+    Telegram.WebApp.MainButton.setText('Закрыть').show().onClick(function () {
+        const data = JSON.stringify({success: true});
+        Telegram.WebApp.sendData(data);
+        Telegram.WebApp.close();
+    });
+  </script>
+</main>
+{% endblock content %}
