@@ -13,21 +13,24 @@ class ApplicationFormAdmin(admin.ModelAdmin):
 
     icon_name = 'priority_high'
     actions = ['approve_applications']
-    exclude = ('telegram_id',)
 
     def get_fields(self,
                    request: HttpRequest,
                    obj: ApplicationForm) -> Sequence[Callable[..., Any] | str]:
-        """Для роли Учителя возращает не все поля."""
+        """
+        Прячет поле telegram_id.
+        
+        Для роли Учителя возвращает не весь набор полей.
+        """
         if obj and obj.role == 'teacher':
-            return ['telegram_id',
-                    'role',
+            return ['role',
                     'name',
                     'surname',
                     'city',
                     'phone_number',
                     'approved']
         fields = super().get_fields(request, obj)
+        fields.remove('telegram_id')
         return fields
 
     @admin.action(description='Подтвердить выбранные заявки')

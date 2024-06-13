@@ -470,19 +470,6 @@ files = [
 ]
 
 [[package]]
-name = "django-modeladmin-reorder"
-version = "0.3.1"
-description = "Custom ordering for the apps and models in the admin app."
-optional = false
-python-versions = "*"
-files = [
-    {file = "django-modeladmin-reorder-0.3.1.tar.gz", hash = "sha256:bf42d0dcd184b796b4d6d988c4b4cea7914adfc4430dd9978a8a0199051f189f"},
-]
-
-[package.dependencies]
-django = "*"
-
-[[package]]
 name = "django-phonenumber-field"
 version = "7.3.0"
 description = "An international phone number field for django models."
@@ -1693,4 +1680,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "5348715dc8d8fd8be4ecc5dcb582ef0d741844cb3ef7507de51c68cbaf9a0be8"
+content-hash = "54876428493c6c5dc14f1d1970318e1c930d5717e8a5a7c43b12f2610face84a"

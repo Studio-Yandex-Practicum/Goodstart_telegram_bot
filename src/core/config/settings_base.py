@@ -37,10 +37,9 @@ LOCAL_APPS = [
 
 EXTERNAL_APPS = [
     'material',
-    'material.admin',
+    'core.apps.CustomAdminConfig',
     'phonenumber_field',
     'django_bootstrap5',
-    'admin_reorder',
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + EXTERNAL_APPS + LOCAL_APPS
@@ -53,7 +52,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'admin_reorder.middleware.ModelAdminReorder',
 ]
 
 ROOT_URLCONF = 'core.urls'
