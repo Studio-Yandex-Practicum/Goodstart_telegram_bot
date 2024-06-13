@@ -32,6 +32,6 @@ class CustomAdminSite(MaterialAdminSite):
                     studyclass_dict,
                     subject_dict,
                 ],
-            }
+            },
         )
         return app_list
