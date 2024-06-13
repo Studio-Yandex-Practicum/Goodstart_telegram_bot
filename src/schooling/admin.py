@@ -51,7 +51,7 @@ class LessonAdmin(admin.ModelAdmin):
 
     list_display = (
         'name', 'subject', 'teacher_id', 'student_id',
-        'datetime_start', 'datetime_end', 'is_passed', 'test_lesson',
+        'start_time', 'duration', 'is_passed', 'test_lesson',
     )
     list_filter = (
         'subject', 'teacher_id', 'student_id',
@@ -62,3 +62,15 @@ class LessonAdmin(admin.ModelAdmin):
         'teacher_id__name', 'student_id__name',
     )
     icon_name = 'access_time'
+
+    @admin.display(description='Длительность')
+    def duration(self, obj):
+        """Возвращает длительность занятия."""
+        if obj.datetime_end:
+            return obj.datetime_end - obj.datetime_start
+        return None
+
+    @admin.display(description='Начало', ordering='datetime_start')
+    def start_time(self, obj):
+        """Обрабатывает поле datetime_start."""
+        return obj.datetime_start

@@ -161,8 +161,8 @@ class Lesson(models.Model):
         verbose_name='Студент',
         related_name='lessons',
     )
-    datetime_start = models.DateTimeField('Начало занятия')
-    datetime_end = models.DateTimeField('Длительность')
+    datetime_start = models.DateTimeField('Время начала занятия')
+    datetime_end = models.DateTimeField('Время окончания занятия')
     is_passed = models.BooleanField('Занятие прошло', default=False)
     test_lesson = models.BooleanField('Тестовое занятие', default=False)
 
