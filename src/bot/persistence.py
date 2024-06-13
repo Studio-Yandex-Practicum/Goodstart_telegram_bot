@@ -1,5 +1,6 @@
 from telegram.ext import BasePersistence
 from asgiref.sync import sync_to_async
+from django.db.utils import IntegrityError
 
 from schooling.models import Teacher, Student
 from bot.utils import check_user_from_db
@@ -35,8 +36,11 @@ class DjangoPersistence(BasePersistence):
             from_models=[Teacher, Student],
         )
         if user:
-            user.state = new_state
-            await user.asave()
+            try:
+                user.state = new_state
+                await user.asave()
+            except IntegrityError as error:
+                print(f'Возникла ошибка при сохранении состояния: {error}')
 
     async def get_bot_data(self):
         """Заглушка для неиспользуемого метода."""

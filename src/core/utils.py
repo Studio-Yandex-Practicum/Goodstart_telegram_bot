@@ -1,3 +1,4 @@
+from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.mail import send_mail
 from django.db import IntegrityError
@@ -98,3 +99,36 @@ def send_registration_email(application_form):
         html_message=html_content,
     )
     return HttpResponse('Заявка на регистрацию принята!')
+
+
+@sync_to_async
+def send_feedback_email(subject, body, user):
+    """Отправляет админу сообщение от зарегистрированного пользователя."""
+    html_content = render_to_string(
+        'emailing/feedback_email.html',
+        {
+            'subject': f'{user.name} {user.surname}: {subject}',
+            'body': body,
+            'footer_meta_data_phone': (
+                f'Телефон для связи: {user.phone_number}'
+            ),
+            'footer_meta_data_tg_id': (
+                f'Телеграм-id пользователя: {user.telegram_id}'
+            ),
+        },
+    )
+    from_email = EMAIL_HOST_USER
+    recipient_list = Administrator.objects.filter(
+        is_active=True,
+    ).values_list(
+        'email',
+        flat=True,
+    )
+
+    send_mail(
+        subject,
+        message=None,
+        from_email=from_email,
+        recipient_list=recipient_list,
+        html_message=html_content,
+    )

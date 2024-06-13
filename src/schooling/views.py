@@ -1,42 +1,29 @@
 import datetime
 
 from django.shortcuts import render
+from asgiref.sync import sync_to_async
 
-from schooling.models import Lesson, Teacher, Student
-from schooling.utils import check_role_user_from_db
+from schooling.models import Teacher, Student
+from schooling.utils import (
+    get_schedule_for_role, get_schedule_week_tasks,
+)
+from bot.utils import check_user_from_db
 
 
-#TODO 2очереди. Посмотреть и отрефакторить вьюху.
-#Возможно в асинхронном представлении
-def schedule_page(request, id):
+async def schedule_page(request, id):
     """Обрабатывает запрос на получение расписания занятий."""
     today = datetime.date.today()
     start_week = today - datetime.timedelta(days=today.weekday())
     end_week = start_week + datetime.timedelta(days=6)
-    user = check_role_user_from_db(id, (Teacher, Student))
 
-    if user.__class__.__name__ == 'Teacher':
-        schedule = Lesson.objects.filter(teacher_id=user.id)
-    else:
-        schedule = Lesson.objects.filter(student_id=user.id)
+    user = await check_user_from_db(id, (Teacher, Student))
 
-    schedule_mon = schedule.filter(datetime_start__date=start_week)
-    schedule_tue = schedule.filter(
-        datetime_start__date=start_week + datetime.timedelta(days=1),
-    )
-    schedule_wed = schedule.filter(
-        datetime_start__date=start_week + datetime.timedelta(days=2),
-    )
-    schedule_thu = schedule.filter(
-        datetime_start__date=start_week + datetime.timedelta(days=3),
-    )
-    schedule_fri = schedule.filter(
-        datetime_start__date=start_week + datetime.timedelta(days=4),
-    )
-    schedule_sat = schedule.filter(
-        datetime_start__date=start_week + datetime.timedelta(days=5),
-    )
-    schedule_sun = schedule.filter(datetime_start__date=end_week)
+    schedule = await get_schedule_for_role(user)
+
+    (
+        schedule_mon, schedule_tue, schedule_wed,
+        schedule_thu, schedule_fri, schedule_sat, schedule_sun,
+    ) = await get_schedule_week_tasks(schedule, start_week)
 
     context = {
         'start_week': start_week,
@@ -51,4 +38,6 @@ def schedule_page(request, id):
         'role': user.__class__.__name__,
     }
 
-    return render(request, 'schedule/schedule_lessons.html', context)
+    return await sync_to_async(render)(
+        request, 'schedule/schedule.html', context,
+    )
