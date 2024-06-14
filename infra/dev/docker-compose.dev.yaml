@@ -16,7 +16,7 @@ services:
     ports:
       - 5432:5432
   backend:
-    image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:dev
+    image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:feature-id-116-deploy
     # build:
     #   context: ../..
     #   dockerfile: infra/dev/dev.Dockerfile
