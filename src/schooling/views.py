@@ -42,7 +42,7 @@ async def schedule_page(request, id):
     }
 
     return await sync_to_async(render)(
-        request, 'schedule/schedule.html', context,
+        request, 'schedule.html', context,
     )
 
 
@@ -68,7 +68,7 @@ async def details_schedule_page(request, id, lesson_id):
     context['lesson'] = lesson
 
     return await sync_to_async(render)(
-        request, 'schedule/schedule_details_card.html', context,
+        request, 'schedule_details_card.html', context,
     )
 
 
@@ -86,7 +86,7 @@ async def change_datetime_lesson(request, id, lesson_id):
 
     return render(
         request,
-        'schedule/schedule_change_dt_lesson.html',
+        'schedule_change_dt_lesson.html',
         context={'form': form},
     )
 
@@ -99,5 +99,5 @@ async def cancel_lesson(request, id, lesson_id):
 
     return render(
         request,
-        'schedule/schedule_cancel_lesson.html',
+        'schedule_cancel_lesson.html',
     )
