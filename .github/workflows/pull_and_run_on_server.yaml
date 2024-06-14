@@ -79,6 +79,10 @@ jobs:
           echo EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} >> .env
           echo DEFAULT_EMAIL_ADDRESS=${{ secrets.DEFAULT_EMAIL_ADDRESS }} >> .env
           echo NGINX_PORT=${{ secrets.NGINX_PORT }} >> .env
+          # удалить после мержа в dev
+          echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+          echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
           
           cd infra/dev
 
@@ -87,9 +91,9 @@ jobs:
           # Перезапускает все контейнеры в Docker Compose
           sudo docker compose -f docker-compose.dev.yaml down
           sudo docker compose -f docker-compose.dev.yaml up -d
-          sudo docker compose -f docker-compose.dev.yaml exec backend export RUN_BOT=false
+          sudo docker compose -f docker-compose.dev.yaml exec backend sh -c "export RUN_BOT=false"
           sudo docker compose -f docker-compose.dev.yaml exec backend python manage.py collectstatic
           sudo docker compose -f docker-compose.dev.yaml exec backend python manage.py migrate
-          sudo docker compose -f docker-compose.dev.yaml exec backend export RUN_BOT=true
+          sudo docker compose -f docker-compose.dev.yaml exec backend sh -c "export RUN_BOT=true"
           # Выполняет удаление старых образов
           sudo docker image prune -f
