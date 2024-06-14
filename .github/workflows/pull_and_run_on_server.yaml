@@ -46,6 +46,7 @@ jobs:
           labels: feature-id-116-deploy
   deploy:
     runs-on: ubuntu-latest
+    needs: build_and_push
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
