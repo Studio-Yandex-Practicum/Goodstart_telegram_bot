@@ -39,7 +39,7 @@ jobs:
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        source: "infra/def/nginx.conf"
+        source: "infra/dev/nginx.conf"
         target: ${{ env.DEPLOY_PATH }}
     - name: Executing remote ssh commands to deploy
       uses: appleboy/ssh-action@master
