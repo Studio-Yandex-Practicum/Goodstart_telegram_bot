@@ -18,6 +18,32 @@ env:
   DEPLOY_PATH: Goodstart_telegram_bot
 
 jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      
+      - name: Build and push Docker image for Stage
+        if: github.ref == 'refs/heads/dev'
+        uses: docker/build-push-action@v5
+        with:
+          context: . 
+          file: infra/dev/dev.Dockerfile
+          push: true
+          tags: feature-id-116-deploy
+          labels: feature-id-116-deploy
   deploy:
     runs-on: ubuntu-latest
     steps:

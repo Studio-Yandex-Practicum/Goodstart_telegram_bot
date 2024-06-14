@@ -12,4 +12,4 @@ COPY ../../src /app/src
 RUN poetry config virtualenvs.create false \
     && poetry install --without dev --no-root
 
-CMD ["poetry", "run", "uvicorn", "core.asgi_prod:application", "--reload", "--lifespan", "on", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["poetry", "run", "uvicorn", "core.asgi_prod:application", "--lifespan", "on", "--host", "0.0.0.0", "--port", "8000"]
