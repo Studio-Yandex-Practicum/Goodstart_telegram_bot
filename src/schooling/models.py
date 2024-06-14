@@ -64,8 +64,7 @@ class Student(GeneralUserModel):
 
     study_class_id = models.ForeignKey(
         'StudyClass',
-        # TODO После реализации модели StudyClass проработать правило удаления
-        on_delete=models.DO_NOTHING,
+        on_delete=models.PROTECT,
         verbose_name='ID учебного класса',
         related_name='students',
         null=True,
