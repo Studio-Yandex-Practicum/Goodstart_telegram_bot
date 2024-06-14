@@ -1,11 +1,14 @@
 name: Pull and run on server
 
 on:
-  workflow_run:
-    workflows:
-      - Build and push Docker image
-    types:
-      - completed
+  # workflow_run:
+  #   workflows:
+  #     - Build and push Docker image
+  #   types:
+  #     - completed
+  push:
+    branches:
+      - feature-id-116-deploy-test
 
 env:
   REGISTRY: ghcr.io
@@ -53,7 +56,37 @@ jobs:
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         timeout: 120s
         script: |
-          cd Goodstart_telegram_bot/infra/dev
+          cd Goodstart_telegram_bot
+          rm .env
+          touch .env
+
+          echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env
+          echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
+          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
+          echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
+          echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+          echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+          echo BASE_URL=${{ secrets.BASE_URL }} >> .env
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+          echo DEBUG=${{ secrets.DEBUG }} >> .env
+          echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
+          echo CSRF_TRUSTED_ORIGINS=${{ secrets.CSRF_TRUSTED_ORIGINS }} >> .env
+          echo TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }} >> .env
+          echo DJANGO_SUPERUSER_USERNAME=${{ secrets.DJANGO_SUPERUSER_USERNAME }} >> .env
+          echo DJANGO_SUPERUSER_EMAIL=${{ secrets.HOST_DJANGO_SUPERUSER_EMAILNG }} >> .env
+          echo DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD }} >> .env
+          echo DJANGO_SUPERUSER_FIRSTNAME=${{ secrets.DJANGO_SUPERUSER_FIRSTNAME }} >> .env
+          echo DJANGO_SUPERUSER_LASTNAME=${{ secrets.DJANGO_SUPERUSER_LASTNAME }} >> .env
+          echo DJANGO_SUPERUSER_PHONE=${{ secrets.DJANGO_SUPERUSER_PHONE }} >> .env
+          echo EMAIL_BACKEND=${{ secrets.EMAIL_BACKEND }} >> .env
+          echo EMAIL_HOST=${{ secrets.EMAIL_HOST }} >> .env
+          echo EMAIL_PORT=${{ secrets.EMAIL_PORT }} >> .env
+          echo EMAIL_ACCOUNT=${{ secrets.EMAIL_ACCOUNT }} >> .env
+          echo EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} >> .env
+          echo DEFAULT_EMAIL_ADDRESS=${{ secrets.DEFAULT_EMAIL_ADDRESS }} >> .env
+          
+          cd infra/dev
+
           # Выполняет pull образов с Docker Hub
           sudo docker compose -f docker-compose.dev.yaml pull
           # Перезапускает все контейнеры в Docker Compose
