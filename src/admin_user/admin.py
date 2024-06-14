@@ -31,10 +31,6 @@ class AdministratorAdmin(UserAdmin):
             'Разрешения', {
                 'fields': (
                     'is_active',
-                    'is_staff',
-                    'is_superuser',
-                    'groups',
-                    'user_permissions',
                 ),
             },
         ),
@@ -71,3 +67,4 @@ class AdministratorAdmin(UserAdmin):
     list_filter = ('is_staff',)
     search_help_text = 'Поиск по почте или имени пользователя.'
     ordering = ('last_name',)
+    readonly_fields = ('last_login', 'date_joined')
