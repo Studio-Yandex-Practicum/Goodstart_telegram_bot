@@ -61,7 +61,7 @@ class AdministratorAdmin(UserAdmin):
             },
         ),
     )
-    
+
     list_display = ('first_name', 'last_name', 'email', 'last_login',)
     search_fields = ('email',)
     list_filter = ('is_staff',)
