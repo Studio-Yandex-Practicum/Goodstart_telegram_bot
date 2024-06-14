@@ -3,7 +3,7 @@ import datetime
 from django.shortcuts import render
 from asgiref.sync import sync_to_async
 
-from schooling.models import Teacher, Student
+from schooling.models import Teacher, Student, Lesson
 from schooling.utils import (
     get_schedule_for_role, get_schedule_week_tasks,
 )
@@ -36,8 +36,34 @@ async def schedule_page(request, id):
         'schedule_sat': schedule_sat,
         'schedule_sun': schedule_sun,
         'role': user.__class__.__name__,
+        'user_tg_id': user.telegram_id,
     }
 
     return await sync_to_async(render)(
         request, 'schedule/schedule.html', context,
+    )
+
+
+async def details_schedule_page(request, id, lesson_id):
+    context = {}
+    user = await check_user_from_db(id, (Teacher, Student))
+    user_role = user.__class__.__name__
+    lesson = await Lesson.objects.select_related(
+        'subject', 'teacher_id', 'student_id',
+    ).aget(id=lesson_id)
+
+    if user_role == 'Teacher':
+        context['user_full_name'] = (
+            f'{lesson.student_id}'
+        )
+    else:
+        context['user_full_name'] = (
+            f'{lesson.teacher_id}'
+        )
+
+    context['user_role'] = user_role
+    context['lesson'] = lesson
+
+    return await sync_to_async(render)(
+        request, 'schedule/schedule_details_card.html', context
     )

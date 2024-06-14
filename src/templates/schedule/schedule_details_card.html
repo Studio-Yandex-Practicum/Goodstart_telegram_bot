@@ -1,0 +1,23 @@
+{% extends "schedule/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<main class="mx-auto p-2" align="center" style="max-width: 550px">
+  <div class="card">
+    <h2 class="card-header">
+      {{ lesson.name }}
+    </h2>
+    <div class="card-body">
+      <p class="card-text"><strong>Предмет:</strong> {{ lesson.subject }}</p>
+      {% if user_role == 'Teacher' %}
+        <p class="card-text"><strong>Ученик:</strong> {{ user_full_name }}</p>
+      {% else %}
+        <p class="card-text"><strong>Преподаватель:</strong> {{ user_full_name }}</p>
+      {% endif %}
+      <p class="card-text"><strong>Время и дата:</strong><br>{{ lesson.datetime_start }} - {{ lesson.datetime_end }}</p>
+      <button type="button" class="btn btn-outline-primary" style="width: 38%;">Перенести</button>
+      <button type="button" class="btn btn-outline-danger" style="width: 38%;">Отменить</button>
+    </div>
+  </div>
+</main>
+{% endblock content %}
