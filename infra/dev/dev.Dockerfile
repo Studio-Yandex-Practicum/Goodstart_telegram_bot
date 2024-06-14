@@ -15,4 +15,4 @@ RUN poetry config virtualenvs.create false \
 ENTRYPOINT ["bash", "entrypoint.sh"]
 ENV RUN_BOT true
 
-CMD ["poetry", "run", "uvicorn", "core.asgi_prod:application", "--reload", "--lifespan", "on", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["poetry", "run", "uvicorn", "core.asgi_prod:application", "--lifespan", "on", "--host", "0.0.0.0", "--port", "8000"]
