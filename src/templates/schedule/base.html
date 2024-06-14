@@ -1,21 +1,22 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Телеграм-бот для преподавателей и учеников</title>
-    {% load django_bootstrap5 %}
-    {% bootstrap_css %}
+    {% load django_bootstrap5 %} {% bootstrap_css %}
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script>
-      function webviewClose() {
-        window.Telegram.WebApp.close();
-      }
-    </script>
+    <link href="{% static 'styles/accordion-schedule.css' %}" rel="stylesheet">
   </head>
   <body>
-    {% include "schedule/header.html" %}
-    <div class="card-body">
-      {% block content %}{% endblock %}
-    </div>
+    {% include "schedule/includes/header.html" %}
+  
+    {% block content %}
+    {% endblock content %}
+
+    {% include "schedule/includes/footer.html" %}
+
+    {% bootstrap_javascript %}
+    <script src="{% static 'scripts/accordion-schedule.js' %}"></script>
   </body>
 </html>
