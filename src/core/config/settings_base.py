@@ -40,7 +40,7 @@ LOCAL_APPS = [
 
 EXTERNAL_APPS = [
     'material',
-    'material.admin',
+    'core.apps.CustomAdminConfig',
     'phonenumber_field',
     'django_bootstrap5',
 ]
@@ -140,5 +140,3 @@ MATERIAL_ADMIN_SITE = {
     'NAVBAR_REVERSE': True,  # Hide side navbar by default
     'SHOW_COUNTS': True,  # Show instances counts for each model
 }
-PERSISTENCE_DIR = ROOT_DIR / 'persistence_data'
-PERSISTENCE_PATH = PERSISTENCE_DIR / 'persistence_file'
