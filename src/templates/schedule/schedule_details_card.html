@@ -15,8 +15,12 @@
         <p class="card-text"><strong>Преподаватель:</strong> {{ user_full_name }}</p>
       {% endif %}
       <p class="card-text"><strong>Время и дата:</strong><br>{{ lesson.datetime_start }} - {{ lesson.datetime_end }}</p>
-      <button type="button" class="btn btn-outline-primary" style="width: 38%;">Перенести</button>
-      <button type="button" class="btn btn-outline-danger" style="width: 38%;">Отменить</button>
+      <a class="btn btn-outline-primary" style="width: 38%;" href="{% url 'schedule:change_datetime_lesson' user_tg_id lesson.id %}" role="button">
+        Перенести
+      </a>
+      <a class="btn btn-outline-danger" style="width: 38%;" href="{% url 'schedule:cancel_lesson' user_tg_id lesson.id %}" role="button">
+        Отменить
+      </a>
     </div>
   </div>
 </main>

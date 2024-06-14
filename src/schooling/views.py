@@ -1,8 +1,10 @@
 import datetime
 
+from django.http import HttpResponse
 from django.shortcuts import render
 from asgiref.sync import sync_to_async
 
+from schooling.forms import ChangeDateTimeLesson
 from schooling.models import Teacher, Student, Lesson
 from schooling.utils import (
     get_schedule_for_role, get_schedule_week_tasks,
@@ -61,9 +63,41 @@ async def details_schedule_page(request, id, lesson_id):
             f'{lesson.teacher_id}'
         )
 
+    context['user_tg_id'] = user.telegram_id
     context['user_role'] = user_role
     context['lesson'] = lesson
 
     return await sync_to_async(render)(
-        request, 'schedule/schedule_details_card.html', context
+        request, 'schedule/schedule_details_card.html', context,
+    )
+
+
+async def change_datetime_lesson(request, id, lesson_id):
+    form = ChangeDateTimeLesson()
+
+    if request.method == 'POST':
+        form = ChangeDateTimeLesson(request.POST)
+        if form.is_valid():
+            return HttpResponse(
+                'Заявка отправлена администратору! '
+                f'Новое дата/время {form.cleaned_data['dt_field']}',
+            )
+            # TODO: обработать сценарий отправки заявки администратору.
+
+    return render(
+        request,
+        'schedule/schedule_change_dt_lesson.html',
+        context={'form': form},
+    )
+
+
+async def cancel_lesson(request, id, lesson_id):
+    if request.method == 'POST':
+        return HttpResponse(
+            'Заявка на отмену занятия отправлена администратору!',
+        )
+
+    return render(
+        request,
+        'schedule/schedule_cancel_lesson.html',
     )

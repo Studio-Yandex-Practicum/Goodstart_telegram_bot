@@ -1,0 +1,16 @@
+{% extends "schedule/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<main class="mx-auto p-2" align="center" style="max-width: 550px">
+  <div class="card">
+    <h2 class="card-header">
+      Вы уверены, что хотите оставить заявку на отмену занятия?
+    </h2>
+    <form method="post">
+      {% csrf_token %}
+      {% bootstrap_button button_type="submit" content="Уверен" %}
+    </form>
+  </div>
+</main>
+{% endblock content %}
