@@ -137,20 +137,3 @@ MATERIAL_ADMIN_SITE = {
     'NAVBAR_REVERSE': True,  # Hide side navbar by default
     'SHOW_COUNTS': True,  # Show instances counts for each model
 }
-
-ADMIN_REORDER = (
-    'potential_user',
-    'admin_user',
-    {
-        'app': 'schooling',
-        'models': ('schooling.Teacher', 'schooling.Student', 'schooling.Lesson'),
-    },
-    {
-        'app': 'schooling',
-        'label': 'Предметы и классы',
-        'models': ('schooling.Subject', 'schooling.StudyClass'),
-    },
-)
-
-PERSISTENCE_DIR = ROOT_DIR / 'persistence_data'
-PERSISTENCE_PATH = PERSISTENCE_DIR / 'persistence_file'
