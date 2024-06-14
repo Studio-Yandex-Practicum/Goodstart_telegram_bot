@@ -15,6 +15,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  DEPLOY_PATH: Goodstart_telegram_bot
 
 jobs:
   deploy:
@@ -58,7 +59,7 @@ jobs:
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         timeout: 120s
         script: |
-          cd Goodstart_telegram_bot
+          cd ${{ env.DEPLOY_PATH }}
           rm .env
           touch .env
 
@@ -86,6 +87,7 @@ jobs:
           echo EMAIL_ACCOUNT=${{ secrets.EMAIL_ACCOUNT }} >> .env
           echo EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} >> .env
           echo DEFAULT_EMAIL_ADDRESS=${{ secrets.DEFAULT_EMAIL_ADDRESS }} >> .env
+          echo NGINX_PORT=${{ secrets.NGINX_PORT }} >> .env
           
           cd infra/dev
 
