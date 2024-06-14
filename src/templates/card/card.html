@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Телеграм-бот для преподавателей и учеников</title>
+    {% load django_bootstrap5 %} {% bootstrap_css %}
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+      .card-header {
+        font-size: 1.5rem;
+        padding: 1rem 1.25rem;
+        background-color: #cfe2ff;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1 class="text-center mx-auto mb-4" style="max-width: 550px">
+        Телеграм-бот <br/> для преподавателей и учеников
+      </h1>
+    </header>
+    <main class="mx-auto p-2" align="center" style="max-width: 550px">
+      <div class="card">
+        <h2 class="card-header">
+          Тригонометрические функции
+        </h2>
+        <div class="card-body">
+          <p class="card-text"><strong>Предмет:</strong> Математика</p>
+          <p class="card-text"><strong>Преподаватель:</strong> Иванов И.И.</p>
+          <p class="card-text"><strong>Время и дата:</strong> 12 июня 2024, 10:00</p>
+          <button type="button" class="btn btn-outline-primary" style="width: 38%;">Перенести</button>
+          <button type="button" class="btn btn-outline-danger" style="width: 38%;">Отменить</button>
+        </div>
+      </div>
+    </main>
+    <footer class="footer"></footer>
+    {% bootstrap_javascript %}
+  </body>
+</html>
