@@ -4,6 +4,7 @@ from django.shortcuts import render
 
 from potential_user.forms import RegistrationForm
 from potential_user.models import ApplicationForm
+from core.logging import log_errors
 from core.utils import send_registration_email
 
 
@@ -14,12 +15,11 @@ class RegistrationCreateView(CreateView):
     form_class = RegistrationForm
     template_name = 'registration_form.html'
 
-    # TODO убрать после реализации получения telegram_id
+    @log_errors
     def form_valid(self, form):
         """Присваивает telegram_id."""
         form.instance.telegram_id = self.kwargs.get('id')
         response = super().form_valid(form)
-        # TODO Добавить логгер обработки отправки письма
         send_registration_email(self.object)
         return response
 
