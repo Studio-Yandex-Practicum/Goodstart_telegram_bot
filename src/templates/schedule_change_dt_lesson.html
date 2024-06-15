@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<main class="mx-auto p-2" align="center" style="max-width: 550px">
+  <div class="card">
+    <form method="post">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      {% bootstrap_button button_type="submit" content="Отправить" %}
+    </form>
+  </div>
+</main>
+{% endblock content %}
