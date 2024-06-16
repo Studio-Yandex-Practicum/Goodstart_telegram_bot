@@ -82,13 +82,13 @@ jobs:
           cd infra/dev
 
           # Выполняет pull образов с Docker Hub
-          sudo docker compose -f docker-compose.dev.yaml pull
+          docker compose -f docker-compose.dev.yaml pull
           # Перезапускает все контейнеры в Docker Compose
-          sudo docker compose -f docker-compose.dev.yaml down
-          sudo docker compose -f docker-compose.dev.yaml up -d
-          sudo docker compose -f docker-compose.dev.yaml exec backend sh -c "export RUN_BOT=false"
-          sudo docker compose -f docker-compose.dev.yaml exec backend python manage.py collectstatic
-          sudo docker compose -f docker-compose.dev.yaml exec backend python manage.py migrate
-          sudo docker compose -f docker-compose.dev.yaml exec backend sh -c "export RUN_BOT=true"
+          docker compose -f docker-compose.dev.yaml down
+          docker compose -f docker-compose.dev.yaml up -d
+          docker compose -f docker-compose.dev.yaml exec backend sh -c "export RUN_BOT=false"
+          docker compose -f docker-compose.dev.yaml exec backend python manage.py collectstatic
+          docker compose -f docker-compose.dev.yaml exec backend python manage.py migrate
+          docker compose -f docker-compose.dev.yaml exec backend sh -c "export RUN_BOT=true"
           # Выполняет удаление старых образов
-          sudo docker image prune -f
+          docker image prune -f

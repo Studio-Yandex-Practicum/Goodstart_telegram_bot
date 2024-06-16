@@ -123,8 +123,4 @@ sudo docker compose -f docker-compose.dev.yaml exec backend export RUN_BOT=false
 sudo docker compose -f docker-compose.dev.yaml exec backend python manage.py createsuperuser
 ```
 ## Настройка CD
-В настройках репозитория (settings->secrets and variables->Actions->Repository secrets) настроить следующие переменные
-- HOST - ip вашего сервера
-- SSH_KEY - private key (полное содержание файла id_rsa)
-- SSH_PASSPHRASE - кодовая фраза вашего private key
-- USER - имя пользователя
+В настройках репозитория (settings->secrets and variables->Actions->Repository secrets) настроить все переменные из .env.example
