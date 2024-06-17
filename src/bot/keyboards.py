@@ -7,7 +7,7 @@ async def get_root_markup(telegram_id):
     keyboard = [
             [
                 InlineKeyboardButton('Что умеет бот',
-                                     callback_data="help"),
+                                     callback_data='help'),
                 InlineKeyboardButton(
                     text='Посмотреть расписание',
                     web_app=WebAppInfo(
