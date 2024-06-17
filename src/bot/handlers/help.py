@@ -1,12 +1,12 @@
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes
 
-from core.logging import log_errors
-from schooling.models import Teacher, Student
 from bot.utils import check_user_from_db
 from bot.messages_texts.constants import (
     UNKNOWN_USER_HELP_MSG, TEACHER_HELP_MSG, STUDENT_HELP_MSG,
 )
+from core.logging import log_errors
+from schooling.models import Teacher, Student
 
 
 @log_errors
