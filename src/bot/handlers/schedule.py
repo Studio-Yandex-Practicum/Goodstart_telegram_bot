@@ -50,6 +50,6 @@ async def schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ]],
             ),
         )
-    return UserStates.SCHEDULE
+    return UserStates.START
 
 schedule_handler = CommandHandler(schedule.__name__, schedule)

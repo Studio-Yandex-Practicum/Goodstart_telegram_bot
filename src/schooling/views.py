@@ -1,9 +1,11 @@
 import datetime
 
+from django.http import HttpResponse
 from django.shortcuts import render
 from asgiref.sync import sync_to_async
 
-from schooling.models import Teacher, Student
+from schooling.forms import ChangeDateTimeLesson
+from schooling.models import Teacher, Student, Lesson
 from schooling.utils import (
     get_schedule_for_role, get_schedule_week_tasks,
 )
@@ -36,8 +38,66 @@ async def schedule_page(request, id):
         'schedule_sat': schedule_sat,
         'schedule_sun': schedule_sun,
         'role': user.__class__.__name__,
+        'user_tg_id': user.telegram_id,
     }
 
     return await sync_to_async(render)(
-        request, 'schedule/schedule.html', context,
+        request, 'schedule.html', context,
+    )
+
+
+async def details_schedule_page(request, id, lesson_id):
+    context = {}
+    user = await check_user_from_db(id, (Teacher, Student))
+    user_role = user.__class__.__name__
+    lesson = await Lesson.objects.select_related(
+        'subject', 'teacher_id', 'student_id',
+    ).aget(id=lesson_id)
+
+    if user_role == 'Teacher':
+        context['user_full_name'] = (
+            f'{lesson.student_id}'
+        )
+    else:
+        context['user_full_name'] = (
+            f'{lesson.teacher_id}'
+        )
+
+    context['user_tg_id'] = user.telegram_id
+    context['user_role'] = user_role
+    context['lesson'] = lesson
+
+    return await sync_to_async(render)(
+        request, 'schedule_details_card.html', context,
+    )
+
+
+async def change_datetime_lesson(request, id, lesson_id):
+    form = ChangeDateTimeLesson()
+
+    if request.method == 'POST':
+        form = ChangeDateTimeLesson(request.POST)
+        if form.is_valid():
+            return HttpResponse(
+                'Заявка отправлена администратору! '
+                f'Новое дата/время {form.cleaned_data['dt_field']}',
+            )
+            # TODO: обработать сценарий отправки заявки администратору.
+
+    return render(
+        request,
+        'schedule_change_dt_lesson.html',
+        context={'form': form},
+    )
+
+
+async def cancel_lesson(request, id, lesson_id):
+    if request.method == 'POST':
+        return HttpResponse(
+            'Заявка на отмену занятия отправлена администратору!',
+        )
+
+    return render(
+        request,
+        'schedule_cancel_lesson.html',
     )

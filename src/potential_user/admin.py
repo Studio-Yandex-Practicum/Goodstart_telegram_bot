@@ -14,6 +14,10 @@ class ApplicationFormAdmin(admin.ModelAdmin):
     icon_name = 'priority_high'
     actions = ['approve_applications']
 
+    def has_add_permission(self, request):
+        """Запрет на создание новых заявок из админки."""
+        return False
+
     def get_fields(self,
                    request: HttpRequest,
                    obj: ApplicationForm) -> Sequence[Callable[..., Any] | str]:

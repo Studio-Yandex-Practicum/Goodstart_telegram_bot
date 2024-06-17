@@ -19,7 +19,7 @@
           </thead>
           <tbody>
             <tr>
-              <td class="text-nowrap">{{ lesson.datetime_start.time }} - {{ lesson.datetime_end.time }}</td>
+              <td class="text-nowrap"><a href="{% url 'schedule:details_schedule' user_tg_id lesson.id %}">{{ lesson.datetime_start.time }} - {{ lesson.datetime_end.time }}</a></td>
               <td>
                 {{ lesson.name }}<br>
                 {{ lesson.subject }}<br>

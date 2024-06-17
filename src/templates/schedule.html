@@ -1,4 +1,4 @@
-{% extends "schedule/base.html" %}
+{% extends "base.html" %}
 {% load django_bootstrap5 %}
 
 {% block content %}
@@ -13,7 +13,7 @@
           Понедельник
         </button>
       </h3>
-      {% include "schedule/includes/schedule_day_card.html" with schedule_day=schedule_mon id="collapseOne" %}
+      {% include "includes/schedule_day_card.html" with schedule_day=schedule_mon id="collapseOne" %}
     </div>
     <div class="accordion-item">
       <h3 class="accordion-header">
@@ -21,7 +21,7 @@
           Вторник
         </button>
       </h3>
-      {% include "schedule/includes/schedule_day_card.html" with schedule_day=schedule_tue id="collapseTwo" %}
+      {% include "includes/schedule_day_card.html" with schedule_day=schedule_tue id="collapseTwo" %}
     </div>
     <div class="accordion-item">
       <h3 class="accordion-header">
@@ -29,7 +29,7 @@
           Среда
         </button>
       </h3>
-      {% include "schedule/includes/schedule_day_card.html" with schedule_day=schedule_wed id="collapseThree" %}
+      {% include "includes/schedule_day_card.html" with schedule_day=schedule_wed id="collapseThree" %}
     </div>
     <div class="accordion-item">
       <h3 class="accordion-header">
@@ -37,7 +37,7 @@
           Четверг
         </button>
       </h3>
-      {% include "schedule/includes/schedule_day_card.html" with schedule_day=schedule_thu id="collapseFour" %}
+      {% include "includes/schedule_day_card.html" with schedule_day=schedule_thu id="collapseFour" %}
     </div>
     <div class="accordion-item">
       <h3 class="accordion-header">
@@ -45,7 +45,7 @@
           Пятница
         </button>
       </h3>
-      {% include "schedule/includes/schedule_day_card.html" with schedule_day=schedule_fri id="collapseFive" %}
+      {% include "includes/schedule_day_card.html" with schedule_day=schedule_fri id="collapseFive" %}
     </div>
     <div class="accordion-item">
       <h3 class="accordion-header">
@@ -53,7 +53,7 @@
           Суббота
         </button>
       </h3>
-      {% include "schedule/includes/schedule_day_card.html" with schedule_day=schedule_sat id="collapseSix" %}
+      {% include "includes/schedule_day_card.html" with schedule_day=schedule_sat id="collapseSix" %}
     </div>
   </div>
   <script type="text/javascript">

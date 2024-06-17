@@ -13,7 +13,7 @@ class RegistrationCreateView(CreateView):
 
     model = ApplicationForm
     form_class = RegistrationForm
-    template_name = 'registration/registration_form.html'
+    template_name = 'registration_form.html'
 
     @log_errors
     def form_valid(self, form):
@@ -29,4 +29,4 @@ class RegistrationCreateView(CreateView):
 
 
 def registration_success(request):
-    return render(request, 'registration/registration_success.html')
+    return render(request, 'registration_success.html')

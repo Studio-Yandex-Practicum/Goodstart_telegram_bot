@@ -31,7 +31,7 @@ async def send_message_to_user(bot_token, user_id,
 def start_chat(sender, instance, created, **kwargs):
     """Отправляет уведомление об одобрении заявки."""
     if created:
-        reply_markup = async_to_sync(get_root_markup)()
+        reply_markup = async_to_sync(get_root_markup)(instance.telegram_id)
         send_message_to_user(settings.TELEGRAM_TOKEN,
                              instance.telegram_id,
                              message_text='Ваша заявка одобрена!',
@@ -42,10 +42,19 @@ def start_chat(sender, instance, created, **kwargs):
 def notify_about_lesson(sender, instance, created, **kwargs):
     """Отправляет уведомление о времени занятия."""
     if created:
-        message_text = f"""Ваше занятие назначено с {instance.datetime_start}
-                        до {instance.datetime_end}.
-                        Тема: {instance.name}"""
-        reply_markup = async_to_sync(get_root_markup)()
+        message_text = (
+            f'Ваше занятие назначено с {instance.datetime_start} '
+            f'до {instance.datetime_end}.\n'
+            f'Тема: {instance.name}'
+        )
+        if instance.teacher_id.telegram_id:
+            reply_markup = async_to_sync(get_root_markup)(
+                instance.teacher_id.telegram_id,
+            )
+        else:
+            reply_markup = async_to_sync(get_root_markup)(
+                instance.student_id.telegram_id,
+            )
         send_message_to_user(settings.TELEGRAM_TOKEN,
                              instance.teacher_id.telegram_id,
                              message_text,

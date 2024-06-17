@@ -74,7 +74,7 @@ def send_registration_email(application_form):
     subject = 'Goodstart: Новая заявка на регистрацию'
     user_role = roles_mapping.get(application_form.role, application_form.role)
     html_content = render_to_string(
-        'emailing/registration_notification_email.html',
+        'registration_notification_email.html',
         {
             'name': application_form.name,
             'surname': application_form.surname,
@@ -105,7 +105,7 @@ def send_registration_email(application_form):
 def send_feedback_email(subject, body, user):
     """Отправляет админу сообщение от зарегистрированного пользователя."""
     html_content = render_to_string(
-        'emailing/feedback_email.html',
+        'feedback_email.html',
         {
             'subject': f'{user.name} {user.surname}: {subject}',
             'body': body,

@@ -33,7 +33,7 @@ async def start(
         await context.bot.send_message(
             chat_id=telegram_id,
             text=WELCOME_MSG,
-            reply_markup=await get_root_markup(),
+            reply_markup=await get_root_markup(telegram_id),
         )
         return UserStates.START
 
