@@ -6,14 +6,29 @@
     <title>Телеграм-бот для преподавателей и учеников</title>
     {% load django_bootstrap5 %} {% bootstrap_css %}
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="{% static 'styles/accordion-schedule.css' %}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
       .card-header {
         font-size: 1.5rem;
         padding: 1rem 1.25rem;
         background-color: #cfe2ff;
       }
+
+      .button-style {
+        background-color: #cfe2ff;
+        border-radius: 5px;
+        color: black;
+      }
+
+      .edit-icon {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 1rem;
+        color: #b1b1b1;
+      }
     </style>
-    <link href="{% static 'styles/accordion-schedule.css' %}" rel="stylesheet">
   </head>
   <body>
     {% include "includes/header.html" %}
