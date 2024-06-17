@@ -82,7 +82,7 @@ jobs:
           cd infra/dev
 
           # Выполняет pull образов с Docker Hub
-          docker compose -f docker-compose.dev.yaml pull
+          sudo docker compose -f docker-compose.dev.yaml pull
           # Перезапускает все контейнеры в Docker Compose
           docker compose -f docker-compose.dev.yaml down
           docker compose -f docker-compose.dev.yaml up -d
