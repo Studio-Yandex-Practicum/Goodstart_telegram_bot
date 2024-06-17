@@ -4,13 +4,13 @@ RUN pip install poetry
 
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock /app/
+COPY pyproject.toml .
+COPY poetry.lock .
 
 # Copy source code
-COPY src /app/src
+COPY src/. /app/
 
 RUN poetry config virtualenvs.create false \
     && poetry install --without dev --no-root
-WORKDIR ./src
 
-CMD ["poetry", "run", "uvicorn", "core.asgi_prod:application", "--reload", "--lifespan", "on", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["poetry", "run", "uvicorn", "core.asgi_prod:application", "--lifespan", "on", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,94 @@
+name: Pull and run on server
+
+on:
+  workflow_run:
+    workflows:
+      - Build and push Docker image
+    types:
+      - completed
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  DEPLOY_PATH: Goodstart_telegram_bot
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+    - name: Copy docker-compose.dev.yaml via ssh
+      uses: appleboy/scp-action@v0.1.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        source: "infra/dev/docker-compose.dev.yaml"
+        target: ${{ env.DEPLOY_PATH }}
+    - name: Copy nginx.conf via ssh
+      uses: appleboy/scp-action@v0.1.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        source: "infra/dev/nginx.conf"
+        target: ${{ env.DEPLOY_PATH }}
+    - name: Executing remote ssh commands to deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        timeout: 120s
+        script: |
+          cd ${{ env.DEPLOY_PATH }}
+          rm .env
+          touch .env
+
+          echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env
+          echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
+          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
+          echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
+          echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+          echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+          echo BASE_URL=${{ secrets.BASE_URL }} >> .env
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+          echo DEBUG=${{ secrets.DEBUG }} >> .env
+          echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
+          echo CSRF_TRUSTED_ORIGINS=${{ secrets.CSRF_TRUSTED_ORIGINS }} >> .env
+          echo TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }} >> .env
+          echo DJANGO_SUPERUSER_USERNAME=${{ secrets.DJANGO_SUPERUSER_USERNAME }} >> .env
+          echo DJANGO_SUPERUSER_EMAIL=${{ secrets.HOST_DJANGO_SUPERUSER_EMAILNG }} >> .env
+          echo DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD }} >> .env
+          echo DJANGO_SUPERUSER_FIRSTNAME=${{ secrets.DJANGO_SUPERUSER_FIRSTNAME }} >> .env
+          echo DJANGO_SUPERUSER_LASTNAME=${{ secrets.DJANGO_SUPERUSER_LASTNAME }} >> .env
+          echo DJANGO_SUPERUSER_PHONE=${{ secrets.DJANGO_SUPERUSER_PHONE }} >> .env
+          echo EMAIL_BACKEND=${{ secrets.EMAIL_BACKEND }} >> .env
+          echo EMAIL_HOST=${{ secrets.EMAIL_HOST }} >> .env
+          echo EMAIL_PORT=${{ secrets.EMAIL_PORT }} >> .env
+          echo EMAIL_ACCOUNT=${{ secrets.EMAIL_ACCOUNT }} >> .env
+          echo EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} >> .env
+          echo DEFAULT_EMAIL_ADDRESS=${{ secrets.DEFAULT_EMAIL_ADDRESS }} >> .env
+          echo NGINX_PORT=${{ secrets.NGINX_PORT }} >> .env
+          # удалить после мержа в dev
+          echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+          echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+          
+          cd infra/dev
+
+          # Выполняет pull образов с Docker Hub
+          sudo docker compose -f docker-compose.dev.yaml pull
+          # Перезапускает все контейнеры в Docker Compose
+          docker compose -f docker-compose.dev.yaml down
+          docker compose -f docker-compose.dev.yaml up -d
+          docker compose -f docker-compose.dev.yaml exec backend sh -c "export RUN_BOT=false"
+          docker compose -f docker-compose.dev.yaml exec backend python manage.py collectstatic
+          docker compose -f docker-compose.dev.yaml exec backend python manage.py migrate
+          docker compose -f docker-compose.dev.yaml exec backend sh -c "export RUN_BOT=true"
+          # Выполняет удаление старых образов
+          docker image prune -f

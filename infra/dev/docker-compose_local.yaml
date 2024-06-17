@@ -2,6 +2,7 @@ version: "3.8"
 
 volumes:
   pg_data:
+  static_volume:
 
 services:
   db:
