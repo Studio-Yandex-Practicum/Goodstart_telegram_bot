@@ -2,12 +2,14 @@ from django.conf import settings
 from django.urls import reverse
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
+from bot.states import UserStates
+
 
 async def get_root_markup(telegram_id):
     keyboard = [
             [
                 InlineKeyboardButton('Что умеет бот',
-                                     callback_data='help'),
+                                     callback_data=UserStates.HELP.value),
                 InlineKeyboardButton(
                     text='Посмотреть расписание',
                     web_app=WebAppInfo(
