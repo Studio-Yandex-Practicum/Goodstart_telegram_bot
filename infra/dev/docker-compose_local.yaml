@@ -2,6 +2,7 @@ version: "3.8"
 
 volumes:
   pg_data:
+  static_volume:
 
 services:
   db:
@@ -15,3 +16,19 @@ services:
       - pg_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+  backend:
+    build: .
+    env_file: .env
+    depends_on:
+      - db
+    volumes:
+      - static_volume:/app/static/
+    ports:
+      - 8002:8000
+  gateway:
+    build: ./infra/
+    env_file: .env
+    volumes:
+      - static_volume:/static/
+    ports:
+      - 80:80
