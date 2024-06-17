@@ -21,7 +21,7 @@
         <tr>
           <td class="text-nowrap">{{ lesson.datetime_start.time }} - {{ lesson.datetime_end.time }}</td>
           <td>
-            <a href="/lesson/{{ lesson.id }}" class="text-decoration-none position-relative">
+            <a href="{% url 'schedule:details_schedule' user_tg_id lesson.id %}" class="text-decoration-none position-relative">
               <div class="p-2 button-style">
                 <div class="text-center">
                   {{ lesson.name }}<br>
