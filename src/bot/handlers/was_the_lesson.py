@@ -60,8 +60,6 @@ async def was_the_lesson_completed(update: Update, context: CallbackContext):
 
     if all([teacher_answ, student_answ]):
 
-        # у меня нет идей как обработать случай, если один зачем-то ответил
-        # "нет", а другой "да"
         if teacher_answ == 'yes' and student_answ == 'yes':
             lesson.is_passed = True
             await lesson.asave()
