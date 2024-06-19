@@ -29,7 +29,7 @@ async def feedback(update: Update, context: CallbackContext):
         context.user_data['current_user'] = user
         await update.message.reply_text(
             text=FEEDBACK_REMOVE_SUPPORT_KEYBOARD_MSG,
-            reply_markup=ReplyKeyboardRemove()
+            reply_markup=ReplyKeyboardRemove(),
         )
         await update.message.reply_text(FEEDBACK_SUBJECT_REQUEST_MSG)
         return UserStates.FEEDBACK_SUBJECT

@@ -38,7 +38,7 @@ async def was_the_lesson_completed(update: Update, context: CallbackContext):
     lesson = await Lesson.objects.select_related(
         'teacher_id', 'student_id',
     ).aget(
-        id=int(lesson_id)
+        id=int(lesson_id),
     )
 
     teacher_tg_id = lesson.teacher_id.telegram_id
@@ -72,19 +72,19 @@ async def was_the_lesson_completed(update: Update, context: CallbackContext):
         else:
             await no_answ_lesson_response(
                 query=query,
-                update=update
+                update=update,
             )
             context.user_data['lesson_responses'].clear()
 
     elif teacher_answ == 'no' or student_answ == 'no':
         await no_answ_lesson_response(
                 query=query,
-                update=update
+                update=update,
             )
 
     else:
         await query.edit_message_text(
-            text=SUCCESS_LESSON_MSG
+            text=SUCCESS_LESSON_MSG,
         )
 
 lesson_end_handler = CallbackQueryHandler(was_the_lesson_completed)

@@ -30,7 +30,7 @@ async def send_lesson_end_notification(context: CallbackContext):
         await bot.send_message(
             chat_id=student_chat_id,
             text=message_text,
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
         )
     except BadRequest:
         print('Такой чат не найден!')
@@ -39,7 +39,7 @@ async def send_lesson_end_notification(context: CallbackContext):
         await bot.send_message(
             chat_id=teacher_chat_id,
             text=message_text,
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
         )
     except BadRequest:
         print('Такой чат не найден!')
@@ -58,5 +58,5 @@ async def schedule_lesson_end_notification(sender, instance, **kwargs):
                 'teacher_chat_id': instance.teacher_id.telegram_id,
                 'student_chat_id': instance.student_id.telegram_id,
                 'lesson_id': instance.id,
-            }
+            },
         )
