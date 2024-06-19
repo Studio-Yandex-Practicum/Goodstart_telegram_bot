@@ -14,6 +14,7 @@ from telegram.ext import (
 from bot.handlers import (
     echo_handler, start_handler, help_handler, feedback_handler,
     success_registration_webapp_handler, schedule_handler,
+    lesson_end_handler,
 )
 from bot.handlers.feedback import subject, body
 from bot.handlers.conversation import help, schedule
@@ -78,6 +79,7 @@ class Bot:
             echo_handler,
             feedback_handler,
             schedule_handler,
+            lesson_end_handler,
             ])
         logger.info('Bot application built with handlers.')
         return app
