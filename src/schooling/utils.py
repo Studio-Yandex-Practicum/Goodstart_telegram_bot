@@ -15,7 +15,7 @@ from schooling.models import Student, Teacher, Lesson
 
 
 async def send_message_async(
-    bot, chat_id, message_text, reply_markup
+    bot, chat_id, message_text, reply_markup,
 ):
     try:
         await bot.send_message(
@@ -28,11 +28,11 @@ async def send_message_async(
 
 
 async def gather_send_messages_to_users(
-    bot, chat_ids, message_text, reply_markup
+    bot, chat_ids, message_text, reply_markup,
 ):
     tasks = [
         send_message_async(
-            bot, chat_id, message_text, reply_markup
+            bot, chat_id, message_text, reply_markup,
         ) for chat_id in chat_ids
     ]
     await asyncio.gather(*tasks)
@@ -56,7 +56,7 @@ async def send_lesson_end_notification(context: CallbackContext):
 
     chat_ids = (teacher_chat_id, student_chat_id)
     await gather_send_messages_to_users(
-        bot, chat_ids, message_text, reply_markup
+        bot, chat_ids, message_text, reply_markup,
     )
 
 
