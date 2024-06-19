@@ -75,3 +75,20 @@ FEEDBACK_BODY_REQUEST_MSG = (
 FEEDBACK_SUCCESS_MSG = (
     'Спасибо, сообщение успешно отправлено!'
 )
+
+FEEDBACK_REMOVE_SUPPORT_KEYBOARD_MSG = (
+    'Спасибо! Следуйте подсказкам:'
+)
+
+UNCOMPLETED_LESSON_FEEDBACK_MSG = (
+    'Пожалуйста, сообщите нам почему занятия не было, '
+    'выбрав команду ниже.'
+)
+
+COMPLETED_LESSON_MSG = (
+    'Занятие завершено.'
+)
+
+SUCCESS_LESSON_MSG = (
+    'Ответ получен! Благодарим за обратную связь.'
+)

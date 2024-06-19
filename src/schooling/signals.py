@@ -19,22 +19,25 @@ async def send_lesson_end_notification(context: CallbackContext):
     lesson_id = context.job.data.get('lesson_id')
 
     keyboard = [[
-        InlineKeyboardButton('Да', callback_data=f'yes_{lesson_id}'),
-        InlineKeyboardButton('Нет', callback_data=f'no_{lesson_id}'),
+        InlineKeyboardButton('Да', callback_data=f'yes {lesson_id}'),
+        InlineKeyboardButton('Нет', callback_data=f'no {lesson_id}'),
     ]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    message_text = 'Прошло ли занятие?'
+    message_text = 'Было ли занятие?'
+
+    try:
+        await bot.send_message(
+            chat_id=student_chat_id,
+            text=message_text,
+            reply_markup=reply_markup
+        )
+    except BadRequest:
+        print('Такой чат не найден!')
 
     try:
         await bot.send_message(
             chat_id=teacher_chat_id,
-            text=message_text,
-            reply_markup=reply_markup
-        )
-
-        await bot.send_message(
-            chat_id=student_chat_id,
             text=message_text,
             reply_markup=reply_markup
         )

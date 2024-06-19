@@ -1,4 +1,4 @@
-from telegram import Update
+from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import (
     CommandHandler, CallbackContext, ConversationHandler,
 )
@@ -11,6 +11,7 @@ from bot.states import UserStates
 from bot.messages_texts.constants import (
     FEEDBACK_SUBJECT_REQUEST_MSG, FEEDBACK_SUBJECT_REQUEST_MSG_ERROR,
     FEEDBACK_BODY_REQUEST_MSG, FEEDBACK_SUCCESS_MSG,
+    FEEDBACK_REMOVE_SUPPORT_KEYBOARD_MSG,
 )
 
 
@@ -26,6 +27,10 @@ async def feedback(update: Update, context: CallbackContext):
 
     if user:
         context.user_data['current_user'] = user
+        await update.message.reply_text(
+            text=FEEDBACK_REMOVE_SUPPORT_KEYBOARD_MSG,
+            reply_markup=ReplyKeyboardRemove()
+        )
         await update.message.reply_text(FEEDBACK_SUBJECT_REQUEST_MSG)
         return UserStates.FEEDBACK_SUBJECT
     else:
