@@ -4,6 +4,7 @@ from telegram import (
 from telegram.ext import CallbackContext, CallbackQueryHandler
 
 from schooling.models import Lesson
+from bot.states import UserStates
 from bot.messages_texts.constants import (
     UNCOMPLETED_LESSON_FEEDBACK_MSG, COMPLETED_LESSON_MSG,
     SUCCESS_LESSON_MSG,
@@ -33,7 +34,7 @@ async def was_the_lesson_completed(update: Update, context: CallbackContext):
     await query.answer()
 
     if query.data == 'help':
-        pass
+        return UserStates.HELP
 
     response, lesson_id = query.data.split()
     user_id = query.from_user.id
