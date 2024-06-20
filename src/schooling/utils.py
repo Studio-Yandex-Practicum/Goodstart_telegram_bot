@@ -64,18 +64,22 @@ async def send_lesson_end_notification(context: CallbackContext):
 async def schedule_lesson_end_notification(sender, instance, **kwargs):
     from bot.bot_interface import Bot
     bot = Bot()
+    app = await bot.get_app()
     lesson_end_time = instance.datetime_end
     if lesson_end_time > timezone.now():
-        bot._app.job_queue.run_once(
-            send_lesson_end_notification,
-            when=lesson_end_time,
-            name=f'lesson_end_{instance.id}',
-            data={
-                'teacher_chat_id': instance.teacher_id.telegram_id,
-                'student_chat_id': instance.student_id.telegram_id,
-                'lesson_id': instance.id,
-            },
-        )
+        try:
+            app.job_queue.run_once(
+                send_lesson_end_notification,
+                when=lesson_end_time,
+                name=f'lesson_end_{instance.id}',
+                data={
+                    'teacher_chat_id': instance.teacher_id.telegram_id,
+                    'student_chat_id': instance.student_id.telegram_id,
+                    'lesson_id': instance.id,
+                },
+            )
+        except AttributeError as error:
+            print(f'Ошибка: {error}')
 
 
 @async_to_sync

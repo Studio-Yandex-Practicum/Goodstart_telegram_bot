@@ -108,6 +108,12 @@ class Bot:
         await self._app.stop()
         logger.info('Bot stopped.')
 
+    async def get_app(self):
+        """Public method to get the application instance."""
+        if self._app is None:
+            self._app = await self._build_app()
+        return self._app
+
 
 async def build_main_handler():
     """Функция создания главного обработчика."""
