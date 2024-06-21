@@ -19,9 +19,9 @@ from schooling.utils import send_message_to_user
 
 @receiver(pre_delete, sender=Student)
 @receiver(pre_delete, sender=Teacher)
-def delete_person_and_send_msg(sender, instance, *args, **kwargs):
+async def delete_person_and_send_msg(sender, instance, *args, **kwargs):
     """Удалить и отправить выбранным пользователям прощальное сообщение."""
-    send_message_to_user(
+    await send_message_to_user(
         settings.TELEGRAM_TOKEN,
         instance.telegram_id,
         message_text=(
