@@ -1,3 +1,16 @@
+.logo {
+  width: 100%;
+}
+
+.title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32px;
+  color: transparent;
+}
+
 .accordion-button {
   background-color: #fff;
   box-shadow: none;
