@@ -81,14 +81,13 @@
 }
 
 .card {
-  padding: 20px;
   border-radius: 10px;
   background-color: #f8f9fa;
 }
 
 .form-control {
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 0;
   box-sizing: border-box;
 }
 
@@ -107,4 +106,10 @@
 
 .btn-lg {
   width: 100%;
+}
+
+.second-button {
+  width: 100%;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }

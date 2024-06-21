@@ -9,10 +9,8 @@
     </h2>
     <form method="post">
       {% csrf_token %}
-      <div class="mb-3" align="center">
-        <input type="datetime-local" name="dt_field" id="id_dt_field" class="form-control" placeholder="Новая дата и время занятия" required>
-      </div>
-      <button type="submit" class="btn main-button" style="width: 100%;">Отправить</button>
+      <input type="datetime-local" name="dt_field" id="id_dt_field" class="form-control" placeholder="Новая дата и время занятия" required>
+      <button type="submit" class="btn main-button second-button">Отправить</button>
     </form>
   </div>
 </main>
