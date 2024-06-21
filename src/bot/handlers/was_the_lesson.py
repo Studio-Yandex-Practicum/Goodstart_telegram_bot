@@ -66,6 +66,7 @@ async def was_the_lesson_completed(update: Update, context: CallbackContext):
 
         if teacher_answ == 'yes' and student_answ == 'yes':
             lesson.is_passed = True
+            #TODO Проверить установку флага пройденного занятия, неккоректно
             await lesson.asave()
             await query.edit_message_text(
                 text=COMPLETED_LESSON_MSG,
