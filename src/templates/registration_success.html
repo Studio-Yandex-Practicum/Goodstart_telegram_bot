@@ -2,19 +2,19 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-    <div class="card">
-      <div class="card-header">
-        <p>
-          Данные успешно отправлены.
-        </p>
-      </div>
+<main class="mx-auto p-2" align="center" style="max-width: 550px">
+  <div class="card">
+    <div class="card-header">
+      <p class="m-0">Данные успешно отправлены.</p>
     </div>
-    <script type="text/javascript">
-      Telegram.WebApp.ready();
-      Telegram.WebApp.MainButton.setText('Отлично!').show().onClick(function () {
-          const data = JSON.stringify({success: true});
-          Telegram.WebApp.sendData(data);
-          Telegram.WebApp.close();
-      });
-    </script>
+  </div>
+  <script type="text/javascript">
+    Telegram.WebApp.ready();
+    Telegram.WebApp.MainButton.setText('Отлично!').show().onClick(function () {
+        const data = JSON.stringify({success: true});
+        Telegram.WebApp.sendData(data);
+        Telegram.WebApp.close();
+    });
+  </script>
+</main>
 {% endblock %}

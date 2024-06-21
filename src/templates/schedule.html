@@ -2,7 +2,7 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<main class="mx-auto p-2" style="max-width: 550px">
+<main class="mx-auto p-2" align="center" style="max-width: 550px">
   <div class="accordion" id="accordionExample">
     <h2 class="accordion-header accordion-title" align="center">
       Расписание уроков
@@ -63,6 +63,11 @@
       </h3>
       {% include "includes/schedule_day_card.html" with schedule_day=schedule_sun id="collapseSeven" %}
     </div>
+  </div>
+  <div class="btn-group mt-2" role="group" aria-label="Basic outlined example">
+    <a href="?week={{ week_offset|add:-1 }}" class="btn-previous-week">Предыдущая неделя</a>
+    <span class="following-week">{{ start_week|date:"d.m.Y" }} {{ end_week|date:"d.m.Y" }}</span>
+    <a href="?week={{ week_offset|add:1 }}" class="btn-next-week">Следующая неделя</a>
   </div>
   <script type="text/javascript">
     Telegram.WebApp.ready();
