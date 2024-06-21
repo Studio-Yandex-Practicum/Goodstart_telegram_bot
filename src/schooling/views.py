@@ -17,7 +17,9 @@ async def schedule_page(request, id):
     week_offset = int(request.GET.get('week', 0))
 
     today = datetime.date.today()
-    start_week = today + datetime.timedelta(weeks=week_offset, days=-today.weekday())
+    start_week = (
+    today + datetime.timedelta(weeks=week_offset, days=-today.weekday())
+    )
     end_week = start_week + datetime.timedelta(days=6)
 
     user = await check_user_from_db(id, (Teacher, Student))
