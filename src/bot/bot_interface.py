@@ -14,6 +14,7 @@ from telegram.ext import (
 from bot.handlers import (
     echo_handler, start_handler, help_handler, feedback_handler,
     success_registration_webapp_handler, schedule_handler,
+    lesson_end_handler,
 )
 from bot.handlers.feedback import subject, body
 from bot.handlers.conversation import help, schedule
@@ -78,6 +79,7 @@ class Bot:
             echo_handler,
             feedback_handler,
             schedule_handler,
+            lesson_end_handler,
             ])
         logger.info('Bot application built with handlers.')
         return app
@@ -105,6 +107,12 @@ class Bot:
 
         await self._app.stop()
         logger.info('Bot stopped.')
+
+    async def get_app(self):
+        """Public method to get the application instance."""
+        if self._app is None:
+            self._app = await self._build_app()
+        return self._app
 
 
 async def build_main_handler():
