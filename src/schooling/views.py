@@ -14,8 +14,12 @@ from bot.utils import check_user_from_db
 
 async def schedule_page(request, id):
     """Обрабатывает запрос на получение расписания занятий."""
+    week_offset = int(request.GET.get('week', 0))
+
     today = datetime.date.today()
-    start_week = today - datetime.timedelta(days=today.weekday())
+    start_week = (
+    today + datetime.timedelta(weeks=week_offset, days=-today.weekday())
+    )
     end_week = start_week + datetime.timedelta(days=6)
 
     user = await check_user_from_db(id, (Teacher, Student))
@@ -39,12 +43,12 @@ async def schedule_page(request, id):
         'schedule_sun': schedule_sun,
         'role': user.__class__.__name__,
         'user_tg_id': user.telegram_id,
+        'week_offset': week_offset,
     }
 
     return await sync_to_async(render)(
         request, 'schedule.html', context,
     )
-
 
 async def details_schedule_page(request, id, lesson_id):
     context = {}
