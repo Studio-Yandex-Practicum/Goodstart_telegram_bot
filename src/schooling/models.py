@@ -5,6 +5,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from bot.states import UserStates
 
+
 MAX_LEN_NAME_SURNAME = 150
 MAX_LEN_CITY = 50
 MAX_LEN_STATE = 50
