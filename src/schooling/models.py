@@ -162,14 +162,9 @@ class Lesson(models.Model):
         related_name='lessons',
     )
     datetime_start = models.DateTimeField('Время начала занятия')
-    duration = models.PositiveIntegerField('Продолжительность занятия в минутах')
+    duration = models.PositiveIntegerField('Продолжительность занятия')
     is_passed = models.BooleanField('Занятие прошло', default=False)
     test_lesson = models.BooleanField('Тестовое занятие', default=False)
-
-    @property
-    def datetime_end(self):
-        """Returns the datetime end lesson."""
-        return self.datetime_start + timedelta(minutes=self.duration)
 
     class Meta:
         """Meta class of LessonModel."""
@@ -193,3 +188,8 @@ class Lesson(models.Model):
     def __str__(self):
         """Return a lesson string representation."""
         return f'{self.name} {self.subject.name}'
+
+    @property
+    def datetime_end(self):
+        """Returns the datetime end lesson."""
+        return self.datetime_start + timedelta(minutes=self.duration)
