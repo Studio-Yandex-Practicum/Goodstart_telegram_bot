@@ -1,8 +1,9 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 from phonenumber_field.modelfields import PhoneNumberField
 
 from bot.states import UserStates
-
 
 MAX_LEN_NAME_SURNAME = 150
 MAX_LEN_CITY = 50
@@ -165,6 +166,18 @@ class Lesson(models.Model):
     is_passed = models.BooleanField('Занятие прошло', default=False)
     test_lesson = models.BooleanField('Тестовое занятие', default=False)
 
+    def clean(self):
+        lessons_count = Lesson.objects.filter(
+            student_id=self.student_id,
+            test_lesson=False,
+            is_passed=False,
+        ).count()
+        if not self.test_lesson:
+            if lessons_count >= self.student_id.paid_lessons:
+                raise ValidationError(
+                    {'student_id': _('Исчерпан лимит оплаченных занятий!')},
+                )
+
     class Meta:
         """Meta class of LessonModel."""
 
@@ -182,7 +195,7 @@ class Lesson(models.Model):
                 ],
                 name='unique_lesson',
             ),
-        ]
+        ]      
 
     def __str__(self):
         """Return a lesson string representation."""
