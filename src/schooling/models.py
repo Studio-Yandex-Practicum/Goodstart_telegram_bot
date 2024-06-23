@@ -1,3 +1,4 @@
+from datetime import  timedelta
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -161,9 +162,14 @@ class Lesson(models.Model):
         related_name='lessons',
     )
     datetime_start = models.DateTimeField('Время начала занятия')
-    duration = models.PositiveIntegerField('Продолжительность занятия')
+    duration = models.PositiveIntegerField('Продолжительность занятия в минутах')
     is_passed = models.BooleanField('Занятие прошло', default=False)
     test_lesson = models.BooleanField('Тестовое занятие', default=False)
+
+    @property
+    def datetime_end(self):
+        """Returns the datetime end lesson."""
+        return self.datetime_start + timedelta(minutes=self.duration)
 
     class Meta:
         """Meta class of LessonModel."""
