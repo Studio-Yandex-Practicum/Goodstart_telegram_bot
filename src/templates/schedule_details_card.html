@@ -14,11 +14,11 @@
       {% else %}
         <p class="card-text"><strong>Преподаватель:</strong> {{ user_full_name }}</p>
       {% endif %}
-      <p class="card-text"><strong>Время и дата:</strong><br>{{ lesson.datetime_start }} - {{ lesson.datetime_end }}</p>
-      <a class="btn btn-outline-primary" style="width: 38%;" href="{% url 'schedule:change_datetime_lesson' user_tg_id lesson.id %}" role="button">
+      <p class="card-text"><strong>Время и дата:</strong><br>{{ lesson.datetime_start|date:"d.m.Y H:i" }} - {{ lesson.datetime_end|date:"d.m.Y H:i" }}</p>
+      <a class="btn main-button" style="width: 40%;" href="{% url 'schedule:change_datetime_lesson' user_tg_id lesson.id %}" role="button">
         Перенести
       </a>
-      <a class="btn btn-outline-danger" style="width: 38%;" href="{% url 'schedule:cancel_lesson' user_tg_id lesson.id %}" role="button">
+      <a class="btn main-button danger-button" style="width: 40%;" href="{% url 'schedule:cancel_lesson' user_tg_id lesson.id %}" role="button">
         Отменить
       </a>
     </div>

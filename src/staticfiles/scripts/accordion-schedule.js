@@ -1,4 +1,3 @@
-// Когда весь HTML-документ загружен...
 document.addEventListener("DOMContentLoaded", function () {
   const days = [
     "Понедельник",
@@ -7,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     "Четверг",
     "Пятница",
     "Суббота",
+    "Воскресенье"
   ];
   const months = [
     "января",
@@ -20,46 +20,52 @@ document.addEventListener("DOMContentLoaded", function () {
     "сентября",
     "октября",
     "ноября",
-    "декабря",
+    "декабря"
   ];
   const accordionItems = document.querySelectorAll(".accordion-item");
-  const today = new Date();
-  // Вычисляем индекс текущего дня недели (Понедельник = 0, Вторник = 1, ..., Суббота = 5)
-  let dayIndex = today.getDay() - 1;
 
-  // Если сегодня воскресенье (dayIndex < 0), устанавливаем индекс дня на понедельник следующей недели
-  if (dayIndex < 0) {
-    dayIndex = 0;
-    today.setDate(today.getDate() + 1);
+  // Функция для получения даты на нужной неделе
+  function getDateForWeek(weekOffset, index) {
+    const today = new Date();
+    const startOfWeek = new Date(today.getTime() + (weekOffset * 7 * 24 * 60 * 60 * 1000));
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + index + 1); // +1 чтобы начать с текущего дня
+    return startOfWeek;
   }
 
-  const date = today.getDate();
+  // Функция для обновления дат в аккордеоне
+  function updateAccordionDates(weekOffset) {
+    const today = new Date();
+    accordionItems.forEach((item, index) => {
+      const headerButton = item.querySelector(".accordion-header .accordion-button");
+      const dayName = days[index];
+      const newDate = getDateForWeek(weekOffset, index);
+      headerButton.innerHTML = `${dayName}, ${newDate.getDate()} ${months[newDate.getMonth()]}`;
 
-  // Устанавливаем номера для каждого дня в аккордеоне
-  accordionItems.forEach((item, index) => {
-    const headerButton = item.querySelector(
-      ".accordion-header .accordion-button"
-    );
-    const dayName = days[index];
-    const newDate = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      date - dayIndex + index
-    );
-    headerButton.innerHTML = `${dayName}, ${newDate.getDate()} ${months[newDate.getMonth()]
-      }`;
-  });
+      // Сравниваем даты, чтобы открыть текущий день
+      if (today.getDate() === newDate.getDate() && today.getMonth() === newDate.getMonth()) {
+        const currentDayAccordion = item.querySelector(".accordion-collapse");
+        currentDayAccordion.classList.add("show");
+        const currentDayButton = item.querySelector(".accordion-header .accordion-button");
+        currentDayButton.setAttribute("aria-expanded", "true");
+        currentDayButton.classList.remove("collapsed");
+      }
+    });
 
-  // Открываем текущий день в аккордеоне
-  if (dayIndex >= 0 && dayIndex < accordionItems.length) {
-    const currentDayAccordion = accordionItems[dayIndex].querySelector(
-      ".accordion-collapse"
-    );
-    currentDayAccordion.classList.add("show");
-    const currentDayButton = accordionItems[dayIndex].querySelector(
-      ".accordion-header .accordion-button"
-    );
-    currentDayButton.setAttribute("aria-expanded", "true");
-    currentDayButton.classList.remove("collapsed");
+    // Обновляем ссылки "Предыдущая неделя" и "Следующая неделя"
+    const prevWeekLink = document.querySelector(".btn-previous-week");
+    const nextWeekLink = document.querySelector(".btn-next-week");
+    if (prevWeekLink) {
+      prevWeekLink.setAttribute("href", `?week=${weekOffset - 1}`);
+    }
+    if (nextWeekLink) {
+      nextWeekLink.setAttribute("href", `?week=${weekOffset + 1}`);
+    }
   }
+
+  // Получаем текущее значение week_offset из параметров URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const weekOffset = parseInt(urlParams.get('week')) || 0;
+
+  // Инициализируем аккордеон при загрузке страницы
+  updateAccordionDates(weekOffset);
 });

@@ -2,12 +2,15 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<main class="mx-auto p-2" align="center" style="max-width: 550px">
+<main class="mx-auto p-2" style="max-width: 550px; text-align: center;">
   <div class="card">
+    <h2 class="card-header">
+      Новая дата <br>и время занятия
+    </h2>
     <form method="post">
       {% csrf_token %}
-      {% bootstrap_form form %}
-      {% bootstrap_button button_type="submit" content="Отправить" %}
+      <input type="datetime-local" name="dt_field" id="id_dt_field" class="form-control" placeholder="Новая дата и время занятия" required>
+      <button type="submit" class="btn main-button second-button">Отправить</button>
     </form>
   </div>
 </main>
