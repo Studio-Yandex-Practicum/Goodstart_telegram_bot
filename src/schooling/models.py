@@ -191,7 +191,7 @@ class Lesson(models.Model):
         return f'{self.name} {self.subject.name}'
 
     def clean(self):
-        """Валидация поля student_id модели Lesson"""
+        """Валидация поля student_id модели Lesson."""
         lessons_count = Lesson.objects.filter(
             student_id=self.student_id,
             test_lesson=False,
