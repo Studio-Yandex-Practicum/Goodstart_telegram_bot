@@ -167,7 +167,7 @@ class Lesson(models.Model):
     duration = models.PositiveIntegerField(
         'Продолжительность занятия',
         help_text='Продолжительность занятия в минутах.',
-        default=45
+        default=45,
     )
     is_passed = models.BooleanField('Занятие прошло', default=False)
     test_lesson = models.BooleanField('Тестовое занятие', default=False)
