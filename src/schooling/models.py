@@ -1,3 +1,4 @@
+from datetime import  timedelta
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -163,7 +164,11 @@ class Lesson(models.Model):
         related_name='lessons',
     )
     datetime_start = models.DateTimeField('Время начала занятия')
-    datetime_end = models.DateTimeField('Время окончания занятия')
+    duration = models.PositiveIntegerField(
+        'Продолжительность занятия',
+        help_text='Продолжительность занятия в минутах.',
+        default=45,
+    )
     is_passed = models.BooleanField('Занятие прошло', default=False)
     test_lesson = models.BooleanField('Тестовое занятие', default=False)
 
@@ -180,7 +185,7 @@ class Lesson(models.Model):
                     'teacher_id',
                     'student_id',
                     'datetime_start',
-                    'datetime_end',
+                    'duration',
                 ],
                 name='unique_lesson',
             ),
@@ -202,3 +207,8 @@ class Lesson(models.Model):
                 raise ValidationError(
                     {'student_id': _('Исчерпан лимит оплаченных занятий!')},
                 )
+
+    @property
+    def datetime_end(self):
+        """Returns the datetime end lesson."""
+        return self.datetime_start + timedelta(minutes=self.duration)
