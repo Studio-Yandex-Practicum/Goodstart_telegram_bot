@@ -102,7 +102,7 @@ class LessonFactory(DjangoModelFactory):
     is_passed = factory.LazyAttribute(lambda o: random.choice([True, False]))
     test_lesson = factory.LazyAttribute(lambda o: random.choice([True, False]))
     datetime_start = timezone.now()
-    datetime_end = timezone.now()
+    duration = 60
 
     @factory.post_generation
     def datetime_start_and_end(self, create, extracted, **kwargs):
@@ -110,10 +110,8 @@ class LessonFactory(DjangoModelFactory):
         if create:
             if self.is_passed:
                 self.datetime_start = timezone.now() - timedelta(days=365)
-                self.datetime_end = self.datetime_start + timedelta(hours=1)
             else:
                 self.datetime_start = timezone.now() + timedelta(days=365)
-                self.datetime_end = self.datetime_start + timedelta(hours=1)
 
     @factory.lazy_attribute
     def subject(self):
