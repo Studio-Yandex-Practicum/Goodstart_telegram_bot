@@ -84,7 +84,7 @@ async def change_datetime_lesson(request, id, lesson_id):
         if form.is_valid():
             # Обработка успешной отправки формы
             return HttpResponseRedirect(
-                reverse_lazy('schedule:lesson_change_success')
+                reverse_lazy('schedule:lesson_change_success'),
                 )
 
             # TODO: обработать сценарий отправки заявки администратору.
@@ -99,7 +99,7 @@ async def change_datetime_lesson(request, id, lesson_id):
 async def cancel_lesson(request, id, lesson_id):
     if request.method == 'POST':
          return HttpResponseRedirect(
-            reverse_lazy('schedule:lesson_cancel_success')
+            reverse_lazy('schedule:lesson_cancel_success'),
             )
 
     return render(

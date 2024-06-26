@@ -2,7 +2,7 @@ from django.urls import path
 
 from schooling.views import (
     schedule_page, details_schedule_page, cancel_lesson,
-    change_datetime_lesson, lesson_change_success, lesson_cancel_success
+    change_datetime_lesson, lesson_change_success, lesson_cancel_success,
 )
 
 app_name = 'schedule'
@@ -26,10 +26,10 @@ urlpatterns = [
     ),
     path('lesson_change_success/',
          lesson_change_success,
-         name='lesson_change_success'
+         name='lesson_change_success',
     ),
     path('lesson_cancel_success/',
          lesson_cancel_success,
-         name='lesson_cancel_success'
+         name='lesson_cancel_success',
     ),
 ]
