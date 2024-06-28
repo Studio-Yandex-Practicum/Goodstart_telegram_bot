@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from schooling.models import Lesson
 
 class LessonForm(forms.ModelForm):
-    """Форма создания занятий"""
+    """Форма создания занятий."""
 
     class Meta:
         model = Lesson
