@@ -195,19 +195,6 @@ class Lesson(models.Model):
         """Return a lesson string representation."""
         return f'{self.name} {self.subject.name}'
 
-    def clean(self):
-        """Валидация поля student_id модели Lesson."""
-        lessons_count = Lesson.objects.filter(
-            student_id=self.student_id,
-            test_lesson=False,
-            is_passed=False,
-        ).count()
-        if not self.test_lesson:
-            if lessons_count >= self.student_id.paid_lessons:
-                raise ValidationError(
-                    {'student_id': _('Исчерпан лимит оплаченных занятий!')},
-                )
-
     @property
     def datetime_end(self):
         """Returns the datetime end lesson."""
