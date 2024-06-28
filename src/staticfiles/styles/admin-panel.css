@@ -1,0 +1,42 @@
+#content-main {
+  flex-direction: row-reverse;
+  justify-content: start;
+}
+
+#administrator_form {
+  background-color: white;
+}
+
+.input-field>label {
+  top: 3px;
+}
+
+form .aligned p.help, form .aligned div.help {
+  font-size: 0.9rem;
+  margin-left: 50px;
+}
+
+#id_password_helptext {
+  position: absolute;
+  top: -10px;
+}
+
+form .aligned input + p.help, form .aligned textarea + p.help, form .aligned select + p.help, form .aligned input + div.help, form .aligned textarea + div.help, form .aligned select + div.help {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.submit-row {
+  border: none;
+}
+
+.object-tools a:link, .object-tools a:visited {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 0;
+  font-size: 0.9rem;
+  padding: 12px;
+  color: black;
+  margin-left: 10px;
+}
