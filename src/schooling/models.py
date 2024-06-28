@@ -1,7 +1,5 @@
 from datetime import  timedelta
 from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
 from phonenumber_field.modelfields import PhoneNumberField
 
 from bot.states import UserStates

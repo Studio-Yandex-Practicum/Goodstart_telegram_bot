@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from schooling.models import Lesson
 
 class LessonForm(forms.ModelForm):
+    """Форма создания занятий"""
 
     class Meta:
         model = Lesson
@@ -32,7 +33,7 @@ class LessonForm(forms.ModelForm):
                 )
         if subject not in teacher.competence.all():
                 raise forms.ValidationError(
-                    {'subject': _('Этот предмет преподаёт другой преподаватель!')},
+                    {'subject': _('Предмет преподаёт другой преподаватель!')},
                 )
 
 class ChangeDateTimeLesson(forms.Form):
