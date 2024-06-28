@@ -1,7 +1,7 @@
 import datetime
 
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.shortcuts import render, HttpResponseRedirect
 from asgiref.sync import sync_to_async
 
 from schooling.forms import ChangeDateTimeLesson
@@ -82,10 +82,11 @@ async def change_datetime_lesson(request, id, lesson_id):
     if request.method == 'POST':
         form = ChangeDateTimeLesson(request.POST)
         if form.is_valid():
-            return HttpResponse(
-                'Заявка отправлена администратору! '
-                f'Новое дата/время {form.cleaned_data['dt_field']}',
-            )
+            # Обработка успешной отправки формы
+            return HttpResponseRedirect(
+                reverse_lazy('schedule:lesson_change_success'),
+                )
+
             # TODO: обработать сценарий отправки заявки администратору.
 
     return render(
@@ -97,11 +98,17 @@ async def change_datetime_lesson(request, id, lesson_id):
 
 async def cancel_lesson(request, id, lesson_id):
     if request.method == 'POST':
-        return HttpResponse(
-            'Заявка на отмену занятия отправлена администратору!',
-        )
+         return HttpResponseRedirect(
+            reverse_lazy('schedule:lesson_cancel_success'),
+            )
 
     return render(
         request,
         'schedule_cancel_lesson.html',
     )
+
+def lesson_change_success(request):
+    return render(request, 'lesson_change_success.html')
+
+def lesson_cancel_success(request):
+    return render(request, 'lesson_cancel_success.html')
