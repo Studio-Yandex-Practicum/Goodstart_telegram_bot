@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from schooling.models import Student, Teacher, Subject, StudyClass, Lesson
+from schooling.forms import LessonForm
 
 
 @admin.register(Teacher)
@@ -49,6 +50,7 @@ class StudyClassAdmin(admin.ModelAdmin):
 class LessonAdmin(admin.ModelAdmin):
     """Управление занятиями."""
 
+    form = LessonForm
     list_display = (
         'name', 'subject', 'teacher_id', 'student_id',
         'start_time', 'duration', 'is_passed', 'test_lesson',
