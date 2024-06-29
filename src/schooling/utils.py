@@ -110,11 +110,23 @@ async def start_chat(sender, instance, created, **kwargs):
 async def notify_about_lesson(sender, instance, created, **kwargs):
     """Отправляет уведомление о времени занятия."""
     if created:
-        message_text = (
-            f'Ваше занятие назначено с {instance.datetime_start} '
-            f'до {instance.datetime_end}.\n'
-            f'Тема: {instance.name}'
-        )
+        if instance.test_lesson == True:
+            message_text = (
+                f'Ваше занятие назначено с {instance.datetime_start} '
+                f'до {instance.datetime_end}.\n'
+                f'Тема: {instance.name}.\n'
+                f'{instance._meta.get_field('test_lesson').verbose_name}.\n'
+                f'Преподаватель: {instance.teacher_id}\n'
+                f'Ученик: {instance.student_id}'
+            )
+        else:
+            message_text = (
+                f'Ваше занятие назначено с {instance.datetime_start} '
+                f'до {instance.datetime_end}.\n'
+                f'Тема: {instance.name}.\n'
+                f'Преподаватель: {instance.teacher_id}\n'
+                f'Ученик: {instance.student_id}'
+            )
         if instance.teacher_id.telegram_id:
             reply_markup = await get_root_markup(
                 instance.teacher_id.telegram_id,
