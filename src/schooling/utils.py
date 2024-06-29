@@ -110,7 +110,7 @@ async def start_chat(sender, instance, created, **kwargs):
 async def notify_about_lesson(sender, instance, created, **kwargs):
     """Отправляет уведомление о времени занятия."""
     if created:
-        if instance.test_lesson == True:
+        if instance.test_lesson:
             message_text = (
                 f'Ваше занятие назначено с {instance.datetime_start} '
                 f'до {instance.datetime_end}.\n'
