@@ -168,7 +168,7 @@ class Lesson(models.Model):
         default=45,
     )
     is_passed = models.BooleanField('Занятие прошло', default=False)
-    test_lesson = models.BooleanField('Тестовое занятие', default=False)
+    test_lesson = models.BooleanField('Пробное занятие', default=False)
 
     class Meta:
         """Meta class of LessonModel."""
