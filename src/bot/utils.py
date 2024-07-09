@@ -42,6 +42,7 @@ async def check_user_application_exists(
 
 async def end_paid_message(context):
     """
+
     Проверяет учащихся, отправляет уведомление
     об окончании оплаченных занятий.
     """
@@ -50,10 +51,10 @@ async def end_paid_message(context):
         if student.paid_lessons == 0:
             await context.bot.send_message(
                 chat_id=student.telegram_id,
-                text='Необходимо внести оплату за обучение!'
+                text='Необходимо внести оплату за обучение!',
             )
         else:
             await context.bot.send_message(
                 chat_id=student.telegram_id,
-                text=f'Осталось оплаченных занятий: {student.paid_lessons}.'
+                text=f'Осталось оплаченных занятий: {student.paid_lessons}.',
             )

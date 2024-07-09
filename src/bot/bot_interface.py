@@ -103,8 +103,8 @@ class Bot:
         self._app = await self._build_app()
         self._app.job_queue.run_daily(
             end_paid_message, datetime.time(
-                17, 9, tzinfo=timezone('Europe/Moscow')
-            )
+                17, 9, tzinfo=timezone('Europe/Moscow'),
+            ),
         )
         await self._app.initialize()
         await self._app.updater.start_polling(allowed_updates=Update.ALL_TYPES)
