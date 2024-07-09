@@ -1,7 +1,9 @@
+import datetime
 import asyncio
 import threading
 import time
 from typing import Self
+from pytz import timezone
 
 from django.conf import settings
 from loguru import logger
@@ -20,6 +22,7 @@ from bot.handlers.feedback import subject, body
 from bot.handlers.conversation import help, schedule
 from bot.states import UserStates
 from bot.persistence import DjangoPersistence
+from bot.utils import end_paid_message
 
 PERSISTENCE_UPDATE_DELAY = 5
 
@@ -98,6 +101,11 @@ class Bot:
     async def _start_bot(self):
         """Start the bot."""
         self._app = await self._build_app()
+        self._app.job_queue.run_daily(
+            end_paid_message, datetime.time(
+                17, 9, tzinfo=timezone('Europe/Moscow')
+            )
+        )
         await self._app.initialize()
         await self._app.updater.start_polling(allowed_updates=Update.ALL_TYPES)
         await self._app.start()
