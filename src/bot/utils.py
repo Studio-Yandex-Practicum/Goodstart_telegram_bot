@@ -41,11 +41,7 @@ async def check_user_application_exists(
 
 
 async def end_paid_message(context):
-    """
-
-    Проверяет учащихся, отправляет уведомление
-    об окончании оплаченных занятий.
-    """
+    """Проверяет и отправляет уведомление об окончании оплаченных занятий."""
     students = Student.objects.filter(paid_lessons__lte=2)
     async for student in students:
         if student.paid_lessons == 0:
