@@ -6,7 +6,7 @@ from asgiref.sync import sync_to_async
 
 from schooling.forms import ChangeDateTimeLesson
 from schooling.models import Teacher, Student, Lesson
-from schooling.utils import (
+from schooling.signals_bot import (
     get_schedule_for_role, get_schedule_week_tasks,
 )
 from bot.utils import check_user_from_db

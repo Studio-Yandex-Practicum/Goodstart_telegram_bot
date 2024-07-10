@@ -10,4 +10,4 @@ class SchoolingConfig(AppConfig):
 
     def ready(self) -> None:
         """Подлючает сигналы."""
-        from schooling import utils # noqa
+        from schooling import signals_bot # noqa
