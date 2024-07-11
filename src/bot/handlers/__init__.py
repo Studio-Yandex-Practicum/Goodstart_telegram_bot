@@ -12,5 +12,5 @@ from bot.handlers.left_lessons import left_lessons_handler
 __all__ = [
     'echo_handler', 'start_handler', 'help_handler',
     'success_registration_webapp_handler', 'feedback_handler',
-    'schedule_handler', 'lesson_end_handler', 'left_lessons_handler'
+    'schedule_handler', 'lesson_end_handler', 'left_lessons_handler',
 ]
