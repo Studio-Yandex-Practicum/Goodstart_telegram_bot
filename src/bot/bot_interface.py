@@ -14,7 +14,7 @@ from telegram.ext import (
 from bot.handlers import (
     echo_handler, start_handler, help_handler, feedback_handler,
     success_registration_webapp_handler, schedule_handler,
-    lesson_end_handler,
+    lesson_end_handler, left_lessons_handler
 )
 from bot.handlers.feedback import subject, body
 from bot.handlers.conversation import help, schedule
@@ -80,6 +80,7 @@ class Bot:
             feedback_handler,
             schedule_handler,
             lesson_end_handler,
+            left_lessons_handler,
             ])
         logger.info('Bot application built with handlers.')
         return app
@@ -138,6 +139,12 @@ async def build_main_handler():
             UserStates.SCHEDULE: [
                 CallbackQueryHandler(
                     start_handler,
+                    pattern=f'^{UserStates.START.value}$',
+                ),
+            ],
+            UserStates.LEFT_LESSONS: [
+                CallbackQueryHandler(
+                    left_lessons_handler,
                     pattern=f'^{UserStates.START.value}$',
                 ),
             ],

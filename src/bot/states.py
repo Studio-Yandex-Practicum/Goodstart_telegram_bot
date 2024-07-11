@@ -10,3 +10,4 @@ class UserStates(TextChoices):
     FEEDBACK = 'feedback'
     FEEDBACK_SUBJECT = 'feedback_subject_msg'
     FEEDBACK_BODY = 'feedback_body_msg'
+    LEFT_LESSONS = 'left_lessons'
