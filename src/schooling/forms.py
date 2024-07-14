@@ -66,22 +66,22 @@ class LessonForm(forms.ModelForm):
             datetime_start__date=date(
                 datetime_start.year,
                 datetime_start.month,
-                datetime_start.day
+                datetime_start.day,
                 ),
         )
         validation_intersections_time_periods(
-            student_lessons, datetime_start, duration
+            student_lessons, datetime_start, duration,
         )
         teacher_lessons = Lesson.objects.filter(
             teacher_id=teacher,
             datetime_start__date=date(
                 datetime_start.year,
                 datetime_start.month,
-                datetime_start.day
+                datetime_start.day,
                 ),
         )
         validation_intersections_time_periods(
-            teacher_lessons, datetime_start, duration
+            teacher_lessons, datetime_start, duration,
         )
 
 
