@@ -68,4 +68,4 @@ async def add_daily_task():
         end_paid_message, datetime.time(
             12, 0, tzinfo=timezone('Europe/Moscow'),
         ),
-    ),
+    )
