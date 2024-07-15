@@ -1,8 +1,11 @@
+import datetime
+from pytz import timezone
 from typing import Sequence
 from django.db.models import Model
 
 from potential_user.models import ApplicationForm
 from schooling.models import Student
+from bot.messages_texts.constants import END_PAID_LESSON_MSG, PAID_LESSON_MSG
 
 
 async def check_user_from_db(
@@ -47,10 +50,22 @@ async def end_paid_message(context):
         if student.paid_lessons == 0:
             await context.bot.send_message(
                 chat_id=student.telegram_id,
-                text='Необходимо внести оплату за обучение!',
+                text=END_PAID_LESSON_MSG,
             )
         else:
             await context.bot.send_message(
                 chat_id=student.telegram_id,
-                text=f'Осталось оплаченных занятий: {student.paid_lessons}.',
+                text=f'{PAID_LESSON_MSG}{student.paid_lessons}',
             )
+
+
+async def add_daily_task():
+    """Метод добавления ежедневных задач для бота."""
+    from bot.bot_interface import Bot
+    bot = Bot()
+    app = await bot.get_app()
+    app.job_queue.run_daily(
+        end_paid_message, datetime.time(
+            12, 0, tzinfo=timezone('Europe/Moscow'),
+        ),
+    ),
