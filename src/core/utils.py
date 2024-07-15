@@ -14,7 +14,7 @@ from bot.messages_texts.constants import (
 from core.config.settings_base import EMAIL_HOST_USER
 from potential_user.models import ApplicationForm
 from schooling.models import Student, Teacher
-from schooling.utils import send_message_to_user
+from schooling.signals_bot import send_message_to_user
 
 
 @receiver(pre_delete, sender=Student)

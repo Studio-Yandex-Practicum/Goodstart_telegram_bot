@@ -4,7 +4,7 @@ from material.admin.sites import MaterialAdminSite
 class CustomAdminSite(MaterialAdminSite):
     """Необходим для оверрайда списка приложений в админке."""
 
-    def get_app_list(self, request):
+    def get_app_list(self, request, app_label=None):
         """Формирование собственного списка моделей в админке."""
         app_list = super().get_app_list(request)
         studyclass_dict = {}

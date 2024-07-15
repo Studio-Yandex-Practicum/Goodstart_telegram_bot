@@ -1,7 +1,5 @@
 from datetime import  timedelta
 from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
 from phonenumber_field.modelfields import PhoneNumberField
 
 from bot.states import UserStates
@@ -170,7 +168,7 @@ class Lesson(models.Model):
         default=45,
     )
     is_passed = models.BooleanField('Занятие прошло', default=False)
-    test_lesson = models.BooleanField('Тестовое занятие', default=False)
+    test_lesson = models.BooleanField('Пробное занятие', default=False)
 
     class Meta:
         """Meta class of LessonModel."""
@@ -194,19 +192,6 @@ class Lesson(models.Model):
     def __str__(self):
         """Return a lesson string representation."""
         return f'{self.name} {self.subject.name}'
-
-    def clean(self):
-        """Валидация поля student_id модели Lesson."""
-        lessons_count = Lesson.objects.filter(
-            student_id=self.student_id,
-            test_lesson=False,
-            is_passed=False,
-        ).count()
-        if not self.test_lesson:
-            if lessons_count >= self.student_id.paid_lessons:
-                raise ValidationError(
-                    {'student_id': _('Исчерпан лимит оплаченных занятий!')},
-                )
 
     @property
     def datetime_end(self):
