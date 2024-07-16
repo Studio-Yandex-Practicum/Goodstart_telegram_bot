@@ -1,7 +1,12 @@
 from django import forms
-from django.utils.translation import gettext_lazy as _
 
 from schooling.models import Lesson
+from schooling.form_validators import (
+    validate_intersections_time_periods,
+    validate_paid_lessons,
+    validate_teacher_subjects,
+)
+
 
 class LessonForm(forms.ModelForm):
     """Форма создания занятий."""
@@ -9,9 +14,9 @@ class LessonForm(forms.ModelForm):
     class Meta:
         model = Lesson
         fields = (
-        'name', 'subject', 'teacher_id', 'student_id',
-        'datetime_start', 'duration', 'is_passed', 'test_lesson',
-    )
+            'name', 'subject', 'teacher_id', 'student_id',
+            'datetime_start', 'duration', 'is_passed', 'test_lesson',
+        )
 
     def clean(self):
         """Валидация полей student_id и Subject модели Lesson."""
@@ -20,21 +25,22 @@ class LessonForm(forms.ModelForm):
         test_lesson = self.cleaned_data['test_lesson']
         teacher = self.cleaned_data['teacher_id']
         subject = self.cleaned_data['subject']
+        datetime_start = self.cleaned_data['datetime_start']
+        duration = self.cleaned_data['duration']
 
-        lessons_count = Lesson.objects.filter(
-            student_id=student,
-            test_lesson=False,
-            is_passed=False,
-        ).count()
-        if not test_lesson:
-            if lessons_count >= student.paid_lessons:
-                raise forms.ValidationError(
-                    {'student_id': _('Исчерпан лимит оплаченных занятий!')},
-                )
-        if subject not in teacher.competence.all():
-                raise forms.ValidationError(
-                    {'subject': _('Предмет преподаёт другой преподаватель!')},
-                )
+        validate_paid_lessons(student=student, test_lesson=test_lesson)
+        validate_teacher_subjects(subject=subject, teacher=teacher,)
+        validate_intersections_time_periods(
+            user=student,
+            requested_time=datetime_start,
+            requested_lesson_duration=duration,
+        )
+        validate_intersections_time_periods(
+            user=teacher,
+            requested_time=datetime_start,
+            requested_lesson_duration=duration,
+        )
+
 
 class ChangeDateTimeLesson(forms.Form):
     """Форма для запроса нового времени для урока."""
