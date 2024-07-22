@@ -5,31 +5,6 @@ from schooling.models import Teacher, Student, Lesson
 from typing import Union
 
 
-def checking_for_lesson_updates(
-    name: str,
-    subject: object,
-    teacher: int,
-    student: int,
-    requested_time: datetime,
-) -> Union[None, int]:
-    """Проверяет на наличие текущего урока в базе."""
-    try:
-        scheduled_lesson = Lesson.objects.get(
-            name=name,
-            subject=subject,
-            teacher_id=teacher,
-            student_id=student,
-            datetime_start__date=date(
-                requested_time.year,
-                requested_time.month,
-                requested_time.day,
-            ),
-        )
-        return scheduled_lesson.pk
-    except (Lesson.DoesNotExist, Lesson.MultipleObjectsReturned):
-        return None
-
-
 def validate_intersections_time_periods(
     user: Union[Teacher, Student],
     requested_time: datetime,
