@@ -5,6 +5,7 @@ from schooling.form_validators import (
     validate_intersections_time_periods,
     validate_paid_lessons,
     validate_teacher_subjects,
+    checking_for_lesson_updates,
 )
 
 
@@ -30,15 +31,20 @@ class LessonForm(forms.ModelForm):
 
         validate_paid_lessons(student=student, test_lesson=test_lesson)
         validate_teacher_subjects(subject=subject, teacher=teacher,)
+        excluded_lesson = checking_for_lesson_updates(
+            student, teacher, subject, datetime_start,
+        )
         validate_intersections_time_periods(
             user=student,
             requested_time=datetime_start,
             requested_lesson_duration=duration,
+            excluded_lesson=excluded_lesson,
         )
         validate_intersections_time_periods(
             user=teacher,
             requested_time=datetime_start,
             requested_lesson_duration=duration,
+            excluded_lesson=excluded_lesson,
         )
 
 

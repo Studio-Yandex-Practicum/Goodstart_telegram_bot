@@ -5,10 +5,34 @@ from schooling.models import Teacher, Student, Lesson
 from typing import Union
 
 
+def checking_for_lesson_updates(
+    student: int,
+    teacher: int,
+    subject: object,
+    requested_time: datetime,
+) -> Union[None, int]:
+    """Проверяет на наличие текущего урока в базе."""
+    try:
+        scheduled_lesson = Lesson.objects.get(
+            subject=subject,
+            teacher_id=teacher,
+            student_id=student,
+            datetime_start__date=date(
+                requested_time.year,
+                requested_time.month,
+                requested_time.day,
+            ),
+        )
+        return scheduled_lesson.pk
+    except (Lesson.DoesNotExist, Lesson.MultipleObjectsReturned):
+        return None
+
+
 def validate_intersections_time_periods(
     user: Union[Teacher, Student],
     requested_time: datetime,
     requested_lesson_duration: int,
+    excluded_lesson: Union[None, int],
 ) -> None:
     """
     Проверка в форме создаваемого занятия.
@@ -23,7 +47,7 @@ def validate_intersections_time_periods(
                         requested_time.month,
                         requested_time.day,
                         ),
-                )
+                ).exclude(pk=excluded_lesson)
     elif isinstance(user, Student):
         user_lessons_queryset = Lesson.objects.filter(
                     student_id=user,
@@ -32,7 +56,7 @@ def validate_intersections_time_periods(
                         requested_time.month,
                         requested_time.day,
                         ),
-                )
+                ).exclude(pk=excluded_lesson)
 
     for scheduled_lesson in user_lessons_queryset:
         potential_lesson_time_start = scheduled_lesson.datetime_start
@@ -75,6 +99,6 @@ def validate_paid_lessons(student: Student, test_lesson: bool) -> None:
 
 def validate_teacher_subjects(subject: str, teacher: Teacher) -> None:
     if subject not in teacher.competence.all():
-            raise forms.ValidationError(
-                {'subject': _('Предмет преподаёт другой преподаватель!')},
-            )
+        raise forms.ValidationError(
+            {'subject': _('Предмет преподаёт другой преподаватель!')},
+        )
