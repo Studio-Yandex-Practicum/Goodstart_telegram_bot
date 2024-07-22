@@ -6,14 +6,16 @@ from typing import Union
 
 
 def checking_for_lesson_updates(
-    student: int,
-    teacher: int,
+    name: str,
     subject: object,
+    teacher: int,
+    student: int,
     requested_time: datetime,
 ) -> Union[None, int]:
     """Проверяет на наличие текущего урока в базе."""
     try:
         scheduled_lesson = Lesson.objects.get(
+            name=name,
             subject=subject,
             teacher_id=teacher,
             student_id=student,
