@@ -40,6 +40,16 @@ class ApplicationFormAdmin(admin.ModelAdmin):
     @admin.action(description='Подтвердить выбранные заявки')
     def approve_applications(self, request, queryset):
         """Перевести все выбранные заявки в статус 'Подтверждено'."""
+        application: bool = False
         for query in queryset:
-            query.approved = True
-            query.save()
+            if (
+                query.study_class_id is not None and
+                query.parents_contacts is not None
+            ):
+                query.approved = True
+                query.save()
+            else:
+                application = True
+        if application:
+            text = 'Оставшиеся заявки не заполнены все поля?'
+            self.message_user(request, text)
