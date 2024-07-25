@@ -121,10 +121,7 @@ EMAIL_BACKEND = env.str(
 )
 EMAIL_TEMPLATE_NAME = 'emailing/greeting_email.html'
 EMAIL_HOST = env.str('EMAIL_HOST', default='smtp.yandex.ru')
-try:
-    EMAIL_PORT = env.int('EMAIL_PORT', default=456)
-except ValueError:
-    EMAIL_PORT = 465
+EMAIL_PORT = env.int('EMAIL_PORT', default=465)
 EMAIL_HOST_USER = env.str('EMAIL_ACCOUNT', default='example@yandex.ru')
 EMAIL_HOST_PASSWORD = env.str('EMAIL_PASSWORD', default='password')
 EMAIL_TIMEOUT = 5
