@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.http import HttpRequest
 
 from potential_user.models import ApplicationForm
+from potential_user.constants import APPROVE_VALIDATION_TEXT
 
 
 @admin.register(ApplicationForm)
@@ -51,5 +52,4 @@ class ApplicationFormAdmin(admin.ModelAdmin):
             else:
                 application = True
         if application:
-            text = 'Оставшиеся заявки не заполнены все поля?'
-            self.message_user(request, text)
+            self.message_user(request, APPROVE_VALIDATION_TEXT)
