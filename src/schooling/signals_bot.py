@@ -107,7 +107,7 @@ async def start_chat(sender, instance, created, **kwargs):
 
 
 async def get_message_text(instance):
-    """Получаем сообщение о назначении урока"""
+    """Получаем сообщение о назначении урока."""
     if instance.test_lesson:
         message_text = (
             f'Вам назначено занятие с {instance.datetime_start} '
@@ -140,7 +140,7 @@ async def notify_about_lesson(sender, instance, created, **kwargs):
     """Отправляет уведомление о времени занятия."""
     if created:
         message_text = await get_message_text(instance)
-        
+
         if instance.teacher_id.telegram_id:
             reply_markup = await get_root_markup(
                 instance.teacher_id.telegram_id,
@@ -208,7 +208,7 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
             )
         elif instance.teacher_old.telegram_id:
             reply_markup = await get_root_markup(
-                instance.teacher_old.telegram_id
+                instance.teacher_old.telegram_id,
             )
         else:
             reply_markup = await get_root_markup(
@@ -223,7 +223,7 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
         if chat_id:
             bot_token = settings.TELEGRAM_TOKEN
             await send_message_to_user(
-                bot_token, chat_id, msg_teacher, reply_markup
+                bot_token, chat_id, msg_teacher, reply_markup,
             )
 
 
@@ -248,7 +248,7 @@ async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
         reply_markup = await get_root_markup(
             instance.student_id.telegram_id,
         )
-    
+
     await gather_send_messages_to_users(
             chat_ids=chat_ids,
             message_text=message_text,
