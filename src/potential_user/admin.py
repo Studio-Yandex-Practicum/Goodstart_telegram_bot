@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.http import HttpRequest
 
 from potential_user.models import ApplicationForm
+from potential_user.constants import APPROVE_VALIDATION_TEXT
 
 
 @admin.register(ApplicationForm)
@@ -40,6 +41,15 @@ class ApplicationFormAdmin(admin.ModelAdmin):
     @admin.action(description='Подтвердить выбранные заявки')
     def approve_applications(self, request, queryset):
         """Перевести все выбранные заявки в статус 'Подтверждено'."""
+        application: bool = False
         for query in queryset:
-            query.approved = True
-            query.save()
+            if (
+                query.study_class_id is not None and
+                query.parents_contacts is not None
+            ):
+                query.approved = True
+                query.save()
+            else:
+                application = True
+        if application:
+            self.message_user(request, APPROVE_VALIDATION_TEXT)
