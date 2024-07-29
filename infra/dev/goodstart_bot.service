@@ -20,12 +20,6 @@ ExecStartPre=sudo docker compose -f docker-compose.dev.yaml pull
 ExecStartPre=docker compose -f docker-compose.dev.yaml down
 ExecStart=docker compose -f docker-compose.dev.yaml up -d
 
-# Выполняет дополнительные действия
-ExecStartPost=docker compose -f docker-compose.dev.yaml exec backend sh -c "export RUN_BOT=false"
-ExecStartPost=docker compose -f docker-compose.dev.yaml exec backend python manage.py collectstatic
-ExecStartPost=docker compose -f docker-compose.dev.yaml exec backend python manage.py migrate
-ExecStartPost=docker compose -f docker-compose.dev.yaml exec backend sh -c "export RUN_BOT=true"
-
 # Выполняет удаление старых образов
 ExecStartPost=docker system prune --force
 
