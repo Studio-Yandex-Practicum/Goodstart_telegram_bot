@@ -1,0 +1,28 @@
+[Unit]
+
+Description=goodstart_telegram_bot
+Requires=docker.service
+After=docker.service
+
+[Service]
+
+Restart=always
+RestartSec=5
+TimeOutStartSec=1200
+User=goodstartuser
+
+WorkingDirectory=/home/goodstartuser/Goodstart_telegram_bot/infra/prod/
+
+# Выполняет pull образов с Docker Hub
+ExecStartPre=sudo docker compose -f docker-compose.prod.yaml pull
+
+# Перезапускает все контейнеры в Docker Compose
+ExecStartPre=docker compose -f docker-compose.prod.yaml down
+ExecStart=docker compose -f docker-compose.prod.yaml up -d
+
+# Выполняет удаление старых образов
+ExecStartPost=docker system prune --force
+
+[Install]
+
+WantedBy=multi-user.target

@@ -1,0 +1,40 @@
+
+version: '3'
+
+volumes:
+  pg_data:
+  static_volume:
+
+services:
+  db:
+    image: postgres:latest
+    env_file: ../../.env
+    restart: always
+    container_name: GoodStart-DB
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  backend:
+    image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:master
+    # build:
+    #   context: ../..
+    #   dockerfile: infra/dev/dev.Dockerfile
+    env_file: ../../.env
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - static_volume:/app/static/
+    ports:
+      - 8002:8000
+  gateway:
+    image: nginx:1.22.1
+    volumes:
+      - ./nginx.conf:/etc/nginx/templates/default.conf.template:ro
+      - static_volume:/static/
+    depends_on:
+      - backend
+    restart: always
+    ports:
+      - 8001:80
