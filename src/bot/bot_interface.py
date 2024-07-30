@@ -102,7 +102,7 @@ class Bot:
             # Сюда добавлять новые комманды
         ]
         await app.bot.set_my_commands(commands)
-        await app.bot.set_chat_menu_button(chat_id=None, 
+        await app.bot.set_chat_menu_button(chat_id=None,
                                            menu_button=MenuButtonCommands())
 
     def _run(self):
