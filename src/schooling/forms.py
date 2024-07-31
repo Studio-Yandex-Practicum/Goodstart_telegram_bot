@@ -34,11 +34,13 @@ class LessonForm(forms.ModelForm):
             user=student,
             requested_time=datetime_start,
             requested_lesson_duration=duration,
+            excluded_lesson=self.instance.id,
         )
         validate_intersections_time_periods(
             user=teacher,
             requested_time=datetime_start,
             requested_lesson_duration=duration,
+            excluded_lesson=self.instance.id,
         )
 
 
