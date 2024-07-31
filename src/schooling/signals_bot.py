@@ -108,23 +108,16 @@ async def start_chat(sender, instance, created, **kwargs):
 
 async def get_message_text(instance):
     """Получаем сообщение о назначении урока."""
+    message_text = (
+            f'Вам назначено занятие с {instance.datetime_start} '
+            f'до {instance.datetime_end}.\n'
+            f'Тема: {instance.name}.\n'
+            f'Преподаватель: {instance.teacher_id}\n'
+            f'Ученик: {instance.student_id}\n'
+        )
+    test_msg = f'{instance._meta.get_field('test_lesson').verbose_name}'
     if instance.test_lesson:
-        message_text = (
-            f'Вам назначено занятие с {instance.datetime_start} '
-            f'до {instance.datetime_end}.\n'
-            f'Тема: {instance.name}.\n'
-            f'{instance._meta.get_field('test_lesson').verbose_name}.\n'
-            f'Преподаватель: {instance.teacher_id}\n'
-            f'Ученик: {instance.student_id}'
-        )
-    else:
-        message_text = (
-            f'Вам назначено занятие с {instance.datetime_start} '
-            f'до {instance.datetime_end}.\n'
-            f'Тема: {instance.name}.\n'
-            f'Преподаватель: {instance.teacher_id}\n'
-            f'Ученик: {instance.student_id}'
-        )
+        message_text = message_text + test_msg
     return message_text
 
 
@@ -151,9 +144,10 @@ async def notify_about_lesson(sender, instance, created, **kwargs):
             )
 
         chat_ids = (
-            instance.teacher_id.telegram_id,
-            instance.student_id.telegram_id,
-        )
+                instance.student_id.telegram_id,
+                instance.teacher_id.telegram_id,
+            )
+
         await gather_send_messages_to_users(
             chat_ids=chat_ids,
             message_text=message_text,
@@ -166,9 +160,9 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
     """Отправляет уведомление о изменении занятия."""
     if not created:
         chat_ids = (
-            instance.student_id.telegram_id,
-            instance.teacher_old.telegram_id,
-        )
+                instance.student_id.telegram_id,
+                instance.teacher_old.telegram_id,
+            )
         chat_id = instance.teacher_id.telegram_id
         msg_teacher = await get_message_text(instance)
         msg_text = (
@@ -231,8 +225,8 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
 async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
     """Отправляет уведомление об отмене занятия."""
     chat_ids = (
-        instance.teacher_id.telegram_id,
         instance.student_id.telegram_id,
+        instance.teacher_id.telegram_id,
     )
     message_text = (
         f'Занятие на тему "{instance.name}" '
