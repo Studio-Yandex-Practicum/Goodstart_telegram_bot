@@ -13,9 +13,9 @@ from telegram.ext import (
     PersistenceInput, MessageHandler, filters,
 )
 from bot.handlers import (
-    echo_handler, start_handler, help_handler, feedback_handler,
+    start_handler, help_handler, feedback_handler,
     success_registration_webapp_handler, schedule_handler,
-    lesson_end_handler, left_lessons_handler,
+    lesson_end_handler, left_lessons_handler, unknown_command_handler,
 )
 from bot.handlers.feedback import subject, body
 from bot.handlers.conversation import help, schedule
@@ -78,7 +78,7 @@ class Bot:
             start_handler,
             help_handler,
             success_registration_webapp_handler,
-            echo_handler,
+            unknown_command_handler,  # Переименованный echo handler
             feedback_handler,
             schedule_handler,
             lesson_end_handler,
@@ -94,13 +94,11 @@ class Bot:
             BotCommand('start', 'Запустить бот'),
             BotCommand('help', 'Помощь'),
             BotCommand('feedback', 'Отправить отзыв'),
-            BotCommand('echo', 'Отправить эхо-сообщение'),
-            BotCommand('schedule', 'Запланировать урок'),
-            BotCommand('success_registration', 'Успешная регистрация'),
-            BotCommand('left_lessons', 'Оставшиеся уроки'),
-            BotCommand('was_the_lesson', 'Был ли урок'),
+            # Обновленное описание
+            BotCommand('schedule', 'Просмотреть расписание'),
             # Сюда добавлять новые комманды
         ]
+
         await app.bot.set_my_commands(commands)
         await app.bot.set_chat_menu_button(chat_id=None,
                                            menu_button=MenuButtonCommands())
