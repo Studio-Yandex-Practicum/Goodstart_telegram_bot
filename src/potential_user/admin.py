@@ -44,12 +44,13 @@ class ApplicationFormAdmin(admin.ModelAdmin):
         application: bool = False
         for query in queryset:
             if (
-                query.study_class_id is not None and
-                query.parents_contacts is not None
+                query.role == 'student' and
+                query.study_class_id is None and
+                query.parents_contacts is None
             ):
+                application = True
+            else:
                 query.approved = True
                 query.save()
-            else:
-                application = True
         if application:
             self.message_user(request, APPROVE_VALIDATION_TEXT)
