@@ -94,7 +94,6 @@ class Bot:
             BotCommand('start', 'Запустить бот'),
             BotCommand('help', 'Помощь'),
             BotCommand('feedback', 'Отправить отзыв'),
-            # Обновленное описание
             BotCommand('schedule', 'Просмотреть расписание'),
             # Сюда добавлять новые комманды
         ]
