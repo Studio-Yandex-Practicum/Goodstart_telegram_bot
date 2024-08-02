@@ -16,24 +16,26 @@ def validate_intersections_time_periods(
 
     Проверяет пересечения по времени с существующим.
     """
+    if not all([user, requested_time, requested_lesson_duration]):
+        raise forms.ValidationError('Отсутствуют необходимые данные.')
     if isinstance(user, Teacher):
         user_lessons_queryset = Lesson.objects.filter(
-                    teacher_id=user,
-                    datetime_start__date=date(
-                        requested_time.year,
-                        requested_time.month,
-                        requested_time.day,
-                        ),
-                ).exclude(pk=excluded_lesson)
+            teacher_id=user,
+            datetime_start__date=date(
+                requested_time.year,
+                requested_time.month,
+                requested_time.day,
+            ),
+        ).exclude(pk=excluded_lesson)
     elif isinstance(user, Student):
         user_lessons_queryset = Lesson.objects.filter(
-                    student_id=user,
-                    datetime_start__date=date(
-                        requested_time.year,
-                        requested_time.month,
-                        requested_time.day,
-                        ),
-                ).exclude(pk=excluded_lesson)
+            student_id=user,
+            datetime_start__date=date(
+                requested_time.year,
+                requested_time.month,
+                requested_time.day,
+            ),
+        ).exclude(pk=excluded_lesson)
 
     for scheduled_lesson in user_lessons_queryset:
         potential_lesson_time_start = scheduled_lesson.datetime_start
@@ -63,10 +65,10 @@ def validate_intersections_time_periods(
 
 def validate_paid_lessons(student: Student, test_lesson: bool) -> None:
     lessons_count = Lesson.objects.filter(
-            student_id=student,
-            test_lesson=False,
-            is_passed=False,
-        ).count()
+        student_id=student,
+        test_lesson=False,
+        is_passed=False,
+    ).count()
     if not test_lesson:
         if lessons_count >= student.paid_lessons:
             raise forms.ValidationError(

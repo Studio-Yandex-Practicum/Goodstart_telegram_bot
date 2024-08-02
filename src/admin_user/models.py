@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from admin_user.managers import UserManager
+from schooling.validator import validate_phone_number
 
 DEFAULT_NAME_LENGTH = 150
 EMAIL_LENGTH = 254
@@ -24,6 +25,7 @@ class Administrator(AbstractBaseUser, PermissionsMixin):
     )
     phone = PhoneNumberField(
         verbose_name=_('Номер телефона.'),
+        validators=[validate_phone_number],
         help_text='Формат +7XXXXXXXXXX',
     )
     email = models.EmailField(

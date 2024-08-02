@@ -3,6 +3,7 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 from schooling.models import StudyClass
+from schooling.validator import validate_phone_number
 
 
 class ApplicationForm(models.Model):
@@ -38,6 +39,7 @@ class ApplicationForm(models.Model):
     )
     phone_number = PhoneNumberField(
         'Номер телефона',
+        validators=[validate_phone_number],
         help_text='Формат +7XXXXXXXXXX',
     )
     study_class_id = models.ForeignKey(

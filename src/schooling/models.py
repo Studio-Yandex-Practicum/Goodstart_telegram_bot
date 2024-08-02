@@ -1,13 +1,18 @@
 from datetime import timedelta
+
+from django.core.exceptions import ValidationError
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 from bot.states import UserStates
-
+from schooling.validator import validate_phone_number
 
 MAX_LEN_NAME_SURNAME = 150
 MAX_LEN_CITY = 50
 MAX_LEN_STATE = 50
+MAX_COUNT_STUDENTS = 30
+MAX_COUNT_CLASSES = 5
+MAX_COUNT_SUBJECTS = 3
 
 
 class GeneralUserModel(models.Model):
@@ -17,7 +22,11 @@ class GeneralUserModel(models.Model):
     name = models.CharField('Имя', max_length=MAX_LEN_NAME_SURNAME)
     surname = models.CharField('Фамилия', max_length=MAX_LEN_NAME_SURNAME)
     city = models.CharField('Город', max_length=MAX_LEN_CITY)
-    phone_number = PhoneNumberField('Номер телефона')
+    phone_number = PhoneNumberField(
+        'Номер телефона',
+        validators=[validate_phone_number],
+        help_text='Формат +7XXXXXXXXXX',
+    )
     last_login_date = models.DateField('Последнее посещение', auto_now=True)
     registration_date = models.DateField('Дата регистрации', auto_now_add=True)
     state = models.CharField(
@@ -50,10 +59,26 @@ class Teacher(GeneralUserModel):
     )
 
     class Meta:
-        """Meta class of TeacherModel."""
-
         verbose_name = 'преподаватель'
         verbose_name_plural = 'Преподаватели'
+
+    def clean(self):
+        """
+        Проверка на максимальное количество классов и
+        предметов на одного преподавателя.
+        """
+        current_classes_count = self.study_classes.count()
+        current_subjects_count = self.competence.count()
+
+        if current_classes_count > MAX_COUNT_CLASSES:
+            raise ValidationError(
+                f'Преподаватель {self.name} {self.surname} уже '
+                f'ведет максимальное количество классов.')
+
+        if current_subjects_count > MAX_COUNT_SUBJECTS:
+            raise ValidationError(
+                f'Преподаватель {self.name} {self.surname} уже '
+                f'ведет максимальное количество предметов.')
 
     def __str__(self):
         """Return a teacher string representation."""
@@ -69,7 +94,7 @@ class Student(GeneralUserModel):
         verbose_name='ID учебного класса',
         related_name='students',
         null=True,
-        )
+    )
     paid_lessons = models.PositiveIntegerField(
         'Оплаченые занятия',
         default=0,
@@ -77,7 +102,7 @@ class Student(GeneralUserModel):
     parents_contacts = models.CharField(
         max_length=256,  # Переписать значение!
         verbose_name='Контакты представителей',
-        )
+    )
     subjects = models.ManyToManyField(
         'Subject',
         verbose_name='Предмет',
@@ -130,6 +155,18 @@ class StudyClass(models.Model):
         verbose_name='Номер учебного класса',
     )
 
+    def clean(self):
+        """
+        Проверка на максимальное количество
+        студентов в одном классе.
+        """
+        current_students_count = self.students.count()
+
+        if current_students_count > MAX_COUNT_STUDENTS:
+            raise ValidationError(
+                f'Максимальное количество студентов в классе '
+                f'"{self.study_class_name}" уже достигнуто.')
+
     class Meta:
         verbose_name = 'учебный класс'
         verbose_name_plural = 'Учебные классы'
@@ -170,9 +207,18 @@ class Lesson(models.Model):
     is_passed = models.BooleanField('Занятие прошло', default=False)
     test_lesson = models.BooleanField('Пробное занятие', default=False)
 
+    def clean(self):
+        if Lesson.objects.filter(
+            name=self.name,
+            datetime_start__date=self.datetime_start.date()
+        ).exclude(pk=self.pk).exists():
+            raise ValidationError(
+                'Урок с таким названием уже существует в этот день.')
+
     class Meta:
         """Meta class of LessonModel."""
 
+        unique_together = ('name', 'datetime_start')
         verbose_name = 'занятие'
         verbose_name_plural = 'Занятия'
         constraints = [
