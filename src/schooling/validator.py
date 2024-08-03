@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
-from phonenumbers import (NumberParseException,
-                          is_possible_number, is_valid_number, parse)
+from phonenumbers import (NumberParseException, is_possible_number,
+                          is_valid_number, parse)
 from phonenumbers.phonenumberutil import region_code_for_number
 
 

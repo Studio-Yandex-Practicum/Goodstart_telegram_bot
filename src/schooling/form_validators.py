@@ -1,8 +1,12 @@
-from datetime import timedelta, datetime, date
-from django import forms
-from django.utils.translation import gettext_lazy as _
-from schooling.models import Teacher, Student, Lesson
+from datetime import date, datetime, timedelta
 from typing import Union
+
+from django import forms
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+
+from schooling.models import Lesson, Student, Teacher
 
 
 def validate_intersections_time_periods(
@@ -80,4 +84,43 @@ def validate_teacher_subjects(subject: str, teacher: Teacher) -> None:
     if subject not in teacher.competence.all():
         raise forms.ValidationError(
             {'subject': _('Предмет преподаёт другой преподаватель!')},
+        )
+
+
+def validate_lesson_datetime(datetime_start):
+    """Валидация даты и времени начала урока."""
+    if datetime_start < timezone.now():
+        raise ValidationError(
+            'Дата и время начала урока должны быть в будущем.')
+
+
+def validate_lesson_duration(duration):
+    """Валидация продолжительности урока."""
+    if duration < 30 or duration > 180:
+        raise ValidationError(
+            'Длительность урока должна быть от 30 до 180 минут.')
+
+
+def validate_student_last_login(student):
+    """Валидация посещения студента."""
+    if not hasattr(student, 'last_login_date'):
+        raise ValidationError(
+            'У студента отсутствует информация о последнем посещении.')
+    if student.last_login_date + timedelta(days=180) < timezone.now().date():
+        raise ValidationError(
+            f'Студент не посещал занятия в течение последних шести месяцев.\n'
+            f'Последнее посещение: {student.last_login_date}.'
+        )
+
+
+def validate_teacher_last_login(teacher):
+    """Валидация посещения преподавателя."""
+    if not hasattr(teacher, 'last_login_date'):
+        raise ValidationError(
+            'У преподавателя отсутствует информация о последнем посещении.')
+    if teacher.last_login_date + timedelta(days=60) < timezone.now().date():
+        raise ValidationError(
+            f'Преподаватель не проводил занятия '
+            f'в течение последних двух месяцев.\n'
+            f'Последнее посещение: {teacher.last_login_date}.'
         )

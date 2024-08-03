@@ -1,10 +1,11 @@
-from datetime import timedelta
-
 from django import forms
-from django.utils import timezone
 
 from schooling.form_validators import (validate_intersections_time_periods,
+                                       validate_lesson_datetime,
+                                       validate_lesson_duration,
                                        validate_paid_lessons,
+                                       validate_student_last_login,
+                                       validate_teacher_last_login,
                                        validate_teacher_subjects)
 from schooling.models import Lesson
 
@@ -40,50 +41,27 @@ class LessonForm(forms.ModelForm):
 
         # Валидация даты и времени начала урока
         if datetime_start:
-            if datetime_start < timezone.now():
-                raise forms.ValidationError(
-                    'Дата и время начала урока должны быть в будущем.')
+            validate_lesson_datetime(datetime_start)
         else:
             raise forms.ValidationError(
                 'Дата и время начала урока обязательны для заполнения.')
 
         # Валидация продолжительности урока
         if duration:
-            if duration < 30 or duration > 180:
-                raise forms.ValidationError(
-                    'Длительность урока должна быть от 30 до 180 минут.')
+            validate_lesson_duration(duration)
         else:
             raise forms.ValidationError(
                 'Продолжительность урока обязательна для заполнения.')
 
         # Валидация посещения студента
         if student:
-            if not hasattr(student, 'last_login_date'):
-                raise forms.ValidationError(
-                    'У студента отсутствует информация о последнем посещении.')
-            if student.last_login_date + timedelta(
-                    days=60) < timezone.now().date():
-                raise forms.ValidationError(
-                    f'Студент не посещал занятия в '
-                    f'течение последних двух месяцев.\n'
-                    f'Последнее посещение: {student.last_login_date}.'
-                )
+            validate_student_last_login(student)
         else:
             raise forms.ValidationError('Информация о студенте обязательна.')
 
         # Валидация посещения преподавателя
         if teacher:
-            if not hasattr(teacher, 'last_login_date'):
-                raise forms.ValidationError(
-                    'У преподавателя отсутствует '
-                    'информация о последнем посещении.')
-            if teacher.last_login_date + timedelta(
-                    days=60) < timezone.now().date():
-                raise forms.ValidationError(
-                    f'Преподаватель не проводил занятия в '
-                    f'течение последних двух месяцев.\n'
-                    f'Последнее посещение: {teacher.last_login_date}.'
-                )
+            validate_teacher_last_login(teacher)
         else:
             raise forms.ValidationError(
                 'Информация о преподавателе обязательна.')
