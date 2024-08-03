@@ -1,3 +1,4 @@
+# TODO: должна отображаться только ученикам
 from telegram import (
     Update,
 )

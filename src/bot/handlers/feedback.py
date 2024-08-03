@@ -1,3 +1,4 @@
+# TODO: Должна быть доступна после регистрации и ученику и учителю
 from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import (
     CommandHandler, CallbackContext, ConversationHandler,

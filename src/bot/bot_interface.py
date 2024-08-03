@@ -1,3 +1,4 @@
+# bot_interface.py
 import asyncio
 import threading
 import time
@@ -5,16 +6,16 @@ from typing import Self
 
 from django.conf import settings
 from loguru import logger
-from telegram import Update
+from telegram import Update, BotCommand, MenuButtonCommands
 from telegram.ext import (
     Application, ApplicationBuilder,
     CallbackQueryHandler, ConversationHandler,
     PersistenceInput, MessageHandler, filters,
 )
 from bot.handlers import (
-    echo_handler, start_handler, help_handler, feedback_handler,
+    start_handler, help_handler, feedback_handler,
     success_registration_webapp_handler, schedule_handler,
-    lesson_end_handler, left_lessons_handler,
+    lesson_end_handler, left_lessons_handler, unknown_command_handler,
 )
 from bot.handlers.feedback import subject, body
 from bot.handlers.conversation import help, schedule
@@ -77,14 +78,29 @@ class Bot:
             start_handler,
             help_handler,
             success_registration_webapp_handler,
-            echo_handler,
+            unknown_command_handler,  # Переименованный echo handler
             feedback_handler,
             schedule_handler,
             lesson_end_handler,
             left_lessons_handler,
-            ])
+        ])
+        await self._update_bot_commands(app)
         logger.info('Bot application built with handlers.')
         return app
+
+    async def _update_bot_commands(self, app):
+        """Update bot commands to be shown in the menu."""
+        commands = [
+            BotCommand('start', 'Запустить бот'),
+            BotCommand('help', 'Помощь'),
+            BotCommand('feedback', 'Отправить отзыв'),
+            BotCommand('schedule', 'Просмотреть расписание'),
+            # Сюда добавлять новые комманды
+        ]
+
+        await app.bot.set_my_commands(commands)
+        await app.bot.set_chat_menu_button(chat_id=None,
+                                           menu_button=MenuButtonCommands())
 
     def _run(self):
         """Run the bot."""
