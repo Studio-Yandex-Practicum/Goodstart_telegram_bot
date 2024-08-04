@@ -1,4 +1,4 @@
-name: Pull and run on PROD server
+name: Pull and run on Prod
 
 on:
   workflow_run:
@@ -78,6 +78,7 @@ jobs:
           echo DB_NAME=${{ secrets.DB_NAME }} >> .env
           echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
           echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+          echo HOST_NG=${{ secrets.HOST_NG }} >> .env
           
           cd infra/prod
           

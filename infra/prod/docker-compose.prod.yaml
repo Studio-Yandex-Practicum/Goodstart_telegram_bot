@@ -16,10 +16,10 @@ services:
     ports:
       - 5432:5432
   backend:
-    image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:master
-    # build:
-    #   context: ../..
-    #   dockerfile: infra/dev/dev.Dockerfile
+    # для тестовой отправки на сервер:
+    image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:mastertmp
+    # для финальной отправки на сервер:
+    # image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:master    
     env_file: ../../.env
     restart: always
     depends_on:
@@ -29,12 +29,30 @@ services:
     ports:
       - 8002:8000
   gateway:
-    image: nginx:1.22.1
+    image: lscr.io/linuxserver/swag:latest
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000 # id goodstartuser на проде
+      - PGID=1000 # id goodstartuser group на проде
+      - TZ=Europe/Moscow
+      - URL=${HOST_NG}
+      - VALIDATION=http
+      - SUBDOMAINS=www,bot #optional
+      - CERTPROVIDER= #optional
+      - DNSPLUGIN=cloudflare #optional
+      - PROPAGATION= #optional
+      - EMAIL= #optional
+      - ONLY_SUBDOMAINS=false #optional
+      - EXTRA_DOMAINS= #optional
+      - STAGING=false #optional
     volumes:
-      - ./nginx.conf:/etc/nginx/templates/default.conf.template:ro
+      - ./nginx.conf:/config/nginx/site-confs/default.conf:ro
       - static_volume:/static/
     depends_on:
       - backend
-    restart: always
     ports:
       - 8001:80
+      - 443:443
+    restart: unless-stopped
