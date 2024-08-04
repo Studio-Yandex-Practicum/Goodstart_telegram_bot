@@ -123,9 +123,8 @@ async def get_message_text(instance):
 
 @receiver(post_init, sender=Lesson)
 def init_lesson(sender, instance, **kwargs):
-    if instance.id:
-        instance.datetime_old = instance.datetime_start
-        instance.teacher_old = instance.teacher_id
+    instance.datetime_old = instance.datetime_start  # до изменения возникала ошибка при генерации уроков
+    instance.teacher_old = instance.teacher_id
 
 
 @receiver(post_save, sender=Lesson)

@@ -1,22 +1,24 @@
+import os
 import random
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import factory
-from django.utils import timezone
 from django.db.models.signals import post_save
+from django.utils import timezone
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyInteger
 
 from schooling.models import Lesson, Student, StudyClass, Subject, Teacher
+
 from .constants import (
-    START_PHONE_VALUE,
-    END_PHONE_VALUE,
     CREATION_COUNT,
-    START_TELEGRAM_ID_VALUE,
+    END_PHONE_VALUE,
     END_TELEGRAM_ID_VALUE,
-    START_RANDOM_VALUE,
-    STOP_RANDOM_VALUE,
     LOCALE,
+    START_PHONE_VALUE,
+    START_RANDOM_VALUE,
+    START_TELEGRAM_ID_VALUE,
+    STOP_RANDOM_VALUE,
 )
 
 
@@ -46,20 +48,22 @@ class StudentFactory(PersonFactory):
 
     study_class_id = factory.Iterator(StudyClass.objects.all())
     paid_lessons = FuzzyInteger(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
-    parents_contacts = factory.List([
-        factory.Faker('name', locale=LOCALE),
-        factory.Sequence(
-            lambda some: f'+7495{FuzzyInteger(
+    parents_contacts = factory.List(
+        [
+            factory.Faker('name', locale=LOCALE),
+            factory.Sequence(
+                lambda some: f'+7495{FuzzyInteger(
                 START_PHONE_VALUE, END_PHONE_VALUE,
             ).fuzz()}',
-        ),
-    ])
+            ),
+        ]
+    )
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
         """Override default `_create` method to set subjects."""
         subject = Subject.objects.order_by('?')[
-            :random.randint(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
+            : random.randint(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
         ]
         student = super()._create(model_class, *args, **kwargs)
         student.subjects.set(subject)
@@ -78,10 +82,10 @@ class TeacherFactory(PersonFactory):
     def _create(cls, model_class, *args, **kwargs):
         """Override `_create` method to set competence and study classes."""
         competence = Subject.objects.order_by('?')[
-            :random.randint(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
+            : random.randint(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
         ]
         study_classes = StudyClass.objects.order_by('?')[
-            :random.randint(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
+            : random.randint(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
         ]
         teacher = super()._create(model_class, *args, **kwargs)
         teacher.competence.set(competence)
@@ -135,3 +139,38 @@ def create_teachers():
 def create_lessons():
     """Create `Lesson` instances for the project tests."""
     LessonFactory.create_batch(size=CREATION_COUNT)
+
+
+def create_personal_lessons():
+    """Create `Lesson` instances for the project tests."""
+    student = Student.objects.get(telegram_id=os.getenv('TELEGRAM_ID'))
+    teachers = list(Teacher.objects.all())
+    days_to_generate = [
+        timezone.now().date() + timedelta(days=i) for i in range(-7, 14)
+    ]
+    competent_subjects = Subject.objects.filter(
+        teacher__in=teachers
+    ).distinct()
+
+    for day in days_to_generate:
+        number_of_lessons = random.randint(1, 5)
+        for _ in range(number_of_lessons):
+            lesson_start_time = timezone.make_aware(
+                datetime.combine(
+                    day,
+                    timezone.now()
+                    .time()
+                    .replace(
+                        hour=random.randint(8, 18),
+                        minute=random.randint(0, 55) // 5 * 5,
+                    ),
+                )
+            )
+            if competent_subjects:
+                subject = random.choice(list(competent_subjects))
+                LessonFactory.create(
+                    student_id=student,
+                    datetime_start=lesson_start_time,
+                    teacher_id=random.choice(teachers),
+                    subject=subject,
+                )

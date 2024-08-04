@@ -17,7 +17,6 @@ export
 # Команда выполняемая по умолчанию.
 .DEFAULT_GOAL := help
 
-
 # Вызов документации.
 help:
 	@echo "$(SHELL_YELLOW)Список полезных функций:$(SHELL_NC)"
@@ -26,40 +25,35 @@ help:
 	@echo "	stop-db              - $(SHELL_GREEN)Команда для остановки локального контейнера postgres.$(SHELL_NC)"
 	@echo "	clear-db             - $(SHELL_GREEN)Команда для очистки volume локального контейнера postgres.$(SHELL_NC)"
 	@echo "	run-dev              - $(SHELL_GREEN)Команда для локального запуска проекта(разработка).$(SHELL_NC)"
-	@echo "	create-ssl           - $(SHELL_GREEN)Команда для созданиея сертификатов SSL(разработка).$(SHELL_NC)"
+	@echo "	create-ssl           - $(SHELL_GREEN)Команда для создания сертификатов SSL(разработка).$(SHELL_NC)"
 	@echo "	fill-db              - $(SHELL_GREEN)Команда для наполнения БД тестовыми данными.$(SHELL_NC)"
-	@echo "	create_test_admins   - $(SHELL_GREEN)Команда для созданиея тестовых администраторов(разработка).$(SHELL_NC)"
-	@echo "	create_test_students - $(SHELL_GREEN)Команда для созданиея тестовых учеников(разработка).$(SHELL_NC)"
-	@echo "	create_test_teachers - $(SHELL_GREEN)Команда для созданиея тестовых преподавателей(разработка).$(SHELL_NC)"
-	@echo "	help            - $(SHELL_GREEN)Команда вызова справки.$(SHELL_NC)"
-	@echo "$(SHELL_YELLOW)Для запуска исполнения команд используйте данные ключи совместно с командой 'make', например 'make init-app'."
-	@echo "При запуске команды 'make' без какого либо ключа, происходит вызов справки.$(SHELL_NC)"
-
+	@echo "	create_test_admins   - $(SHELL_GREEN)Команда для создания тестовых администраторов(разработка).$(SHELL_NC)"
+	@echo "	create_test_students - $(SHELL_GREEN)Команда для создания тестовых учеников(разработка).$(SHELL_NC)"
+	@echo "	create_test_teachers - $(SHELL_GREEN)Команда для создания тестовых преподавателей(разработка).$(SHELL_NC)"
+	@echo "	create_test_lessons  - $(SHELL_GREEN)Команда для создания тестовых занятий(разработка).$(SHELL_NC)"
+	@echo " create_personal_lessons    - $(SHELL_GREEN)Команда для создания занятий для ученика по id telegram (разработка).$(SHELL_NC)"
+	@echo "$(SHELL_YELLOW)Для запуска команд используйте ключ совместно с командой 'make', например 'make init-app'."
+	@echo "При запуске команды 'make' без ключа, вызывается справка.$(SHELL_NC)"
 
 # Подготовка проекта к локальному запуску
 init-app: collectstatic migrate createsuperuser
 
-
 # Сбор статических файлов проекта.
 collectstatic:
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) collectstatic --no-input
-
 
 # Применение собранных миграций к базе данных, на основе сформированных моделей.
 migrate:
 	export RUN_BOT=false
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) migrate --no-input
 
-
 # Создание новых миграций на основе сформированных моделей.
 makemigrations:
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) makemigrations
 
-
 # Создание супер-юзера.
 createsuperuser:
 	$(POETRY_RUN) $(MANAGE_DIR) createsuperuser --noinput --email=$(DJANGO_SUPERUSER_EMAIL) --first_name=$(DJANGO_SUPERUSER_FIRSTNAME) --last_name=$(DJANGO_SUPERUSER_LASTNAME) --phone=$(DJANGO_SUPERUSER_PHONE)
-
 
 create_test_admins:
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) create_test_admins
@@ -80,15 +74,15 @@ create_test_lessons:
 start-db:
 	docker-compose -f $(DEV_DOCK_FILE) up -d; \
 	if [ $$? -ne 0 ]; \
-    then \
-        docker compose -f $(DEV_DOCK_FILE) up -d; \
-    fi
+	then \
+		docker compose -f $(DEV_DOCK_FILE) up -d; \
+	fi
 
 # Остановка контейнера Postgres
 stop-db:
 	docker-compose -f $(DEV_DOCK_FILE) down; \
 	if [ $$? -ne 0 ]; \
-    then \
+	then \
 		docker compose -f $(DEV_DOCK_FILE) down; \
 	fi
 
@@ -96,7 +90,7 @@ stop-db:
 clear-db:
 	docker-compose -f $(DEV_DOCK_FILE) down --volumes; \
 	if [ $$? -ne 0 ]; \
-    then \
+	then \
 		docker compose -f $(DEV_DOCK_FILE) down --volumes; \
 	fi
 
@@ -115,3 +109,7 @@ run-dev:
 # Запуск сервера продакшена через Uvicorn
 run-prod:
 	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_prod:application --reload --lifespan on
+
+# Создание уроков для определенноко telegram id ученика
+create_personal_lessons:
+	cd $(PROJECT_DIR) && $(DJANGO_RUN) create_personal_lessons
