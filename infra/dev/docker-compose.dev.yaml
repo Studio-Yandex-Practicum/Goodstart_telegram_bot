@@ -17,9 +17,6 @@ services:
       - 5432:5432
   backend:
     image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:dev
-    # build:
-    #   context: ../..
-    #   dockerfile: infra/dev/dev.Dockerfile
     env_file: ../../.env
     restart: always
     depends_on:
