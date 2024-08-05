@@ -6,7 +6,7 @@ from bot.handlers.help import help
 
 
 @log_errors
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Echo messages handler."""
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -14,4 +14,5 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await help(update, context)
 
-echo_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), echo)
+unknown_command_handler = MessageHandler(filters.TEXT & (~filters.COMMAND),
+                                         unknown)
