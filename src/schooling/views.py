@@ -18,7 +18,7 @@ async def schedule_page(request, id):
 
     today = datetime.date.today()
     start_week = (
-    today + datetime.timedelta(weeks=week_offset, days=-today.weekday())
+        today + datetime.timedelta(weeks=week_offset, days=-today.weekday())
     )
     end_week = start_week + datetime.timedelta(days=6)
 
@@ -98,7 +98,7 @@ async def change_datetime_lesson(request, id, lesson_id):
 
 async def cancel_lesson(request, id, lesson_id):
     if request.method == 'POST':
-         return HttpResponseRedirect(
+        return HttpResponseRedirect(
             reverse_lazy('schedule:lesson_cancel_success'),
             )
 
