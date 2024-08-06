@@ -90,9 +90,9 @@ jobs:
           echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
           echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
           echo HOST_NG=${{ secrets.HOST_NG }} >> .env
-          
+
           cd infra/prod
-          
+
           # Настройка автоматического перезапуска приложения при сбое сервера
           sudo cp -f /home/goodstartuser/Goodstart_telegram_bot/infra/prod/goodstart_bot.service /etc/systemd/system/goodstart_bot.service
           sudo systemctl daemon-reload

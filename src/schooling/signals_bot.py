@@ -70,12 +70,14 @@ async def send_lesson_end_notification(context: CallbackContext):
 
 
 @receiver(post_save, sender=Lesson)
-async def schedule_lesson_end_notification(sender, instance, **kwargs):
+def schedule_lesson_end_notification(sender, instance, **kwargs):
     """Создание задачи на отправку уведомления по окончании урока."""
     from bot.bot_interface import Bot
     bot = Bot()
-    app = await bot.get_app()
+    app = asyncio.run(bot.get_app())
     lesson_end_time = instance.datetime_end
+    teacher_id = instance.teacher_id
+    student_id = instance.student_id
     if lesson_end_time > timezone.now():
         try:
             app.job_queue.run_once(
@@ -83,8 +85,8 @@ async def schedule_lesson_end_notification(sender, instance, **kwargs):
                 when=lesson_end_time,
                 name=f'lesson_end_{instance.id}',
                 data={
-                    'teacher_chat_id': instance.teacher_id.telegram_id,
-                    'student_chat_id': instance.student_id.telegram_id,
+                    'teacher_chat_id': teacher_id.telegram_id,
+                    'student_chat_id': student_id.telegram_id,
                     'lesson_id': instance.id,
                 },
             )
@@ -173,6 +175,7 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
             f'{instance.datetime_end.time()}.'
         )
         msg_student_old_teacher = 'Ваше занятие перенесено!\n' + msg_text
+        message_text = ''
 
         if (
             instance.datetime_old != instance.datetime_start
@@ -209,11 +212,12 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
                 instance.student_id.telegram_id,
             )
 
-        await gather_send_messages_to_users(
-            chat_ids=chat_ids,
-            message_text=message_text,
-            reply_markup=reply_markup,
-        )
+        if message_text:
+            await gather_send_messages_to_users(
+                chat_ids=chat_ids,
+                message_text=message_text,
+                reply_markup=reply_markup,
+            )
         if chat_id:
             bot_token = settings.TELEGRAM_TOKEN
             await send_message_to_user(

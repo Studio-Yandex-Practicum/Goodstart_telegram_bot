@@ -1,8 +1,12 @@
+import pytz
 import datetime
+from django.core.mail import send_mail
+from django.urls import reverse
 
 from django.urls import reverse_lazy
 from django.shortcuts import render, HttpResponseRedirect
 from asgiref.sync import sync_to_async
+from decouple import config
 
 from schooling.forms import ChangeDateTimeLesson
 from schooling.models import Teacher, Student, Lesson
@@ -11,6 +15,9 @@ from schooling.signals_bot import (
 )
 from bot.utils import check_user_from_db
 
+
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+ADMIN_EMAIL = [config('DJANGO_SUPERUSER_EMAIL')]
 
 async def schedule_page(request, id):
     """Обрабатывает запрос на получение расписания занятий."""
@@ -76,39 +83,72 @@ async def details_schedule_page(request, id, lesson_id):
     )
 
 
+def send_notification_email(subject, message):
+    send_mail(
+        subject,
+        message,
+        EMAIL_HOST_USER,
+        ADMIN_EMAIL,
+        fail_silently=False,
+    )
+
 async def change_datetime_lesson(request, id, lesson_id):
     form = ChangeDateTimeLesson()
-
     if request.method == 'POST':
         form = ChangeDateTimeLesson(request.POST)
         if form.is_valid():
-            # Обработка успешной отправки формы
-            return HttpResponseRedirect(
-                reverse_lazy('schedule:lesson_change_success'),
-                )
-
-            # TODO: обработать сценарий отправки заявки администратору.
-
-    return render(
+            lesson = await Lesson.objects.aget(id=lesson_id)
+            new_datetime = form.cleaned_data['dt_field']
+            lesson.datetime_start = new_datetime
+            await sync_to_async(lesson.save)()
+            user = await check_user_from_db(id, (Student, Teacher))
+            moscow_tz = pytz.timezone('Europe/Moscow')
+            new_datetime_moscow = new_datetime.astimezone(moscow_tz)
+            formatted_datetime = new_datetime_moscow.strftime(
+                '%Y-%m-%d %H:%M:%S',
+            )
+            await sync_to_async(send_notification_email)(
+                'Запрос на перенос занятия',
+                f'Пользователь {user.name} {user.surname} '
+                f'({user.__class__.__name__}) запросил перенос занятия на '
+                f'{formatted_datetime}.',
+            )
+            redirect_url = (
+                reverse('schedule:lesson_change_success') +
+                f'?new_datetime={formatted_datetime}'
+            )
+            return HttpResponseRedirect(redirect_url)
+    return await sync_to_async(render)(
         request,
         'schedule_change_dt_lesson.html',
         context={'form': form},
     )
 
-
 async def cancel_lesson(request, id, lesson_id):
     if request.method == 'POST':
-         return HttpResponseRedirect(
+        lesson = await Lesson.objects.aget(id=lesson_id)
+        lesson.cancelled = True
+        await sync_to_async(lesson.delete)()
+        user = await check_user_from_db(id, (Student, Teacher))
+        await sync_to_async(send_notification_email)(
+            'Запрос на отмену занятия',
+            f'Пользователь {user.name} {user.surname} '
+            f'({user.__class__.__name__}) запросил отмену занятия.',
+        )
+        return await sync_to_async(HttpResponseRedirect)(
             reverse_lazy('schedule:lesson_cancel_success'),
-            )
-
-    return render(
+        )
+    return await sync_to_async(render)(
         request,
         'schedule_cancel_lesson.html',
     )
 
 def lesson_change_success(request):
-    return render(request, 'lesson_change_success.html')
+    new_datetime = request.GET.get('new_datetime')
+    return render(
+        request, 'lesson_change_success.html',
+        context={'new_datetime': new_datetime},
+    )
 
 def lesson_cancel_success(request):
     return render(request, 'lesson_cancel_success.html')

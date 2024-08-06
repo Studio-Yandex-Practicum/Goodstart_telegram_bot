@@ -6,8 +6,8 @@ from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ROOT_DIR = BASE_DIR.parent
-environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
 env = environ.Env()
+environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
 
 
 STATIC_ROOT = os.path.join(ROOT_DIR, 'static/')
@@ -122,10 +122,10 @@ EMAIL_BACKEND = env.str(
 EMAIL_TEMPLATE_NAME = 'emailing/greeting_email.html'
 EMAIL_HOST = env.str('EMAIL_HOST', default='smtp.yandex.ru')
 EMAIL_PORT = env.int('EMAIL_PORT', default=465)
-EMAIL_HOST_USER = env.str('EMAIL_ACCOUNT', default='example@yandex.ru')
-EMAIL_HOST_PASSWORD = env.str('EMAIL_PASSWORD', default='password')
+EMAIL_HOST_USER = env.str('EMAIL_HOST_USER', default='example@yandex.ru')
+EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD', default='password')
 EMAIL_TIMEOUT = 5
-EMAIL_USE_SSL = True
+EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', default=True)
 DEFAULT_RECEIVER = env.str('DEFAULT_EMAIL_ADDRESS', default='NOT_SET')
 
 BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:8000')

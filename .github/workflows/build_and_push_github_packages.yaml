@@ -39,12 +39,12 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-      
+
       - name: Build and push Docker image for Stage
         if: github.ref == 'refs/heads/dev'
         uses: docker/build-push-action@v5
         with:
-          context: . 
+          context: .
           file: infra/dev/dev.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}

@@ -19,7 +19,7 @@ services:
     # для тестовой отправки на сервер:
     image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:mastertmp
     # для финальной отправки на сервер:
-    # image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:master    
+    # image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:master
     env_file: ../../.env
     restart: always
     depends_on:
