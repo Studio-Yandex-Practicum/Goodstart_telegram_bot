@@ -171,3 +171,5 @@ static/
 *.pem
 # persistence_data
 persistence_data/persistence_file
+.python-version
+.env:Zone.Identifier
