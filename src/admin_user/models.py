@@ -1,10 +1,11 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
-from phonenumber_field.modelfields import PhoneNumberField
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from phonenumber_field.modelfields import PhoneNumberField
 
 from admin_user.managers import UserManager
+from schooling.validators.phone_validators import validate_phone_number
 
 DEFAULT_NAME_LENGTH = 150
 EMAIL_LENGTH = 254
@@ -24,6 +25,7 @@ class Administrator(AbstractBaseUser, PermissionsMixin):
     )
     phone = PhoneNumberField(
         verbose_name=_('Номер телефона.'),
+        validators=[validate_phone_number],
         help_text='Формат +7XXXXXXXXXX',
     )
     email = models.EmailField(
