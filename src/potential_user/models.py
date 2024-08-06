@@ -2,7 +2,9 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
+
 from schooling.models import StudyClass
+from schooling.validators.phone_validators import validate_phone_number
 
 
 class ApplicationForm(models.Model):
@@ -38,6 +40,7 @@ class ApplicationForm(models.Model):
     )
     phone_number = PhoneNumberField(
         'Номер телефона',
+        validators=[validate_phone_number],
         help_text='Формат +7XXXXXXXXXX',
     )
     study_class_id = models.ForeignKey(
@@ -47,13 +50,13 @@ class ApplicationForm(models.Model):
         related_name='potential_user',
         blank=True,
         null=True,
-        )
+    )
     parents_contacts = models.CharField(
         max_length=256,  # Переписать значение!
         verbose_name='Контакты представителей',
         blank=True,
         null=True,
-        )
+    )
 
     approved = models.BooleanField('Принять заявку', default=False)
 
