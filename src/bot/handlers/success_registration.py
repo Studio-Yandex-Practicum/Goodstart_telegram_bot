@@ -1,3 +1,4 @@
+# TODO: Нам не нужен этот хендлер в виде команды. Он нам нужен как обработчик
 from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import ContextTypes, MessageHandler, filters
 
