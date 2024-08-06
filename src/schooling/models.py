@@ -5,7 +5,8 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 from bot.states import UserStates
-from schooling.validator import validate_phone_number
+from schooling.validators.phone_validators import validate_phone_number
+
 
 MAX_LEN_NAME_SURNAME = 150
 MAX_LEN_CITY = 50
@@ -37,12 +38,11 @@ class GeneralUserModel(models.Model):
     )
 
     class Meta:
-        """Meta class of GeneralUserModel."""
-
         abstract = True
 
     def __str__(self):
-        """Return a general user string representation."""
+        """Возвращает общее строковое представление пользователя."""
+
         return f'{self.name} {self.surname} {self.telegram_id}'
 
 
@@ -67,6 +67,7 @@ class Teacher(GeneralUserModel):
         Проверка на максимальное количество классов и
         предметов на одного преподавателя.
         """
+
         current_classes_count = self.study_classes.count()
         current_subjects_count = self.competence.count()
 
@@ -81,7 +82,8 @@ class Teacher(GeneralUserModel):
                 f'ведет максимальное количество предметов.')
 
     def __str__(self):
-        """Return a teacher string representation."""
+        """Возвращает полное имя преподавателя."""
+
         return f'{self.name} {self.surname}'
 
 
@@ -109,13 +111,13 @@ class Student(GeneralUserModel):
     )
 
     class Meta:
-        """Meta class of StudentModel."""
 
         verbose_name = 'студент'
         verbose_name_plural = 'Студенты'
 
     def __str__(self):
-        """Return a student string representation."""
+        """Возвращает строковое представление студента."""
+
         return f'{self.name} {self.surname}'
 
 
@@ -139,7 +141,8 @@ class Subject(models.Model):
         verbose_name_plural = 'Названия предметов'
 
     def __str__(self):
-        """Return a subject string representation."""
+        """Возвращает строковое представление предмета."""
+
         return self.name
 
 
@@ -156,23 +159,23 @@ class StudyClass(models.Model):
     )
 
     def clean(self):
-        """
-        Проверка на максимальное количество
-        студентов в одном классе.
-        """
+        """Проверка на максимальное количество студентов в одном классе."""
+
         current_students_count = self.students.count()
 
         if current_students_count > MAX_COUNT_STUDENTS:
             raise ValidationError(
                 f'Максимальное количество студентов в классе '
-                f'"{self.study_class_name}" уже достигнуто.')
+                f'"{self.study_class_name}" уже достигнуто.'
+            )
 
     class Meta:
         verbose_name = 'учебный класс'
         verbose_name_plural = 'Учебные классы'
 
     def __str__(self):
-        """Return a studyclass string representation."""
+        """Возвращает название учебного класса."""
+
         return self.study_class_name
 
 
@@ -208,19 +211,17 @@ class Lesson(models.Model):
     test_lesson = models.BooleanField('Пробное занятие', default=False)
 
     def clean(self):
+        """Проверка на совпадение занятия с уже существующими."""
+
         if Lesson.objects.filter(
             name=self.name,
             datetime_start__date=self.datetime_start.date()
         ).exclude(pk=self.pk).exists():
             raise ValidationError(
-                'Урок с таким названием уже существует в этот день.')
+                'Урок с таким названием уже существует в этот день.'
+            )
 
     class Meta:
-        """Meta class of LessonModel."""
-
-        unique_together = ('name', 'datetime_start')
-        verbose_name = 'занятие'
-        verbose_name_plural = 'Занятия'
         constraints = [
             models.UniqueConstraint(
                 fields=[
@@ -234,12 +235,17 @@ class Lesson(models.Model):
                 name='unique_lesson',
             ),
         ]
+        unique_together = ('name', 'datetime_start')
+        verbose_name = 'занятие'
+        verbose_name_plural = 'Занятия'
 
     def __str__(self):
-        """Return a lesson string representation."""
+        """Возвращает строковое представление занятия."""
+
         return f'{self.name} {self.subject.name}'
 
     @property
     def datetime_end(self):
-        """Returns the datetime end lesson."""
+        """Возвращает дату и время окончания урока."""
+
         return self.datetime_start + timedelta(minutes=self.duration)

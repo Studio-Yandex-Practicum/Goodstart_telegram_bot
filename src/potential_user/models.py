@@ -4,7 +4,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 from schooling.models import StudyClass
-from schooling.validator import validate_phone_number
+from schooling.validators.phone_validators import validate_phone_number
 
 
 class ApplicationForm(models.Model):

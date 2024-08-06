@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
 from admin_user.managers import UserManager
-from schooling.validator import validate_phone_number
+from schooling.validators.phone_validators import validate_phone_number
 
 DEFAULT_NAME_LENGTH = 150
 EMAIL_LENGTH = 254

@@ -1,13 +1,11 @@
 from django import forms
 
-from schooling.form_validators import (validate_intersections_time_periods,
-                                       validate_lesson_datetime,
-                                       validate_lesson_duration,
-                                       validate_paid_lessons,
-                                       validate_student_last_login,
-                                       validate_teacher_last_login,
-                                       validate_teacher_subjects)
 from schooling.models import Lesson
+from schooling.validators.form_validators import (
+    validate_intersections_time_periods, validate_lesson_datetime,
+    validate_lesson_duration, validate_paid_lessons,
+    validate_student_last_login, validate_teacher_last_login,
+    validate_teacher_subjects)
 
 
 class LessonForm(forms.ModelForm):
@@ -21,6 +19,17 @@ class LessonForm(forms.ModelForm):
         )
 
     def clean(self):
+        """
+        Выполняет валидацию и очистку данных формы.
+
+        Вызывает:
+            forms.ValidationError: Если какое-либо обязательное поле
+            отсутствует или валидация не проходит.
+
+        Возвращает:
+            dict: Очищенные и провалидированные данные.
+        """
+
         cleaned_data = super().clean()
 
         # Проверка наличия необходимых данных
@@ -83,7 +92,7 @@ class LessonForm(forms.ModelForm):
                 excluded_lesson=self.instance.id,
             )
         except Exception as e:
-            raise forms.ValidationError(str(e))
+            raise forms.ValidationError(str(e)) from e
 
         return cleaned_data
 
