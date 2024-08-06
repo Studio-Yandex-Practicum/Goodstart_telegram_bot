@@ -469,13 +469,13 @@ testing = ["coverage[toml] (>=5.0a4)", "pytest (>=4.6.11)"]
 
 [[package]]
 name = "django-filter"
-version = "24.2"
+version = "24.3"
 description = "Django-filter is a reusable Django application for allowing users to filter querysets dynamically."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "django-filter-24.2.tar.gz", hash = "sha256:48e5fc1da3ccd6ca0d5f9bb550973518ce977a4edde9d2a8a154a7f4f0b9f96e"},
-    {file = "django_filter-24.2-py3-none-any.whl", hash = "sha256:df2ee9857e18d38bed203c8745f62a803fa0f31688c9fe6f8e868120b1848e48"},
+    {file = "django_filter-24.3-py3-none-any.whl", hash = "sha256:c4852822928ce17fb699bcfccd644b3574f1a2d80aeb2b4ff4f16b02dd49dc64"},
+    {file = "django_filter-24.3.tar.gz", hash = "sha256:d8ccaf6732afd21ca0542f6733b11591030fa98669f8d15599b358e24a2cd9c3"},
 ]
 
 [package.dependencies]
@@ -513,13 +513,13 @@ phonenumberslite = ["phonenumberslite (>=7.0.2)"]
 
 [[package]]
 name = "django-viewflow"
-version = "2.2.5"
+version = "2.2.6"
 description = "Reusable library to build business applications fast"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "django_viewflow-2.2.5-py3-none-any.whl", hash = "sha256:5308c7581b190b952cc56d3733b38a130b9bbbeeb475a997f4a386fe1652fbed"},
-    {file = "django_viewflow-2.2.5.tar.gz", hash = "sha256:fdcbb768f6f5e52d6b802a8c441ca7714f9c9281d3acc17df38e7f5602c9012d"},
+    {file = "django_viewflow-2.2.6-py3-none-any.whl", hash = "sha256:f727ee1c689490c546c6787c2c8b527d12b6cd3dea32b25ff57422d21fa52548"},
+    {file = "django_viewflow-2.2.6.tar.gz", hash = "sha256:05ae644064c29a7e220871109673b1204dc7809611c254b1c155424a348b1fa4"},
 ]
 
 [package.dependencies]
@@ -633,13 +633,13 @@ doc = ["Sphinx", "sphinx-rtd-theme", "sphinxcontrib-spelling"]
 
 [[package]]
 name = "faker"
-version = "26.0.0"
+version = "26.1.0"
 description = "Faker is a Python package that generates fake data for you."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Faker-26.0.0-py3-none-any.whl", hash = "sha256:886ee28219be96949cd21ecc96c4c742ee1680e77f687b095202c8def1a08f06"},
-    {file = "Faker-26.0.0.tar.gz", hash = "sha256:0f60978314973de02c00474c2ae899785a42b2cf4f41b7987e93c132a2b8a4a9"},
+    {file = "Faker-26.1.0-py3-none-any.whl", hash = "sha256:e8c5ef795223e945d9166aea3c0ecaf85ac54b4ade2af068d8e3c6524c2c0aa7"},
+    {file = "Faker-26.1.0.tar.gz", hash = "sha256:33921b6fc3b83dd75fd42ec7f47ec87b50c00d3c5380fa7d8a507dab848b8229"},
 ]
 
 [package.dependencies]

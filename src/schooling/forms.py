@@ -29,7 +29,6 @@ class LessonForm(forms.ModelForm):
         Возвращает:
             dict: Очищенные и провалидированные данные.
         """
-
         cleaned_data = super().clean()
 
         # Проверка наличия необходимых данных

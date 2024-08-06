@@ -42,7 +42,6 @@ class GeneralUserModel(models.Model):
 
     def __str__(self):
         """Возвращает общее строковое представление пользователя."""
-
         return f'{self.name} {self.surname} {self.telegram_id}'
 
 
@@ -62,12 +61,16 @@ class Teacher(GeneralUserModel):
         verbose_name = 'преподаватель'
         verbose_name_plural = 'Преподаватели'
 
+    def __str__(self):
+        """Возвращает полное имя преподавателя."""
+        return f'{self.name} {self.surname}'
+
     def clean(self):
         """
-        Проверка на максимальное количество классов и
-        предметов на одного преподавателя.
-        """
+        Проверка на максимальное количество классов и предметов.
 
+        Осуществляется на одного преподавателя.
+        """
         current_classes_count = self.study_classes.count()
         current_subjects_count = self.competence.count()
 
@@ -80,11 +83,6 @@ class Teacher(GeneralUserModel):
             raise ValidationError(
                 f'Преподаватель {self.name} {self.surname} уже '
                 f'ведет максимальное количество предметов.')
-
-    def __str__(self):
-        """Возвращает полное имя преподавателя."""
-
-        return f'{self.name} {self.surname}'
 
 
 class Student(GeneralUserModel):
@@ -102,7 +100,7 @@ class Student(GeneralUserModel):
         default=0,
     )
     parents_contacts = models.CharField(
-        max_length=256,  # Переписать значение!
+        max_length=256,
         verbose_name='Контакты представителей',
     )
     subjects = models.ManyToManyField(
@@ -117,7 +115,6 @@ class Student(GeneralUserModel):
 
     def __str__(self):
         """Возвращает строковое представление студента."""
-
         return f'{self.name} {self.surname}'
 
 
@@ -142,7 +139,6 @@ class Subject(models.Model):
 
     def __str__(self):
         """Возвращает строковое представление предмета."""
-
         return self.name
 
 
@@ -158,25 +154,23 @@ class StudyClass(models.Model):
         verbose_name='Номер учебного класса',
     )
 
-    def clean(self):
-        """Проверка на максимальное количество студентов в одном классе."""
-
-        current_students_count = self.students.count()
-
-        if current_students_count > MAX_COUNT_STUDENTS:
-            raise ValidationError(
-                f'Максимальное количество студентов в классе '
-                f'"{self.study_class_name}" уже достигнуто.'
-            )
-
     class Meta:
         verbose_name = 'учебный класс'
         verbose_name_plural = 'Учебные классы'
 
     def __str__(self):
         """Возвращает название учебного класса."""
-
         return self.study_class_name
+
+    def clean(self):
+        """Проверка на максимальное количество студентов в одном классе."""
+        current_students_count = self.students.count()
+
+        if current_students_count > MAX_COUNT_STUDENTS:
+            raise ValidationError(
+                f'Максимальное количество студентов в классе '
+                f'"{self.study_class_name}" уже достигнуто.',
+            )
 
 
 class Lesson(models.Model):
@@ -210,17 +204,6 @@ class Lesson(models.Model):
     is_passed = models.BooleanField('Занятие прошло', default=False)
     test_lesson = models.BooleanField('Пробное занятие', default=False)
 
-    def clean(self):
-        """Проверка на совпадение занятия с уже существующими."""
-
-        if Lesson.objects.filter(
-            name=self.name,
-            datetime_start__date=self.datetime_start.date()
-        ).exclude(pk=self.pk).exists():
-            raise ValidationError(
-                'Урок с таким названием уже существует в этот день.'
-            )
-
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -241,11 +224,19 @@ class Lesson(models.Model):
 
     def __str__(self):
         """Возвращает строковое представление занятия."""
-
         return f'{self.name} {self.subject.name}'
+
+    def clean(self):
+        """Проверка на совпадение занятия с уже существующими."""
+        if Lesson.objects.filter(
+            name=self.name,
+            datetime_start__date=self.datetime_start.date(),
+        ).exclude(pk=self.pk).exists():
+            raise ValidationError(
+                'Урок с таким названием уже существует в этот день.',
+            )
 
     @property
     def datetime_end(self):
         """Возвращает дату и время окончания урока."""
-
         return self.datetime_start + timedelta(minutes=self.duration)

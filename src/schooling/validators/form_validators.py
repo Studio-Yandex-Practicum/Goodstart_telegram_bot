@@ -109,7 +109,7 @@ def validate_student_last_login(student):
     if student.last_login_date + timedelta(days=180) < timezone.now().date():
         raise ValidationError(
             f'Студент не посещал занятия в течение последних шести месяцев.\n'
-            f'Последнее посещение: {student.last_login_date}.'
+            f'Последнее посещение: {student.last_login_date}.',
         )
 
 
@@ -122,5 +122,5 @@ def validate_teacher_last_login(teacher):
         raise ValidationError(
             f'Преподаватель не проводил занятия '
             f'в течение последних двух месяцев.\n'
-            f'Последнее посещение: {teacher.last_login_date}.'
+            f'Последнее посещение: {teacher.last_login_date}.',
         )
