@@ -16,14 +16,6 @@ class TeacherAdmin(admin.ModelAdmin):
         """Запрещает добавление новых преподавателей."""
         return False
 
-    def has_change_permission(self, request, obj=None):
-        """Разрешает изменение преподавателей."""
-        return True
-
-    def has_delete_permission(self, request, obj=None):
-        """Разрешает удаление преподавателей."""
-        return True
-
     @admin.display(description='Предмет')
     def get_competences(self, obj):
         """Возвращает компетенции преподавателя."""
@@ -41,13 +33,6 @@ class StudentAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
         """Запрещает добавление новых студентов."""
         return False
-
-    def has_change_permission(self, request, obj=None):
-        """Разрешает изменение студентов."""
-        return True
-
-    def has_delete_permission(self, request, obj=None):
-        """Разрешает удаление студентов."""
 
 
 @admin.register(Subject)
