@@ -14,6 +14,7 @@ from django.dispatch import receiver
 
 from bot.keyboards import get_root_markup
 from schooling.models import Student, Teacher, Lesson
+from schooling.utils import format_datetime, format_lesson_duration
 
 
 async def send_message_to_user(
@@ -108,13 +109,17 @@ async def start_chat(sender, instance, created, **kwargs):
 
 async def get_message_text(instance):
     """Получаем сообщение о назначении урока."""
+    start_time_formatted = format_datetime(instance.datetime_start)
+    duration = format_lesson_duration(
+        instance.datetime_start, instance.datetime_end)
+
     message_text = (
-            f'Вам назначено занятие с {instance.datetime_start} '
-            f'до {instance.datetime_end}.\n'
-            f'Тема: {instance.name}.\n'
-            f'Преподаватель: {instance.teacher_id}\n'
-            f'Ученик: {instance.student_id}\n'
-        )
+        f'Вам назначено занятие на {start_time_formatted}, '
+        f'продолжительность занятия {duration}.\n'
+        f'Тема: {instance.name}.\n'
+        f'Преподаватель: {instance.teacher_id}\n'
+        f'Ученик: {instance.student_id}\n'
+    )
     test_msg = f'{instance._meta.get_field('test_lesson').verbose_name}'
     if instance.test_lesson:
         message_text = message_text + test_msg
@@ -158,7 +163,13 @@ async def notify_about_lesson(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Lesson)
 async def msg_change_lesson(sender, instance, created, **kwargs):
     """Отправляет уведомление о изменении занятия."""
+    message_text = ''  # Инициализация переменной
+
     if not created:
+        start_time_formatted = format_datetime(instance.datetime_start)
+        duration = format_lesson_duration(
+            instance.datetime_start, instance.datetime_end)
+
         chat_ids = (
                 instance.student_id.telegram_id,
                 instance.teacher_old.telegram_id,
@@ -168,9 +179,8 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
         msg_text = (
             f'Ваше занятие на тему "{instance.name}" '
             f'проведёт преподаватель {instance.teacher_id}\n'
-            f'{instance.datetime_start.date()} c '
-            f'{instance.datetime_start.time()} до '
-            f'{instance.datetime_end.time()}.'
+            f'{start_time_formatted}'
+            f'продолжительность {duration} минут. '
         )
         msg_student_old_teacher = 'Ваше занятие перенесено!\n' + msg_text
 
@@ -183,9 +193,8 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
         elif instance.datetime_old != instance.datetime_start:
             message_text = (
                 f'Занятие на тему "{instance.name}" перенесено '
-                f'на {instance.datetime_start.date()} c '
-                f'{instance.datetime_start.time()} до '
-                f'{instance.datetime_end.time()}.'
+                f'на {start_time_formatted}, '
+                f'продолжительность {duration} минут.'
             )
             chat_ids = (
                 instance.student_id.telegram_id,
@@ -224,18 +233,22 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
 @receiver(pre_delete, sender=Lesson)
 async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
     """Отправляет уведомление об отмене занятия."""
+    start_time_formatted = format_datetime(instance.datetime_start)
+    duration = format_lesson_duration(
+        instance.datetime_start, instance.datetime_end)
+
     chat_ids = (
         instance.student_id.telegram_id,
         instance.teacher_id.telegram_id,
     )
     message_text = (
         f'Занятие на тему "{instance.name}" '
-        f'{instance.datetime_start.date()} c '
-        f'{instance.datetime_start.time()} до '
+        f'на {start_time_formatted}, '
+        f'продолжительностью {duration} минут.'
         f'{instance.datetime_end.time()} отменено.'
     )
     if instance.teacher_id.telegram_id:
-            reply_markup = await get_root_markup(
+        reply_markup = await get_root_markup(
                 instance.teacher_id.telegram_id,
             )
     else:
