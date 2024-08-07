@@ -84,8 +84,8 @@ async def schedule_lesson_end_notification(sender, instance, **kwargs):
                 when=lesson_end_time,
                 name=f'lesson_end_{instance.id}',
                 data={
-                    'teacher_chat_id': instance.teacher_id.telegram_id,
-                    'student_chat_id': instance.student_id.telegram_id,
+                    'teacher_chat_id': await sync_to_async(lambda: instance.teacher_id.telegram_id)(),
+                    'student_chat_id': await sync_to_async(lambda: instance.student_id.telegram_id)(),
                     'lesson_id': instance.id,
                 },
             )
@@ -120,7 +120,7 @@ async def get_message_text(instance):
         f'Преподаватель: {instance.teacher_id}\n'
         f'Ученик: {instance.student_id}\n'
     )
-    test_msg = f'{instance._meta.get_field('test_lesson').verbose_name}'
+    test_msg = f'{instance._meta.get_field("test_lesson").verbose_name}'
     if instance.test_lesson:
         message_text = message_text + test_msg
     return message_text
@@ -139,19 +139,19 @@ async def notify_about_lesson(sender, instance, created, **kwargs):
     if created:
         message_text = await get_message_text(instance)
 
-        if instance.teacher_id.telegram_id:
+        if await sync_to_async(lambda: instance.teacher_id.telegram_id)():
             reply_markup = await get_root_markup(
-                instance.teacher_id.telegram_id,
+                await sync_to_async(lambda: instance.teacher_id.telegram_id)(),
             )
         else:
             reply_markup = await get_root_markup(
-                instance.student_id.telegram_id,
+                await sync_to_async(lambda: instance.student_id.telegram_id)(),
             )
 
         chat_ids = (
-                instance.student_id.telegram_id,
-                instance.teacher_id.telegram_id,
-            )
+            await sync_to_async(lambda: instance.student_id.telegram_id)(),
+            await sync_to_async(lambda: instance.teacher_id.telegram_id)(),
+        )
 
         await gather_send_messages_to_users(
             chat_ids=chat_ids,
@@ -171,10 +171,10 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
             instance.datetime_start, instance.datetime_end)
 
         chat_ids = (
-                instance.student_id.telegram_id,
-                instance.teacher_old.telegram_id,
-            )
-        chat_id = instance.teacher_id.telegram_id
+            await sync_to_async(lambda: instance.student_id.telegram_id)(),
+            await sync_to_async(lambda: instance.teacher_old.telegram_id)(),
+        )
+        chat_id = await sync_to_async(lambda: instance.teacher_id.telegram_id)()
         msg_teacher = await get_message_text(instance)
         msg_text = (
             f'Ваше занятие на тему "{instance.name}" '
@@ -198,25 +198,25 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
                 f'продолжительность {duration} минут.'
             )
             chat_ids = (
-                instance.student_id.telegram_id,
-                instance.teacher_id.telegram_id,
+                await sync_to_async(lambda: instance.student_id.telegram_id)(),
+                await sync_to_async(lambda: instance.teacher_id.telegram_id)(),
             )
             chat_id = None
 
         elif instance.teacher_old != instance.teacher_id:
             message_text = msg_text
 
-        if instance.teacher_id.telegram_id:
+        if await sync_to_async(lambda: instance.teacher_id.telegram_id)():
             reply_markup = await get_root_markup(
-                instance.teacher_id.telegram_id,
+                await sync_to_async(lambda: instance.teacher_id.telegram_id)(),
             )
-        elif instance.teacher_old.telegram_id:
+        elif await sync_to_async(lambda: instance.teacher_old.telegram_id)():
             reply_markup = await get_root_markup(
-                instance.teacher_old.telegram_id,
+                await sync_to_async(lambda: instance.teacher_old.telegram_id)(),
             )
         else:
             reply_markup = await get_root_markup(
-                instance.student_id.telegram_id,
+                await sync_to_async(lambda: instance.student_id.telegram_id)(),
             )
 
         if message_text is not None:
@@ -241,8 +241,8 @@ async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
         instance.datetime_start, instance.datetime_end)
 
     chat_ids = (
-        instance.student_id.telegram_id,
-        instance.teacher_id.telegram_id,
+        await sync_to_async(lambda: instance.student_id.telegram_id)(),
+        await sync_to_async(lambda: instance.teacher_id.telegram_id)(),
     )
     message_text = (
         f'Занятие на тему "{instance.name}" '
@@ -250,20 +250,20 @@ async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
         f'продолжительностью {duration} минут.'
         f'{instance.datetime_end.time()} отменено.'
     )
-    if instance.teacher_id.telegram_id:
+    if await sync_to_async(lambda: instance.teacher_id.telegram_id)():
         reply_markup = await get_root_markup(
-                instance.teacher_id.telegram_id,
-            )
+            await sync_to_async(lambda: instance.teacher_id.telegram_id)(),
+        )
     else:
         reply_markup = await get_root_markup(
-            instance.student_id.telegram_id,
+            await sync_to_async(lambda: instance.student_id.telegram_id)(),
         )
 
     await gather_send_messages_to_users(
-            chat_ids=chat_ids,
-            message_text=message_text,
-            reply_markup=reply_markup,
-        )
+        chat_ids=chat_ids,
+        message_text=message_text,
+        reply_markup=reply_markup,
+    )
 
 
 async def get_schedule_for_role(user):
