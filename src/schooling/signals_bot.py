@@ -183,6 +183,7 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
             f'продолжительность {duration} минут. '
         )
         msg_student_old_teacher = 'Ваше занятие перенесено!\n' + msg_text
+        message_text = None
 
         if (
             instance.datetime_old != instance.datetime_start
@@ -218,11 +219,13 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
                 instance.student_id.telegram_id,
             )
 
-        await gather_send_messages_to_users(
-            chat_ids=chat_ids,
-            message_text=message_text,
-            reply_markup=reply_markup,
-        )
+        if message_text is not None:
+            await gather_send_messages_to_users(
+                chat_ids=chat_ids,
+                message_text=message_text,
+                reply_markup=reply_markup,
+            )
+
         if chat_id:
             bot_token = settings.TELEGRAM_TOKEN
             await send_message_to_user(
