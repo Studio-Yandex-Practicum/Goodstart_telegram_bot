@@ -111,5 +111,6 @@ run-prod:
 	export RUN_BOT=true; cd $(DJANGO_DIR) && poetry run uvicorn core.asgi_prod:application --reload --lifespan on
 
 # Создание уроков для определенноко telegram id ученика
+# Например: make create_personal_lessons TELEGRAM_ID=<ваш_telegram_id>
 create_personal_lessons:
-	cd $(PROJECT_DIR) && $(DJANGO_RUN) create_personal_lessons
+	cd $(PROJECT_DIR) && $(DJANGO_RUN) create_personal_lessons --telegram_id $(TELEGRAM_ID)

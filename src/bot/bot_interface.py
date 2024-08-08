@@ -8,14 +8,23 @@ from django.conf import settings
 from loguru import logger
 from telegram import Update, BotCommand, MenuButtonCommands
 from telegram.ext import (
-    Application, ApplicationBuilder,
-    CallbackQueryHandler, ConversationHandler,
-    PersistenceInput, MessageHandler, filters,
+    Application,
+    ApplicationBuilder,
+    CallbackQueryHandler,
+    ConversationHandler,
+    PersistenceInput,
+    MessageHandler,
+    filters,
 )
 from bot.handlers import (
-    start_handler, help_handler, feedback_handler,
-    success_registration_webapp_handler, schedule_handler,
-    lesson_end_handler, left_lessons_handler, unknown_command_handler,
+    start_handler,
+    help_handler,
+    feedback_handler,
+    success_registration_webapp_handler,
+    schedule_handler,
+    lesson_end_handler,
+    left_lessons_handler,
+    unknown_command_handler,
 )
 from bot.handlers.feedback import subject, body
 from bot.handlers.conversation import help, schedule
@@ -70,20 +79,24 @@ class Bot:
             ),
             update_interval=PERSISTENCE_UPDATE_DELAY,
         )
-        app = ApplicationBuilder().token(
-            settings.TELEGRAM_TOKEN).persistence(persistence).build()
+        app = (
+            ApplicationBuilder()
+            .token(settings.TELEGRAM_TOKEN)
+            .persistence(persistence)
+            .build()
+        )
         main_handler = await build_main_handler()
-        app.add_handlers([
-            main_handler,
-            start_handler,
-            help_handler,
-            success_registration_webapp_handler,
-            unknown_command_handler,  # Переименованный echo handler
-            feedback_handler,
-            schedule_handler,
-            lesson_end_handler,
-            left_lessons_handler,
-        ])
+        app.add_handlers(
+            [
+                main_handler,
+                start_handler,
+                help_handler,
+                success_registration_webapp_handler,
+                unknown_command_handler,  # Переименованный echo handler
+                feedback_handler,
+                schedule_handler,
+                lesson_end_handler,
+                left_lessons_handler,])
         await self._update_bot_commands(app)
         logger.info('Bot application built with handlers.')
         return app
@@ -99,33 +112,38 @@ class Bot:
         ]
 
         await app.bot.set_my_commands(commands)
-        await app.bot.set_chat_menu_button(chat_id=None,
-                                           menu_button=MenuButtonCommands())
+        await app.bot.set_chat_menu_button(
+            chat_id=None, menu_button=MenuButtonCommands())
 
-    def _run(self):
+    async def _run(self):
         """Run the bot."""
-        asyncio.set_event_loop(asyncio.new_event_loop())
-        logger.info('Bot event loop created and started.')
         loop = asyncio.get_event_loop()
         try:
-            loop.run_until_complete(self._start_bot())
+            await self._start_bot()
         finally:
+            await loop.shutdown_asyncgens()
             loop.close()
-            logger.info('Bot event loop closed.')
 
     async def _start_bot(self):
         """Start the bot."""
         self._app = await self._build_app()
         await self._app.initialize()
         await add_daily_task()
-        await self._app.updater.start_polling(allowed_updates=Update.ALL_TYPES)
-        await self._app.start()
-        logger.info('Bot is running.')
-        while not self._stop_event.is_set():
-            await asyncio.sleep(1)
-
-        await self._app.stop()
-        logger.info('Bot stopped.')
+        try:
+            await self._app.updater.start_polling(
+                allowed_updates=Update.ALL_TYPES, timeout=60)
+            await self._app.start()
+            logger.info('Bot is running.')
+            while not self._stop_event.is_set():
+                await asyncio.sleep(1)
+                if not self._app.updater.running:
+                    break
+            if self._app.running:
+                await self._app.stop()
+        except asyncio.TimeoutError:
+            print('Ошибка: время ожидания истекло')
+        finally:
+            logger.info('Bot stopped.')
 
     async def get_app(self):
         """Public method to get the application instance."""
@@ -143,10 +161,10 @@ async def build_main_handler():
         states={
             UserStates.START: [
                 feedback_handler,
-                CallbackQueryHandler(help,
-                                     pattern=f'^{UserStates.HELP.value}$'),
-                CallbackQueryHandler(schedule,
-                                     pattern=f'^{UserStates.SCHEDULE.value}$'),
+                CallbackQueryHandler(
+                    help, pattern=f'^{UserStates.HELP.value}$'),
+                CallbackQueryHandler(
+                    schedule, pattern=f'^{UserStates.SCHEDULE.value}$'),
             ],
             UserStates.HELP: [
                 CallbackQueryHandler(

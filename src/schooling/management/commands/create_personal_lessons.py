@@ -1,19 +1,25 @@
 from django.core.management.base import BaseCommand
-
-from schooling.factories import create_personal_lessons
+from schooling.factories.factories import LessonFactory
 
 
 class Command(BaseCommand):
-    """Command to Lesson instances creation for the project tests."""
+    """Команда для создания уроков для ученика по его Telegram ID."""
 
-    def _generate(self):
-        create_personal_lessons()
+    help = 'Создание уроков для ученика по его Telegram ID'
+
+    def add_arguments(self, parser):
+        """Добавление аргументов команды."""
+        parser.add_argument(
+            '--telegram_id',
+            type=int,
+            required=True,
+            help='Telegram ID ученика',
+        )
 
     def handle(self, *args, **options):
-        """Call the method `_generate` for the test Lesson creation."""
-        self._generate()
-        return self.stdout.write(
-                self.style.SUCCESS(
-                    'Фикстуры для таблицы Lesson созданы!',
-                ),
-        )
+        """Создание уроков для ученика по его Telegram ID."""
+        telegram_id = options['telegram_id']
+        LessonFactory.create_personal_lessons(telegram_id)
+        self.stdout.write(
+            self.style.SUCCESS(
+                f'Успешно созданы уроки для ученика {telegram_id}'),)

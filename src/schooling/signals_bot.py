@@ -21,17 +21,32 @@ async def send_message_to_user(
     user_id: int,
     message_text: str,
     reply_markup: Optional[ReplyMarkup] = None,
+    max_retries: int = 3,
+    retry_delay: float = 2.0,
 ):
-    """Инициативно отправляет сообщение."""
+    """Инициативно отправляет сообщение с попытками повторения."""
     bot = Bot(token=bot_token)
-    try:
-        await bot.send_message(
-            chat_id=user_id,
-            text=message_text,
-            reply_markup=reply_markup,
-        )
-    except BadRequest:
-        print(f'Чат с id {user_id} не найден!')
+    attempt = 0
+    while attempt < max_retries:
+        try:
+            await bot.send_message(
+                chat_id=user_id,
+                text=message_text,
+                reply_markup=reply_markup,
+            )
+            return
+        except BadRequest:
+            print(f'Чат с id {user_id} не найден!')
+            return
+        except Exception as e:
+            print(f'Попытка {attempt + 1} провалена: {e}')
+            attempt += 1
+            if attempt < max_retries:
+                await asyncio.sleep(retry_delay)
+            else:
+                print(
+                    f'Не удалось отправить сообщение в чат с id {user_id} '
+                    f'после {max_retries} попыток!')
 
 
 async def gather_send_messages_to_users(
@@ -43,8 +58,12 @@ async def gather_send_messages_to_users(
     bot_token = settings.TELEGRAM_TOKEN
     tasks = [
         send_message_to_user(
-            bot_token, chat_id, message_text, reply_markup,
-        ) for chat_id in chat_ids
+            bot_token,
+            chat_id,
+            message_text,
+            reply_markup,
+        )
+        for chat_id in chat_ids
     ]
     await asyncio.gather(*tasks)
 
@@ -55,17 +74,19 @@ async def send_lesson_end_notification(context: CallbackContext):
     student_chat_id = context.job.data.get('student_chat_id')
     lesson_id = context.job.data.get('lesson_id')
 
-    keyboard = [[
-        InlineKeyboardButton('Да', callback_data=f'yes {lesson_id}'),
-        InlineKeyboardButton('Нет', callback_data=f'no {lesson_id}'),
-    ]]
+    keyboard = [
+        [
+            InlineKeyboardButton('Да', callback_data=f'yes {lesson_id}'),
+            InlineKeyboardButton('Нет', callback_data=f'no {lesson_id}'),]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     message_text = 'Было ли занятие?'
 
     chat_ids = (teacher_chat_id, student_chat_id)
     await gather_send_messages_to_users(
-        chat_ids, message_text, reply_markup,
+        chat_ids,
+        message_text,
+        reply_markup,
     )
 
 
@@ -73,6 +94,7 @@ async def send_lesson_end_notification(context: CallbackContext):
 async def schedule_lesson_end_notification(sender, instance, **kwargs):
     """Создание задачи на отправку уведомления по окончании урока."""
     from bot.bot_interface import Bot
+
     bot = Bot()
     app = await bot.get_app()
     lesson_end_time = instance.datetime_end
@@ -109,12 +131,13 @@ async def start_chat(sender, instance, created, **kwargs):
 async def get_message_text(instance):
     """Получаем сообщение о назначении урока."""
     message_text = (
-            f'Вам назначено занятие с {instance.datetime_start} '
-            f'до {instance.datetime_end}.\n'
-            f'Тема: {instance.name}.\n'
-            f'Преподаватель: {instance.teacher_id}\n'
-            f'Ученик: {instance.student_id}\n'
-        )
+        f'Вам назначено занятие с'
+        f' {instance.datetime_start.strftime('%d-%m-%Y %H-%M')} '
+        f'до {instance.datetime_end.strftime('%d-%m-%Y %H-%M')}.\n'
+        f'Тема: {instance.name}.\n'
+        f'Преподаватель: {instance.teacher_id}\n'
+        f'Ученик: {instance.student_id}\n'
+    )
     test_msg = f'{instance._meta.get_field('test_lesson').verbose_name}'
     if instance.test_lesson:
         message_text = message_text + test_msg
@@ -123,7 +146,7 @@ async def get_message_text(instance):
 
 @receiver(post_init, sender=Lesson)
 def init_lesson(sender, instance, **kwargs):
-    instance.datetime_old = instance.datetime_start  # до изменения возникала ошибка при генерации уроков
+    instance.datetime_old = instance.datetime_start
     instance.teacher_old = instance.teacher_id
 
 
@@ -143,9 +166,9 @@ async def notify_about_lesson(sender, instance, created, **kwargs):
             )
 
         chat_ids = (
-                instance.student_id.telegram_id,
-                instance.teacher_id.telegram_id,
-            )
+            instance.student_id.telegram_id,
+            instance.teacher_id.telegram_id,
+        )
 
         await gather_send_messages_to_users(
             chat_ids=chat_ids,
@@ -159,19 +182,22 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
     """Отправляет уведомление о изменении занятия."""
     if not created:
         chat_ids = (
-                instance.student_id.telegram_id,
-                instance.teacher_old.telegram_id,
-            )
+            instance.student_id.telegram_id,
+            instance.teacher_old.telegram_id,
+        )
         chat_id = instance.teacher_id.telegram_id
         msg_teacher = await get_message_text(instance)
         msg_text = (
             f'Ваше занятие на тему "{instance.name}" '
             f'проведёт преподаватель {instance.teacher_id}\n'
-            f'{instance.datetime_start.date()} c '
-            f'{instance.datetime_start.time()} до '
-            f'{instance.datetime_end.time()}.'
+            f'{instance.datetime_start.date().strftime('%d-%m-%Y %H-%M')} c '
+            f'{instance.datetime_start.time().strftime('%d-%m-%Y %H-%M')} до '
+            f'{instance.datetime_end.time().strftime('%d-%m-%Y %H-%M')}.'
         )
         msg_student_old_teacher = 'Ваше занятие перенесено!\n' + msg_text
+
+        # Инициализация message_text, чтобы не было ошибки
+        message_text = ''
 
         if (
             instance.datetime_old != instance.datetime_start
@@ -182,9 +208,11 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
         elif instance.datetime_old != instance.datetime_start:
             message_text = (
                 f'Занятие на тему "{instance.name}" перенесено '
-                f'на {instance.datetime_start.date()} c '
-                f'{instance.datetime_start.time()} до '
-                f'{instance.datetime_end.time()}.'
+                f'на {instance.datetime_start.date(
+                ).strftime('%d-%m-%Y %H-%M')} c '
+                f'{instance.datetime_start.time(
+                ).strftime('%d-%m-%Y %H-%M')} до '
+                f'{instance.datetime_end.time().strftime('%d-%m-%Y %H-%M')}.'
             )
             chat_ids = (
                 instance.student_id.telegram_id,
@@ -194,6 +222,9 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
 
         elif instance.teacher_old != instance.teacher_id:
             message_text = msg_text
+
+        # Инициализация reply_markup, чтобы не было ошибки
+        reply_markup = None
 
         if instance.teacher_id.telegram_id:
             reply_markup = await get_root_markup(
@@ -216,7 +247,10 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
         if chat_id:
             bot_token = settings.TELEGRAM_TOKEN
             await send_message_to_user(
-                bot_token, chat_id, msg_teacher, reply_markup,
+                bot_token,
+                chat_id,
+                msg_teacher,
+                reply_markup,
             )
 
 
@@ -229,24 +263,24 @@ async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
     )
     message_text = (
         f'Занятие на тему "{instance.name}" '
-        f'{instance.datetime_start.date()} c '
-        f'{instance.datetime_start.time()} до '
-        f'{instance.datetime_end.time()} отменено.'
+        f'{instance.datetime_start.date().strftime('%d-%m-%Y %H-%M')} c '
+        f'{instance.datetime_start.time().strftime('%d-%m-%Y %H-%M')} до '
+        f'{instance.datetime_end.time().strftime('%d-%m-%Y %H-%M')} отменено.'
     )
     if instance.teacher_id.telegram_id:
-            reply_markup = await get_root_markup(
-                instance.teacher_id.telegram_id,
-            )
+        reply_markup = await get_root_markup(
+            instance.teacher_id.telegram_id,
+        )
     else:
         reply_markup = await get_root_markup(
             instance.student_id.telegram_id,
         )
 
     await gather_send_messages_to_users(
-            chat_ids=chat_ids,
-            message_text=message_text,
-            reply_markup=reply_markup,
-        )
+        chat_ids=chat_ids,
+        message_text=message_text,
+        reply_markup=reply_markup,
+    )
 
 
 async def get_schedule_for_role(user):

@@ -1,8 +1,8 @@
-import os
 import random
 from datetime import datetime, timedelta
 
 import factory
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import post_save
 from django.utils import timezone
 from factory.django import DjangoModelFactory
@@ -28,7 +28,8 @@ class PersonFactory(DjangoModelFactory):
     class Meta:
         abstract = True
 
-    telegram_id = FuzzyInteger(START_TELEGRAM_ID_VALUE, END_TELEGRAM_ID_VALUE)
+    telegram_id = FuzzyInteger(START_TELEGRAM_ID_VALUE,
+                               END_TELEGRAM_ID_VALUE)
     name = factory.Faker('first_name', locale=LOCALE)
     surname = factory.Faker('last_name', locale=LOCALE)
     city = factory.Faker('city', locale=LOCALE)
@@ -54,10 +55,7 @@ class StudentFactory(PersonFactory):
             factory.Sequence(
                 lambda some: f'+7495{FuzzyInteger(
                 START_PHONE_VALUE, END_PHONE_VALUE,
-            ).fuzz()}',
-            ),
-        ]
-    )
+            ).fuzz()}',),])
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
@@ -112,10 +110,12 @@ class LessonFactory(DjangoModelFactory):
     def datetime_start_and_end(self, create, extracted, **kwargs):
         """Добавляет дату и время урока и его продолжительность."""
         if create:
-            if self.is_passed:
-                self.datetime_start = timezone.now() - timedelta(days=365)
-            else:
-                self.datetime_start = timezone.now() + timedelta(days=365)
+            # Проверяем, был ли datetime_start уже установлен
+            if not self.datetime_start:
+                if self.is_passed:
+                    self.datetime_start = timezone.now() - timedelta(days=365)
+                else:
+                    self.datetime_start = timezone.now() + timedelta(days=365)
 
     @factory.lazy_attribute
     def subject(self):
@@ -124,6 +124,55 @@ class LessonFactory(DjangoModelFactory):
             random.randint(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
         ]
         return subject
+
+    @classmethod
+    def create_personal_lessons(cls, telegram_id):
+        """Создает случайные уроки для ученика по его telegram_id."""
+        try:
+            student = Student.objects.get(telegram_id=telegram_id)
+        except ObjectDoesNotExist:
+            return
+
+        start_date = timezone.now().date() - timedelta(
+            days=timezone.now().date().weekday() + 7)
+        end_date = timezone.now().date() + timedelta(
+            days=(13 - timezone.now().date().weekday()))
+
+        lessons_to_create = []
+        for n in range(int((end_date - start_date).days)):
+            date = start_date + timedelta(n)
+            for _ in range(random.randint(1, 3)):
+                subject = student.subjects.order_by('?').first()
+                if not subject:
+                    continue
+                teacher = (
+                    Teacher.objects.filter(competence=subject)
+                    .order_by('?')
+                    .first()
+                )
+                if not teacher:
+                    continue
+                lesson_time_aware = timezone.make_aware(
+                    datetime.combine(
+                        date,
+                        timezone.now()
+                        .time()
+                        .replace(
+                            hour=random.randint(8, 18),
+                            minute=random.randint(0, 55) // 5 * 5,
+                        ),))
+                is_passed = lesson_time_aware < timezone.now()
+                lesson = cls(
+                    id=None,
+                    student_id=student,
+                    datetime_start=lesson_time_aware,
+                    is_passed=is_passed,
+                    subject=subject,
+                    teacher_id=teacher,
+                )
+                lessons_to_create.append(lesson)
+
+        Lesson.objects.bulk_create(lessons_to_create, ignore_conflicts=True)
 
 
 def create_students():
@@ -139,38 +188,3 @@ def create_teachers():
 def create_lessons():
     """Create `Lesson` instances for the project tests."""
     LessonFactory.create_batch(size=CREATION_COUNT)
-
-
-def create_personal_lessons():
-    """Create `Lesson` instances for the project tests."""
-    student = Student.objects.get(telegram_id=os.getenv('TELEGRAM_ID'))
-    teachers = list(Teacher.objects.all())
-    days_to_generate = [
-        timezone.now().date() + timedelta(days=i) for i in range(-7, 14)
-    ]
-    competent_subjects = Subject.objects.filter(
-        teacher__in=teachers
-    ).distinct()
-
-    for day in days_to_generate:
-        number_of_lessons = random.randint(1, 5)
-        for _ in range(number_of_lessons):
-            lesson_start_time = timezone.make_aware(
-                datetime.combine(
-                    day,
-                    timezone.now()
-                    .time()
-                    .replace(
-                        hour=random.randint(8, 18),
-                        minute=random.randint(0, 55) // 5 * 5,
-                    ),
-                )
-            )
-            if competent_subjects:
-                subject = random.choice(list(competent_subjects))
-                LessonFactory.create(
-                    student_id=student,
-                    datetime_start=lesson_start_time,
-                    teacher_id=random.choice(teachers),
-                    subject=subject,
-                )
