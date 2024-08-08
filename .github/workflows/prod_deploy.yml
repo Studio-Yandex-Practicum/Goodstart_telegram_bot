@@ -15,12 +15,14 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: prod
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
     - name: Copy docker-compose.prod.yaml via ssh
       uses: appleboy/scp-action@v0.1.3
-      env:
+      with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
@@ -29,7 +31,7 @@ jobs:
         target: ${{ env.DEPLOY_PATH }}
     - name: Copy nginx.conf via ssh
       uses: appleboy/scp-action@v0.1.3
-      env:
+      with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
@@ -38,7 +40,7 @@ jobs:
         target: ${{ env.DEPLOY_PATH }}
     - name: Copy goodstart_bot.service via ssh
       uses: appleboy/scp-action@v0.1.3
-      env:
+      with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
@@ -47,7 +49,7 @@ jobs:
         target: ${{ env.DEPLOY_PATH }}
     - name: Executing remote ssh commands to deploy
       uses: appleboy/ssh-action@master
-      env:
+      with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
