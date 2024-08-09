@@ -648,13 +648,13 @@ doc = ["Sphinx", "sphinx-rtd-theme", "sphinxcontrib-spelling"]
 
 [[package]]
 name = "faker"
-version = "26.2.0"
+version = "26.3.0"
 description = "Faker is a Python package that generates fake data for you."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Faker-26.2.0-py3-none-any.whl", hash = "sha256:7b123090774deff5f2cd3eb92a84dcbbf1e163f30a6d07321b7852c11bfe6a75"},
-    {file = "Faker-26.2.0.tar.gz", hash = "sha256:81768de19012147521140f0d8bf5353e501ac42c1065d25e0cac455d3615c0a7"},
+    {file = "Faker-26.3.0-py3-none-any.whl", hash = "sha256:97fe1e7e953dd640ca2cd4dfac4db7c4d2432dd1b7a244a3313517707f3b54e9"},
+    {file = "Faker-26.3.0.tar.gz", hash = "sha256:7c10ebdf74aaa0cc4fe6ec6db5a71e8598ec33503524bd4b5f4494785a5670dd"},
 ]
 
 [package.dependencies]
@@ -969,13 +969,13 @@ ptyprocess = ">=0.5"
 
 [[package]]
 name = "phonenumbers"
-version = "8.13.42"
+version = "8.13.43"
 description = "Python version of Google's common library for parsing, formatting, storing and validating international phone numbers."
 optional = false
 python-versions = "*"
 files = [
-    {file = "phonenumbers-8.13.42-py2.py3-none-any.whl", hash = "sha256:18acc22ee03116d27b26e990f53806a1770a3e05f05e1620bc09ad187f889456"},
-    {file = "phonenumbers-8.13.42.tar.gz", hash = "sha256:7137904f2db3b991701e853174ce8e1cb8f540b8bfdf27617540de04c0b7bed5"},
+    {file = "phonenumbers-8.13.43-py2.py3-none-any.whl", hash = "sha256:339e521403fe4dd9c664dbbeb2fe434f9ea5c81e54c0fdfadbaeb53b26a76c27"},
+    {file = "phonenumbers-8.13.43.tar.gz", hash = "sha256:35b904e4a79226eee027fbb467a9aa6f1ab9ffc3c09c91bf14b885c154936726"},
 ]
 
 [[package]]

@@ -61,14 +61,13 @@ class ApplicationForm(models.Model):
     approved = models.BooleanField('Принять заявку', default=False)
 
     class Meta:
-        """Meta class of ApplicationForm."""
-
         verbose_name = 'Заявка'
         verbose_name_plural = 'Заявки'
 
     def __str__(self):
-        """Return a string representation."""
-        return f'{self.name} {self.surname} {self.role}'
+        """Возвращает строковое представление заявки."""
+        role_display = dict(self.ROLE_CHOICES).get(self.role, self.role)
+        return f'{self.name} {self.surname} ({role_display})'
 
     def validate_constraints(self, exclude) -> None:
         """Валидатор для роли Студента."""
