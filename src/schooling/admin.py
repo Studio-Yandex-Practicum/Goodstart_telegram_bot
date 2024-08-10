@@ -12,9 +12,13 @@ class TeacherAdmin(admin.ModelAdmin):
     icon_name = 'edit'
     exclude = ('state',)
 
+    def has_add_permission(self, request, obj=None):
+        """Запрещает добавление новых преподавателей."""
+        return False
+
     @admin.display(description='Предмет')
     def get_competences(self, obj):
-        """Return competences."""
+        """Возвращает компетенции преподавателя."""
         return '\n'.join([c.name for c in obj.competence.all()])
 
 
@@ -25,6 +29,10 @@ class StudentAdmin(admin.ModelAdmin):
     list_display = ('name', 'surname', 'paid_lessons')
     icon_name = 'school'
     exclude = ('state',)
+
+    def has_add_permission(self, request, obj=None):
+        """Запрещает добавление новых студентов."""
+        return False
 
 
 @admin.register(Subject)
