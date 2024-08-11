@@ -7,7 +7,7 @@ from telegram.ext import CallbackContext, CallbackQueryHandler
 from schooling.models import Lesson
 from bot.states import UserStates
 from bot.messages_texts.constants import (
-    UNCOMPLETED_LESSON_FEEDBACK_MSG, COMPLETED_LESSON_MSG,
+    UNCOMPLETED_LESSON_FEEDBACK_MSG,
     SUCCESS_LESSON_MSG,
 )
 
