@@ -271,23 +271,20 @@ async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
         instance.datetime_start, instance.datetime_end)
 
     chat_ids = (
-        instance.student_id.telegram_id,
-        instance.teacher_id.telegram_id,
+        await sync_to_async(lambda: instance.student_id.telegram_id)(),
+        await sync_to_async(lambda: instance.teacher_id.telegram_id)(),
     )
     message_text = (
         f'Занятие на тему "{instance.name}" '
         f'на {start_time_formatted}, '
-        f'продолжительностью {duration} минут.'
-        f'{instance.datetime_end.time()} отменено.'
+        f'продолжительностью {duration} минут. '
+        f'Отменено.'
     )
+
     if instance.teacher_id.telegram_id:
-        reply_markup = await get_root_markup(
-                instance.teacher_id.telegram_id,
-            )
+        reply_markup = await get_root_markup(instance.teacher_id.telegram_id)
     else:
-        reply_markup = await get_root_markup(
-            instance.student_id.telegram_id,
-        )
+        reply_markup = await get_root_markup(instance.student_id.telegram_id)
 
     await gather_send_messages_to_users(
         chat_ids=chat_ids,
