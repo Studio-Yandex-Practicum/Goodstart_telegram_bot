@@ -241,11 +241,13 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
             chat_id = False
             # msg_teacher = f'Занятие {instance.name} завершено'
 
-        await gather_send_messages_to_users(
-            chat_ids=chat_ids,
-            message_text=message_text,
-            reply_markup=reply_markup,
-        )
+        if message_text is not None:
+            await gather_send_messages_to_users(
+                chat_ids=chat_ids,
+                message_text=message_text,
+                reply_markup=reply_markup,
+            )
+
         if chat_id:
             bot_token = settings.TELEGRAM_TOKEN
             await send_message_to_user(
