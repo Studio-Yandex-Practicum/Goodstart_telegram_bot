@@ -131,6 +131,9 @@ def init_lesson(sender, instance, **kwargs):
     if instance.id:
         instance.datetime_old = instance.datetime_start
         instance.teacher_old = instance.teacher_id
+        instance.is_passed_teacher_old = instance.is_passed_teacher
+        instance.is_passed_student_old = instance.is_passed_student
+        instance.is_passed_old = instance.is_passed
 
 
 @receiver(post_save, sender=Lesson)
@@ -218,6 +221,23 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
             reply_markup = await get_root_markup(
                 instance.student_id.telegram_id,
             )
+
+        if instance.is_passed_teacher_old != instance.is_passed_teacher:
+            message_text = (
+                f'Занятие на тему "{instance.name}"'
+                'подтверждено преподавателем'
+            )
+            chat_id = False
+
+        if instance.is_passed_student_old != instance.is_passed_student:
+            message_text = (
+                f'Занятие на тему "{instance.name}" подтверждено учеником'
+            )
+            chat_id = False
+
+        if instance.is_passed_old != instance.is_passed:
+            message_text = f'Занятие на тему "{instance.name}" завершено'
+            chat_id = False
 
         if message_text is not None:
             await gather_send_messages_to_users(
