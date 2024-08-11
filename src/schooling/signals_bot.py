@@ -54,6 +54,9 @@ async def send_lesson_end_notification(context: CallbackContext):
     teacher_chat_id = context.job.data.get('teacher_chat_id')
     student_chat_id = context.job.data.get('student_chat_id')
     lesson_id = context.job.data.get('lesson_id')
+    lesson = await Lesson.objects.aget(
+        id=int(lesson_id),
+    )
 
     keyboard = [[
         InlineKeyboardButton('Да', callback_data=f'yes {lesson_id}'),
@@ -61,7 +64,7 @@ async def send_lesson_end_notification(context: CallbackContext):
     ]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    message_text = 'Было ли занятие?'
+    message_text = f'Было ли занятие на тему "{lesson.name}"?'
 
     chat_ids = (teacher_chat_id, student_chat_id)
     await gather_send_messages_to_users(
@@ -126,7 +129,9 @@ def init_lesson(sender, instance, **kwargs):
     if instance.id:
         instance.datetime_old = instance.datetime_start
         instance.teacher_old = instance.teacher_id
-
+        instance.is_passed_teacher_old = instance.is_passed_teacher
+        instance.is_passed_student_old = instance.is_passed_student
+        instance.is_passed_old = instance.is_passed
 
 @receiver(post_save, sender=Lesson)
 async def notify_about_lesson(sender, instance, created, **kwargs):
@@ -208,6 +213,33 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
             reply_markup = await get_root_markup(
                 instance.student_id.telegram_id,
             )
+
+        if instance.is_passed_teacher_old != instance.is_passed_teacher:
+            message_text = (
+                f'Занятие на тему "{instance.name}"'
+                'подтверждено преподавателем'
+            )
+            # Выбор: отправлять преподавателю отдельное сообщение или нет
+            chat_id = False
+            # msg_teacher = (
+            #     f'Вы подтвердили проведение занятия "{instance.name}"'
+            # )
+
+        if instance.is_passed_student_old != instance.is_passed_student:
+            message_text = (
+                f'Занятие на тему "{instance.name}" подтверждено учеником'
+            )
+            # Выбор: отправлять преподавателю отдельное сообщение или нет
+            chat_id = False
+            # msg_teacher = (
+            #     f'Ученик подтвердил проведенное занятие "{instance.name}"'
+            # )
+
+        if instance.is_passed_old != instance.is_passed:
+            message_text = f'Занятие на тему "{instance.name}" завершено'
+            # Выбор: отправлять преподавателю отдельное сообщение или нет
+            chat_id = False
+            # msg_teacher = f'Занятие {instance.name} завершено'
 
         await gather_send_messages_to_users(
             chat_ids=chat_ids,

@@ -63,29 +63,24 @@ async def was_the_lesson_completed(update: Update, context: CallbackContext):
         context.user_data['lesson_responses'].get('student_answ')
     )
 
-    if all([teacher_answ, student_answ]):
+    if teacher_answ == 'yes':
+        lesson.is_passed_teacher = True
+        await lesson.asave()
 
-        if teacher_answ == 'yes' and student_answ == 'yes':
-            lesson.is_passed = True
-            #TODO Проверить установку флага пройденного занятия, неккоректно
-            await lesson.asave()
-            await query.edit_message_text(
-                text=COMPLETED_LESSON_MSG,
-            )
-            context.user_data['lesson_responses'].clear()
-        else:
-            await no_answ_lesson_response(
-                query=query,
-                update=update,
-            )
-            context.user_data['lesson_responses'].clear()
+    if student_answ == 'yes':
+        lesson.is_passed_student = True
+        await lesson.asave()
+
+    if lesson.is_passed_teacher and lesson.is_passed_student:
+        lesson.is_passed = True
+        await lesson.asave()
+        context.user_data['lesson_responses'].clear()
 
     elif teacher_answ == 'no' or student_answ == 'no':
         await no_answ_lesson_response(
                 query=query,
                 update=update,
             )
-
     else:
         await query.edit_message_text(
             text=SUCCESS_LESSON_MSG,
