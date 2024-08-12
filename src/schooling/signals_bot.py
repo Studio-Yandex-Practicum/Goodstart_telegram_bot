@@ -55,6 +55,9 @@ async def send_lesson_end_notification(context: CallbackContext):
     teacher_chat_id = context.job.data.get('teacher_chat_id')
     student_chat_id = context.job.data.get('student_chat_id')
     lesson_id = context.job.data.get('lesson_id')
+    lesson = await Lesson.objects.aget(
+        id=int(lesson_id),
+    )
 
     keyboard = [[
         InlineKeyboardButton('Да', callback_data=f'yes {lesson_id}'),
@@ -62,7 +65,7 @@ async def send_lesson_end_notification(context: CallbackContext):
     ]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    message_text = 'Было ли занятие?'
+    message_text = f'Было ли занятие на тему "{lesson.name}"?'
 
     chat_ids = (teacher_chat_id, student_chat_id)
     await gather_send_messages_to_users(
@@ -222,22 +225,9 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
                 instance.student_id.telegram_id,
             )
 
-        if instance.is_passed_teacher_old != instance.is_passed_teacher:
-            message_text = (
-                f'Занятие на тему "{instance.name}"'
-                'подтверждено преподавателем'
-            )
-            chat_id = False
-
-        if instance.is_passed_student_old != instance.is_passed_student:
-            message_text = (
-                f'Занятие на тему "{instance.name}" подтверждено учеником'
-            )
-            chat_id = False
-
-        if instance.is_passed_old != instance.is_passed:
-            message_text = f'Занятие на тему "{instance.name}" завершено'
-            chat_id = False
+        message_text, chat_id = await msg_comfirm_lesson(instance,
+                                                         message_text,
+                                                         chat_id)
 
         if message_text is not None:
             await gather_send_messages_to_users(
@@ -251,6 +241,27 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
             await send_message_to_user(
                 bot_token, chat_id, msg_teacher, reply_markup,
             )
+
+
+async def msg_comfirm_lesson(instance, message_text, chat_id):
+    if instance.is_passed_teacher_old != instance.is_passed_teacher:
+        message_text = (
+            f'Занятие на тему "{instance.name}"'
+            'подтверждено преподавателем'
+        )
+        chat_id = False
+
+    if instance.is_passed_student_old != instance.is_passed_student:
+        message_text = (
+            f'Занятие на тему "{instance.name}" подтверждено учеником'
+        )
+        chat_id = False
+
+    if instance.is_passed_old != instance.is_passed:
+        message_text = f'Занятие на тему "{instance.name}" завершено'
+        chat_id = False
+
+    return message_text, chat_id
 
 
 @receiver(pre_delete, sender=Lesson)
