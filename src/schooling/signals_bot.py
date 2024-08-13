@@ -181,7 +181,7 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
                 instance.teacher_old.telegram_id,
             )
         chat_id = instance.teacher_id.telegram_id
-        msg_teacher = await get_message_text(instance)
+        msg_private = await get_message_text(instance)
         msg_text = (
             f'Ваше занятие на тему "{instance.name}" '
             f'проведёт преподаватель {instance.teacher_id}\n'
@@ -225,9 +225,12 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
                 instance.student_id.telegram_id,
             )
 
-        message_text, chat_id = await msg_comfirm_lesson(instance,
-                                                         message_text,
-                                                         chat_id)
+        message_text, chat_id, msg_private = await msg_comfirm_lesson(
+            instance,
+            message_text,
+            msg_private,
+            chat_id,
+        )
 
         if message_text is not None:
             await gather_send_messages_to_users(
@@ -239,29 +242,30 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
         if chat_id:
             bot_token = settings.TELEGRAM_TOKEN
             await send_message_to_user(
-                bot_token, chat_id, msg_teacher, reply_markup,
+                bot_token, chat_id, msg_private, reply_markup,
             )
 
 
-async def msg_comfirm_lesson(instance, message_text, chat_id):
+async def msg_comfirm_lesson(instance, message_text, msg_private, chat_id):
     if instance.is_passed_teacher_old != instance.is_passed_teacher:
-        message_text = (
-            f'Занятие на тему "{instance.name}"'
-            'подтверждено преподавателем'
+        msg_private = (
+            'Вы, как преподаватель, подтвердили проведение занятия на тему:'
+            f' "{instance.name}". Спасибо!'
         )
-        chat_id = False
+        chat_id = instance.teacher_id.telegram_id
 
     if instance.is_passed_student_old != instance.is_passed_student:
-        message_text = (
-            f'Занятие на тему "{instance.name}" подтверждено учеником'
+        msg_private = (
+            'Вы, как ученик, подтвердили проведение занятия на тему:'
+            f' "{instance.name}". Спасибо!'
         )
-        chat_id = False
+        chat_id = instance.student_id.telegram_id
 
     if instance.is_passed_old != instance.is_passed:
-        message_text = f'Занятие на тему "{instance.name}" завершено'
+        message_text = f'Занятие на тему "{instance.name}" проведено.'
         chat_id = False
 
-    return message_text, chat_id
+    return message_text, chat_id, msg_private
 
 
 @receiver(pre_delete, sender=Lesson)
