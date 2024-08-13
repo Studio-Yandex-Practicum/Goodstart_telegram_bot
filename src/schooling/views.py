@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import render, HttpResponseRedirect
 from asgiref.sync import sync_to_async
-from decouple import config
+from django.conf import settings
 
 from schooling.forms import ChangeDateTimeLesson
 from schooling.models import Teacher, Student, Lesson
@@ -13,10 +13,12 @@ from schooling.signals_bot import (
     get_schedule_for_role, get_schedule_week_tasks,
 )
 from bot.utils import check_user_from_db
+from django.contrib.auth import get_user_model
 
 
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-ADMIN_EMAIL = [config('DJANGO_SUPERUSER_EMAIL')]
+# EMAIL_HOST_USER - это почтовый ящик, с которого отправляются письма
+EMAIL_HOST_USER = settings.EMAIL_HOST_USER
+
 
 async def schedule_page(request, id):
     """Обрабатывает запрос на получение расписания занятий."""
@@ -81,13 +83,18 @@ async def details_schedule_page(request, id, lesson_id):
         request, 'schedule_details_card.html', context,
     )
 
+async def get_admin_emails():
+    user_model = get_user_model()
+    admins = await sync_to_async(user_model.objects.filter)(is_staff=True)
+    return [admin.email for admin in await sync_to_async(list)(admins)]
 
-def send_notification_email(subject, message):
-    send_mail(
+async def send_notification_email(subject, message):
+    admin_emails = await get_admin_emails()
+    await sync_to_async(send_mail)(
         subject,
         message,
         EMAIL_HOST_USER,
-        ADMIN_EMAIL,
+        admin_emails,
         fail_silently=False,
     )
 
@@ -106,7 +113,7 @@ async def change_datetime_lesson(request, id, lesson_id):
             formatted_datetime = new_datetime_moscow.strftime(
                 '%Y-%m-%d %H:%M:%S',
             )
-            await sync_to_async(send_notification_email)(
+            await send_notification_email(
                 'Запрос на перенос занятия',
                 f'Пользователь {user.name} {user.surname} '
                 f'({user.__class__.__name__}) запросил перенос занятия на '
@@ -129,7 +136,7 @@ async def cancel_lesson(request, id, lesson_id):
         lesson.cancelled = True
         await sync_to_async(lesson.delete, thread_sensitive=True)()
         user = await check_user_from_db(id, (Student, Teacher))
-        await sync_to_async(send_notification_email)(
+        await send_notification_email(
             'Запрос на отмену занятия',
             f'Пользователь {user.name} {user.surname} '
             f'({user.__class__.__name__}) запросил отмену занятия.',
