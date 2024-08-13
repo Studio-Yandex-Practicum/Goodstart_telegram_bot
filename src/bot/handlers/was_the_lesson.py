@@ -66,25 +66,27 @@ async def was_the_lesson_completed(update: Update, context: CallbackContext):
     if teacher_answ == 'yes':
         lesson.is_passed_teacher = True
         await lesson.asave()
+        await query.edit_message_text(
+            text=SUCCESS_LESSON_MSG,
+        )
 
     if student_answ == 'yes':
         lesson.is_passed_student = True
         await lesson.asave()
+        await query.edit_message_text(
+            text=SUCCESS_LESSON_MSG,
+        )
 
     if lesson.is_passed_teacher and lesson.is_passed_student:
         lesson.is_passed = True
         await lesson.asave()
         context.user_data['lesson_responses'].clear()
 
-    elif teacher_answ == 'no' or student_answ == 'no':
+    if teacher_answ == 'no' or student_answ == 'no':
         await no_answ_lesson_response(
                 query=query,
                 update=update,
             )
 
-    else:
-        await query.edit_message_text(
-            text=SUCCESS_LESSON_MSG,
-        )
 
 lesson_end_handler = CallbackQueryHandler(was_the_lesson_completed)
