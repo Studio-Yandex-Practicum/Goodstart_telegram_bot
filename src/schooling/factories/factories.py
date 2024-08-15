@@ -138,18 +138,14 @@ class LessonFactory(DjangoModelFactory):
         end_date = timezone.now().date() + timedelta(
             days=(13 - timezone.now().date().weekday()))
 
-        lessons_to_create = []
         for n in range(int((end_date - start_date).days)):
             date = start_date + timedelta(n)
             for _ in range(random.randint(1, 3)):
                 subject = student.subjects.order_by('?').first()
                 if not subject:
                     continue
-                teacher = (
-                    Teacher.objects.filter(competence=subject)
-                    .order_by('?')
-                    .first()
-                )
+                teachers = list(Teacher.objects.filter(competence=subject))
+                teacher = random.choice(teachers)
                 if not teacher:
                     continue
                 lesson_time_aware = timezone.make_aware(
@@ -162,18 +158,12 @@ class LessonFactory(DjangoModelFactory):
                             minute=random.randint(0, 55) // 5 * 5,
                         ),))
                 is_passed = lesson_time_aware < timezone.now()
-                lesson = cls(
-                    id=None,
+                LessonFactory.create(
                     student_id=student,
                     datetime_start=lesson_time_aware,
                     is_passed=is_passed,
                     subject=subject,
-                    teacher_id=teacher,
-                )
-                lessons_to_create.append(lesson)
-
-        Lesson.objects.bulk_create(lessons_to_create, ignore_conflicts=True)
-
+                    teacher_id=teacher,)
 
 def create_students():
     """Create `Student` instances for the project tests."""

@@ -202,6 +202,12 @@ class Lesson(models.Model):
         default=45,
     )
     is_passed = models.BooleanField('Занятие прошло', default=False)
+    is_passed_teacher = models.BooleanField(
+        'Занятие подтверждено учителем', default=False,
+    )
+    is_passed_student = models.BooleanField(
+        'Занятие подтверждено учеником', default=False,
+    )
     test_lesson = models.BooleanField('Пробное занятие', default=False)
 
     class Meta:
