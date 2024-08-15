@@ -24,12 +24,14 @@ urlpatterns = [
         cancel_lesson,
         name='cancel_lesson',
     ),
-    path('lesson_change_success/',
-         lesson_change_success,
-         name='lesson_change_success',
+    path(
+        'lesson_change_success/',
+        lesson_change_success,
+        name='lesson_change_success',
     ),
-    path('lesson_cancel_success/',
-         lesson_cancel_success,
-         name='lesson_cancel_success',
+    path(
+        'lesson_cancel_success/',
+        lesson_cancel_success,
+        name='lesson_cancel_success',
     ),
 ]
