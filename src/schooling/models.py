@@ -58,7 +58,7 @@ class Teacher(GeneralUserModel):
     )
 
     class Meta:
-        verbose_name = 'преподаватель'
+        verbose_name = 'Преподаватель'
         verbose_name_plural = 'Преподаватели'
 
     def __str__(self):
@@ -110,7 +110,7 @@ class Student(GeneralUserModel):
 
     class Meta:
 
-        verbose_name = 'студент'
+        verbose_name = 'Студент'
         verbose_name_plural = 'Студенты'
 
     def __str__(self):

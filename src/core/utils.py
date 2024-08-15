@@ -1,4 +1,5 @@
 from asgiref.sync import sync_to_async
+import pytz
 from django.conf import settings
 from django.core.mail import send_mail
 from django.db import IntegrityError
@@ -15,8 +16,10 @@ from core.config.settings_base import EMAIL_HOST_USER
 from potential_user.models import ApplicationForm
 from schooling.models import Student, Teacher
 from schooling.signals_bot import send_message_to_user
+from django.contrib.auth import get_user_model
 
 
+#TODO Перенести в сигналы
 @receiver(pre_delete, sender=Student)
 @receiver(pre_delete, sender=Teacher)
 async def delete_person_and_send_msg(sender, instance, *args, **kwargs):
@@ -74,7 +77,7 @@ def send_registration_email(application_form):
     subject = 'Goodstart: Новая заявка на регистрацию'
     user_role = roles_mapping.get(application_form.role, application_form.role)
     html_content = render_to_string(
-        'registration_notification_email.html',
+        'mails/registration_notification_email.html',
         {
             'name': application_form.name,
             'surname': application_form.surname,
@@ -102,20 +105,22 @@ def send_registration_email(application_form):
 
 
 @sync_to_async
-def send_feedback_email(subject, body, user):
+def send_feedback_email(subject, body, user, telegram_username=None):
     """Отправляет админу сообщение от зарегистрированного пользователя."""
+    email_context = {
+        'subject': f'{user.name} {user.surname}: {subject}',
+        'body': body,
+        'footer_meta_data_phone': (
+            f'Телефон для связи: {user.phone_number}'
+        ),
+    }
+    if telegram_username:
+        email_context['footer_meta_data_tg_id'] = (
+            f'Написать в telegram: https://t.me/{telegram_username}'
+        )
     html_content = render_to_string(
-        'feedback_email.html',
-        {
-            'subject': f'{user.name} {user.surname}: {subject}',
-            'body': body,
-            'footer_meta_data_phone': (
-                f'Телефон для связи: {user.phone_number}'
-            ),
-            'footer_meta_data_tg_id': (
-                f'Телеграм-id пользователя: {user.telegram_id}'
-            ),
-        },
+        'mails/feedback_email.html',
+        email_context,
     )
     from_email = EMAIL_HOST_USER
     recipient_list = Administrator.objects.filter(
@@ -126,7 +131,73 @@ def send_feedback_email(subject, body, user):
     )
 
     send_mail(
-        subject,
+        subject= f'Goodstart: {subject}',
+        message=None,
+        from_email=from_email,
+        recipient_list=recipient_list,
+        html_message=html_content,
+    )
+
+
+async def get_admin_emails():
+    user_model = get_user_model()
+    admins = await sync_to_async(user_model.objects.filter)(is_staff=True)
+    return [admin.email for admin in await sync_to_async(list)(admins)]
+
+
+async def send_cancel_lesson_email(lesson, user):
+    from_email = EMAIL_HOST_USER
+    recipient_list = Administrator.objects.filter(
+        is_active=True,
+    ).values_list(
+        'email',
+        flat=True,
+    )
+    moscow_tz = pytz.timezone('Europe/Moscow')
+    new_datetime_moscow = lesson.datetime_start.astimezone(moscow_tz)
+    formatted_datetime = new_datetime_moscow.strftime(
+                '%Y-%m-%d %H:%M:%S',
+            )
+    email_context = {
+        'subject': f'{user._meta.verbose_name} {user.name} {user.surname} запросил(а) отмену занятия', #Noqa
+        'body': f'Название занятия - {lesson.name}. Дата и время - {formatted_datetime}', #Noqa
+        'footer_meta_data_phone': (
+            f'Телефон для связи: {user.phone_number}'
+        ),
+    }
+    html_content = render_to_string(
+        'mails/cansel_lesson_email.html',
+        email_context,
+    )
+    await sync_to_async(send_mail)(
+        subject='Goodstart: Запрос на отмену занятия.',
+        message=None,
+        from_email=from_email,
+        recipient_list=recipient_list,
+        html_message=html_content,
+    )
+
+async def send_change_lesson_email(lesson, user, formatted_datetime):
+    from_email = EMAIL_HOST_USER
+    recipient_list = Administrator.objects.filter(
+        is_active=True,
+    ).values_list(
+        'email',
+        flat=True,
+    )
+    email_context = {
+        'subject': f'{user._meta.verbose_name} {user.name} {user.surname} запросил(а) перенос занятия', #Noqa
+        'body': f'Название занятия - {lesson.name}. Новая дата и время - {formatted_datetime}', #Noqa
+        'footer_meta_data_phone': (
+            f'Телефон для связи: {user.phone_number}'
+        ),
+    }
+    html_content = render_to_string(
+        'mails/cansel_lesson_email.html',
+        email_context,
+    )
+    await sync_to_async(send_mail)(
+        subject='Goodstart: Запрос на перенос занятия.',
         message=None,
         from_email=from_email,
         recipient_list=recipient_list,

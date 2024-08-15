@@ -28,6 +28,11 @@ async def feedback(update: Update, context: CallbackContext):
 
     if user:
         context.user_data['current_user'] = user
+        telegram_username = update.effective_chat.username
+        if telegram_username:
+            context.user_data[
+                'current_user_telegram_username'
+            ] = telegram_username
         await update.message.reply_text(
             text=FEEDBACK_REMOVE_SUPPORT_KEYBOARD_MSG,
             reply_markup=ReplyKeyboardRemove(),
@@ -51,8 +56,12 @@ async def body(update: Update, context: CallbackContext):
     subject = context.user_data['subject']
     body = context.user_data['body']
     user = context.user_data['current_user']
+    if 'current_user_telegram_username' in context.user_data:
+        telegram_username = context.user_data['current_user_telegram_username']
+    else:
+        telegram_username = None
 
-    await send_feedback_email(subject, body, user)
+    await send_feedback_email(subject, body, user, telegram_username)
 
     await update.message.reply_text(FEEDBACK_SUCCESS_MSG)
     return UserStates.START
