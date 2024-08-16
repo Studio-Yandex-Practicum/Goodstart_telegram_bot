@@ -528,13 +528,13 @@ phonenumberslite = ["phonenumberslite (>=7.0.2)"]
 
 [[package]]
 name = "django-viewflow"
-version = "2.2.6"
+version = "2.2.7"
 description = "Reusable library to build business applications fast"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "django_viewflow-2.2.6-py3-none-any.whl", hash = "sha256:f727ee1c689490c546c6787c2c8b527d12b6cd3dea32b25ff57422d21fa52548"},
-    {file = "django_viewflow-2.2.6.tar.gz", hash = "sha256:05ae644064c29a7e220871109673b1204dc7809611c254b1c155424a348b1fa4"},
+    {file = "django_viewflow-2.2.7-py3-none-any.whl", hash = "sha256:38c8493dc25efc49df2003777b951980b773b8bb8e31926dd591e9fe0e8acb91"},
+    {file = "django_viewflow-2.2.7.tar.gz", hash = "sha256:c81a91d55e235c9bd75dc26bbc26dcfdda5f21eb97a381537040d9b7b07221cc"},
 ]
 
 [package.dependencies]
