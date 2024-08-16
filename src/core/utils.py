@@ -19,7 +19,7 @@ from schooling.signals_bot import send_message_to_user
 from django.contrib.auth import get_user_model
 
 
-#TODO Перенести в сигналы
+#TODO Перенести в сигналы bot_signals.py
 @receiver(pre_delete, sender=Student)
 @receiver(pre_delete, sender=Teacher)
 async def delete_person_and_send_msg(sender, instance, *args, **kwargs):
@@ -64,7 +64,6 @@ def create_user_from_application(sender,
                 f'Пользователь с telegram_id {instance.telegram_id} '
                 'уже существует.',
             ) from err
-    # TODO: Возможно обработать сценарий, если пользователь существует.
 
 
 def send_registration_email(application_form):
