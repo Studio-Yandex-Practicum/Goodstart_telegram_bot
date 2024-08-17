@@ -4,24 +4,25 @@ import threading
 import time
 from typing import Self
 
+from asgiref.sync import sync_to_async
 from django.conf import settings
 from loguru import logger
-from telegram import Update, BotCommand, MenuButtonCommands
-from telegram.ext import (
-    Application, ApplicationBuilder,
-    CallbackQueryHandler, ConversationHandler,
-    PersistenceInput, MessageHandler, filters,
-)
-from bot.handlers import (
-    start_handler, help_handler, feedback_handler,
-    success_registration_webapp_handler, schedule_handler,
-    lesson_end_handler, left_lessons_handler, unknown_command_handler,
-)
-from bot.handlers.feedback import subject, body
+from telegram import (BotCommand, BotCommandScopeChat, MenuButtonCommands,
+                      Update)
+from telegram.ext import (Application, ApplicationBuilder,
+                          CallbackQueryHandler, ConversationHandler,
+                          MessageHandler, PersistenceInput, filters)
+
+from bot.handlers import (feedback_handler, help_handler, left_lessons_handler,
+                          lesson_end_handler, schedule_handler, start_handler,
+                          success_registration_webapp_handler,
+                          unknown_command_handler)
 from bot.handlers.conversation import help, schedule
-from bot.states import UserStates
+from bot.handlers.feedback import body, subject
 from bot.persistence import DjangoPersistence
+from bot.states import UserStates
 from bot.utils import add_daily_task
+from schooling.models import Student, Teacher
 
 PERSISTENCE_UPDATE_DELAY = 5
 
@@ -89,18 +90,59 @@ class Bot:
         return app
 
     async def _update_bot_commands(self, app):
-        """Update bot commands to be shown in the menu."""
-        commands = [
-            BotCommand('start', 'Запустить бот'),
-            BotCommand('help', 'Помощь'),
-            BotCommand('feedback', 'Отправить отзыв'),
-            BotCommand('schedule', 'Просмотреть расписание'),
-            # Сюда добавлять новые комманды
+        """Обновление команд бота."""
+        unregistered_commands = [
+            BotCommand('start', 'Запустить бота'),
+            BotCommand('help', 'Необходима регистрация'),
         ]
 
-        await app.bot.set_my_commands(commands)
-        await app.bot.set_chat_menu_button(chat_id=None,
-                                           menu_button=MenuButtonCommands())
+        teacher_commands = [
+            BotCommand('start', 'Запустить бота'),
+            BotCommand('schedule', 'Просмотреть расписание'),
+            BotCommand('feedback', 'Отправить отзыв'),
+            BotCommand('help', 'Все доступные команды бота'),
+        ]
+
+        student_commands = teacher_commands + [
+            BotCommand('left_lessons', 'Оставшиеся уроки'),
+        ]
+
+        async def set_commands_for_users(users, commands):
+            for user in users:
+                try:
+                    # Попробуем установить команды для пользователя
+                    await app.bot.set_my_commands(
+                        commands, scope=BotCommandScopeChat(
+                            chat_id=user.telegram_id))
+                    await app.bot.set_chat_menu_button(
+                        chat_id=user.telegram_id,
+                        menu_button=MenuButtonCommands())
+                except Exception as e:
+                    if 'Chat not found' in str(e):
+                        logger.warning(
+                            f'Пропуск пользователя '
+                            f'{user.telegram_id}: Чат не найден')
+                    else:
+                        logger.error(
+                            f'Ошибка при установке команд для '
+                            f'пользователя {user.telegram_id}: {e}')
+
+        try:
+            await app.bot.delete_my_commands()
+            await app.bot.set_my_commands(unregistered_commands)
+            await app.bot.set_chat_menu_button(
+                chat_id=None, menu_button=MenuButtonCommands())
+
+            teachers = await sync_to_async(list)(Teacher.objects.all())
+            students = await sync_to_async(list)(Student.objects.all())
+
+            await set_commands_for_users(teachers, teacher_commands)
+            await set_commands_for_users(students, student_commands)
+
+            logger.info('Команды бота успешно обновлены для всех ролей.')
+
+        except Exception as e:
+            logger.error(f'Ошибка при обновлении команд бота: {e}')
 
     def _run(self):
         """Run the bot."""
