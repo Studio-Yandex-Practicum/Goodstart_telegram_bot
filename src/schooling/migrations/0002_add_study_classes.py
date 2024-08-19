@@ -56,6 +56,7 @@ def remove_study_class_third(apps, schema_editor):
     )
     remove_subject.delete()
 
+
 def create_study_class_fourth(apps, schema_editor):
     """Create study class 'Четвертый класс'."""
     Subject = apps.get_model('schooling', 'StudyClass')
@@ -237,6 +238,7 @@ class Migration(migrations.Migration):
             create_study_class_tenth, reverse_code=remove_study_class_tenth
         ),
         migrations.RunPython(
-            create_study_class_eleventh, reverse_code=remove_study_class_eleventh
+            create_study_class_eleventh,
+            reverse_code=remove_study_class_eleventh
         ),
     ]
