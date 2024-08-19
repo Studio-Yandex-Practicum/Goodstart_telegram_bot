@@ -1,5 +1,5 @@
 # TODO: Нам не нужен этот хендлер в виде команды. Он нам нужен как обработчик
-from telegram import Update, ReplyKeyboardRemove
+from telegram import Bot, Update, ReplyKeyboardRemove
 from telegram.ext import ContextTypes, MessageHandler, filters
 
 from bot.messages_texts.constants import REGISTRATION_SUCCESS_MSG
@@ -25,6 +25,9 @@ async def success_registration_webapp(
         chat_id=telegram_id,
         message_id=registration_message_id,
     )
+    # Обновляем команды меню для пользователя
+    bot_instance = Bot()
+    await bot_instance._update_bot_commands(update.effective_chat)
 
 success_registration_webapp_handler = MessageHandler(
     filters.StatusUpdate.WEB_APP_DATA,

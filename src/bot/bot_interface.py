@@ -85,12 +85,13 @@ class Bot:
             lesson_end_handler,
             left_lessons_handler,
         ])
+        await app.bot.delete_my_commands()
         await self._update_bot_commands(app)
         logger.info('Bot application built with handlers.')
         return app
 
     async def _update_bot_commands(self, app):
-        """Обновление команд бота."""
+        """Обновление команд меню бота."""
         unregistered_commands = [
             BotCommand('start', 'Запустить бота'),
             BotCommand('help', 'Необходима регистрация'),
@@ -163,11 +164,21 @@ class Bot:
         await self._app.updater.start_polling(allowed_updates=Update.ALL_TYPES)
         await self._app.start()
         logger.info('Bot is running.')
+
+        # Запуск периодического обновления команд
+        asyncio.create_task(self._periodic_update_bot_commands())
+
         while not self._stop_event.is_set():
             await asyncio.sleep(1)
 
         await self._app.stop()
         logger.info('Bot stopped.')
+
+    async def _periodic_update_bot_commands(self):
+        """Периодически обновлять команды бота."""
+        while not self._stop_event.is_set():
+            await self._update_bot_commands(self._app)
+            await asyncio.sleep(10)  # Обновлять команды каждые 10 секунд
 
     async def get_app(self):
         """Public method to get the application instance."""
