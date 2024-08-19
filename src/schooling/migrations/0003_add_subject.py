@@ -25,6 +25,7 @@ def create_subject_algebra(apps, schema_editor):
         name="Алгебра",
     )
 
+
 def remove_subject_algebra(apps, schema_editor):
     """Remove subject 'Algebra' instance."""
     Subject = apps.get_model("schooling", "Subject")
@@ -38,6 +39,7 @@ def create_subject_geometry(apps, schema_editor):
     Subject.objects.create(
         name="Геометрия",
     )
+
 
 def remove_subject_geometry(apps, schema_editor):
     """Remove subject 'Geometry' instance."""
@@ -53,6 +55,7 @@ def create_subject_russian(apps, schema_editor):
         name="Русский язык",
     )
 
+
 def remove_subject_russian(apps, schema_editor):
     """Remove subject 'Russian' instance."""
     Subject = apps.get_model("schooling", "Subject")
@@ -66,6 +69,7 @@ def create_subject_english(apps, schema_editor):
     Subject.objects.create(
         name="Английский язык",
     )
+
 
 def remove_subject_english(apps, schema_editor):
     """Remove subject 'English' instance."""
@@ -81,6 +85,7 @@ def create_subject_spanish(apps, schema_editor):
         name="Испанский язык",
     )
 
+
 def remove_subject_spanish(apps, schema_editor):
     """Remove subject 'Spanish' instance."""
     Subject = apps.get_model("schooling", "Subject")
@@ -94,6 +99,7 @@ def create_subject_literature(apps, schema_editor):
     Subject.objects.create(
         name="Литература",
     )
+
 
 def remove_subject_literature(apps, schema_editor):
     """Remove subject 'Literature' instance."""
@@ -109,6 +115,7 @@ def create_subject_geography(apps, schema_editor):
         name="География",
     )
 
+
 def remove_subject_geography(apps, schema_editor):
     """Remove subject 'Geography' instance."""
     Subject = apps.get_model("schooling", "Subject")
@@ -122,6 +129,7 @@ def create_subject_history(apps, schema_editor):
     Subject.objects.create(
         name="История",
     )
+
 
 def remove_subject_history(apps, schema_editor):
     """Remove subject 'History' instance."""
@@ -137,6 +145,7 @@ def create_subject_chemistry(apps, schema_editor):
         name="Химия",
     )
 
+
 def remove_subject_chemistry(apps, schema_editor):
     """Remove subject 'Chemistry' instance."""
     Subject = apps.get_model("schooling", "Subject")
@@ -151,11 +160,13 @@ def create_subject_science(apps, schema_editor):
         name="Физика",
     )
 
+
 def remove_subject_science(apps, schema_editor):
     """Remove subject 'Science' instance."""
     Subject = apps.get_model("schooling", "Subject")
     remove_subject = Subject.objects.get(name="Физика")
     remove_subject.delete()
+
 
 def create_subject_information_technology(apps, schema_editor):
     """Create name of subject 'Information Technology'."""
@@ -163,6 +174,7 @@ def create_subject_information_technology(apps, schema_editor):
     Subject.objects.create(
         name="Информатика",
     )
+
 
 def remove_subject_information_technology(apps, schema_editor):
     """Remove subject 'Information Technology' instance."""
@@ -211,6 +223,7 @@ class Migration(migrations.Migration):
             create_subject_science, reverse_code=remove_subject_science
         ),
         migrations.RunPython(
-            create_subject_information_technology, reverse_code=remove_subject_information_technology
+            create_subject_information_technology,
+            reverse_code=remove_subject_information_technology
         ),
     ]
