@@ -11,7 +11,7 @@ RestartSec=5
 TimeOutStartSec=1200
 User=goodstartuser
 
-WorkingDirectory=/home/goodstartuser/Goodstart_telegram_bot/infra/stage/
+WorkingDirectory=/home/develop/Goodstart_telegram_bot/infra/stage/
 
 # Выполняет pull образов с Docker Hub
 ExecStartPre=sudo docker compose -f docker-compose.stage.yaml pull

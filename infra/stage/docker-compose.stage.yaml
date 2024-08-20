@@ -29,8 +29,8 @@ services:
     cap_add:
       - NET_ADMIN
     environment:
-      - PUID=1000 # id goodstartuser на проде
-      - PGID=1000 # id goodstartuser group на проде
+      - PUID=1001 # uid=1001(develop) на stage
+      - PGID=1000 # gid=1002(google-sudoers) на stage
       - TZ=Europe/Moscow
       - URL=jetrai.ru
       - VALIDATION=http

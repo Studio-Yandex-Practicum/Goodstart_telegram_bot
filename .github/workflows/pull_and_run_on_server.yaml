@@ -78,7 +78,7 @@ jobs:
           cd infra/stage
 
           # Настройка автоматического перезапуска приложения при сбое сервера
-          sudo cp -f /home/goodstartuser/Goodstart_telegram_bot/infra/stage/goodstart_bot.service /etc/systemd/system/goodstart_bot.service
+          sudo cp -f /home/develop/Goodstart_telegram_bot/infra/stage/goodstart_bot.service /etc/systemd/system/goodstart_bot.service
           sudo systemctl daemon-reload
           sudo systemctl restart goodstart_bot.service
 
