@@ -9,7 +9,7 @@ After=docker.service
 Restart=always
 RestartSec=5
 TimeOutStartSec=1200
-User=goodstartuser
+User=develop
 
 WorkingDirectory=/home/develop/Goodstart_telegram_bot/infra/stage/
 
