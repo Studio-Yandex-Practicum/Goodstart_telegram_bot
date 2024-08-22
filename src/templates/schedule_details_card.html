@@ -11,7 +11,7 @@
       <p class="card-text"><strong>Предмет:</strong> {{ lesson.subject }}</p>
       {% if user_role == 'Teacher' %}
         <p class="card-text"><strong>Ученик:</strong> {{ user_full_name }}</p>
-      {% else %}
+      {% elif user_role == 'Student' %}
         <p class="card-text"><strong>Преподаватель:</strong> {{ user_full_name }}</p>
       {% endif %}
       <p class="card-text"><strong>Время и дата:</strong><br>{{ lesson.datetime_start|date:"d.m.Y H:i" }} - {{ lesson.datetime_end|date:"d.m.Y H:i" }}</p>
