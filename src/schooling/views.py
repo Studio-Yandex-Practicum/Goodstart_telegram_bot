@@ -56,6 +56,7 @@ async def schedule_page(request, id):
         request, 'schedule.html', context,
     )
 
+
 async def details_schedule_page(request, id, lesson_id):
     context = {}
     user = await check_user_from_db(id, (Teacher, Student))
@@ -68,7 +69,7 @@ async def details_schedule_page(request, id, lesson_id):
         context['user_full_name'] = (
             f'{lesson.student_id}'
         )
-    else:
+    elif user_role == 'Student':
         context['user_full_name'] = (
             f'{lesson.teacher_id}'
         )
@@ -107,6 +108,7 @@ async def change_datetime_lesson(request, id, lesson_id):
         context={'form': form},
     )
 
+
 async def cancel_lesson(request, id, lesson_id):
     if request.method == 'POST':
         lesson = await Lesson.objects.aget(id=lesson_id)
@@ -120,12 +122,14 @@ async def cancel_lesson(request, id, lesson_id):
         'schedule_cancel_lesson.html',
     )
 
+
 def lesson_change_success(request):
     new_datetime = request.GET.get('new_datetime')
     return render(
         request, 'lesson_change_success.html',
         context={'new_datetime': new_datetime},
     )
+
 
 def lesson_cancel_success(request):
     return render(request, 'lesson_cancel_success.html')
