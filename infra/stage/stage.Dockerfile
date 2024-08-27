@@ -11,9 +11,6 @@ COPY poetry.lock .
 COPY src/. /app/
 
 RUN poetry config virtualenvs.create false \
-    && poetry install --without dev --no-root \
-    && locale-gen ru_RU.UTF-8
-
-ENV LC_TIME ru_RU.UTF-8
+    && poetry install --without dev --no-root
 
 CMD ["poetry", "run", "uvicorn", "core.asgi_prod:application", "--lifespan", "on", "--host", "0.0.0.0", "--port", "8000"]
