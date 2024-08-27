@@ -1,5 +1,12 @@
 FROM python:3.12
 
+RUN pip install poetry
+
+WORKDIR /app
+
+COPY pyproject.toml .
+COPY poetry.lock .
+
 RUN pip install poetry && \
     apt-get update && \
     apt-get install -y locales && \
@@ -9,11 +16,6 @@ RUN pip install poetry && \
 ENV LANG ru_RU.UTF-8
 ENV LC_ALL ru_RU.UTF-8
 ENV LC_TIME ru_RU.UTF-8
-
-WORKDIR /app
-
-COPY pyproject.toml .
-COPY poetry.lock .
 
 # Copy source code
 COPY src/. /app/
