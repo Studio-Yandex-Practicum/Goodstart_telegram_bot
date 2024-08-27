@@ -48,6 +48,6 @@ services:
     depends_on:
       - backend
     ports:
-      # - 8001:80
-      - 8001:443
+      - 8001:80
+      #- 8001:443
     restart: unless-stopped
