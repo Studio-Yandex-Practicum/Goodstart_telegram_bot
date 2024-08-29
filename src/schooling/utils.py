@@ -1,8 +1,3 @@
-import locale
-
-locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
-
-
 def format_datetime(dt):
     """Функция для форматирования даты и времени в удобный формат."""
     return dt.strftime('%d %B, в %H.%M')
