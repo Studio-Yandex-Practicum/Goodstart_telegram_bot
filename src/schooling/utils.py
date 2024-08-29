@@ -1,6 +1,6 @@
-import locale
+# import locale
 
-locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
+# locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
 
 
 def format_datetime(dt):
