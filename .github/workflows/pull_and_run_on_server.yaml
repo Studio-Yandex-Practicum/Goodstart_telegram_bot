@@ -95,7 +95,4 @@ jobs:
           docker compose -f docker-compose.stage.yaml exec backend sh -c "export RUN_BOT=false"
           docker compose -f docker-compose.stage.yaml exec backend python manage.py collectstatic
           docker compose -f docker-compose.stage.yaml exec backend python manage.py migrate
-          docker compose -f docker-compose.stage.yaml exec backend locale-gen ru_RU.UTF-8
-          docker compose -f docker-compose.stage.yaml exec backend sh -c "export LC_TIME=ru_RU.UTF-8"
-          docker compose -f docker-compose.stage.yaml exec backend dpkg-reconfigure locales
           docker compose -f docker-compose.stage.yaml exec backend sh -c "export RUN_BOT=true"
