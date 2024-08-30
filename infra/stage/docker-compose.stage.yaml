@@ -13,8 +13,10 @@ services:
       - pg_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
+
   backend:
     image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:dev
+    container_name: backend
     env_file: ../../.env
     restart: always
     depends_on:
@@ -23,6 +25,7 @@ services:
       - static_volume:/app/static/
     ports:
       - 8002:8000
+
   gateway:
     image: lscr.io/linuxserver/swag:latest
     container_name: swag
@@ -33,23 +36,13 @@ services:
       - PGID=1002 # gid=1002(google-sudoers) на stage
       - TZ=Europe/Moscow
       - URL=jetrai.ru
-      - VALIDATION=http
-      - SUBDOMAINS=www,bot #optional
-      - CERTPROVIDER= #optional
-      - DNSPLUGIN=cloudflare #optional
-      - PROPAGATION= #optional
-      - EMAIL= #optional
-      - ONLY_SUBDOMAINS=false #optional
-      - EXTRA_DOMAINS= #optional
-      - STAGING=false #optional
     volumes:
+      - /home/aptalca/appdata/swag:/config
       - ./nginx.conf:/config/nginx/site-confs/default.conf:ro
       - static_volume:/static/
     depends_on:
       - backend
     ports:
-      #- 8001:80
-      #- 8001:443
       - 443:443
       - 80:80
     restart: unless-stopped
