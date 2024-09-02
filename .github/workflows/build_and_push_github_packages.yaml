@@ -5,7 +5,6 @@ on:
     branches:
       - master
       - dev
-      - mastertmp
 
 env:
   REGISTRY: ghcr.io
@@ -39,24 +38,13 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-      
+
       - name: Build and push Docker image for Stage
         if: github.ref == 'refs/heads/dev'
         uses: docker/build-push-action@v5
         with:
-          context: . 
-          file: infra/dev/dev.Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-      # Для тестирования отправки на Prod
-      - name: Build and push Docker image for Production-Tmp
-        if: github.ref == 'refs/heads/mastertmp'
-        uses: docker/build-push-action@v5
-        with:
           context: .
-          file: infra/prod/prod.Dockerfile
+          file: infra/dev/dev.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

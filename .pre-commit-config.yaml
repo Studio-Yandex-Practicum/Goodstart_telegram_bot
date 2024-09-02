@@ -24,14 +24,18 @@ repos:
     hooks:
       - id: ruff
         types_or: [ python ]
-        #TODO К ruff подключить одинарные кавычки
-      # - id: ruff-format
-      #   types_or: [ python ]
 
   - repo: local
     hooks:
       - id: export-dev-dependencies
-        name: Export development dependencies
+        name: Export dev Dependencies
         language: system
         pass_filenames: false
-        entry: poetry lock
+        entry: poetry export --without-hashes --dev --output requirements/dev.txt
+        files: ^(pyproject.toml|poetry.lock)$
+      - id: export-prod-dependencies
+        name: Export prod Dependencies
+        language: system
+        pass_filenames: false
+        entry: poetry export --without-hashes --output requirements/prod.txt
+        files: ^(pyproject.toml|poetry.lock)$
