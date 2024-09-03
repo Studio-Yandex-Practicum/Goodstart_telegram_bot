@@ -1,0 +1,93 @@
+name: Bot stage deploy
+
+on:
+  workflow_run:
+    workflows:
+      - Build and push Docker image
+    types:
+      - completed
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  DEPLOY_PATH: Goodstart_telegram_bot
+
+defaults:
+  run:
+    working-directory: .
+
+jobs:
+  deploy:
+    name: Deploy changes on server
+    runs-on: ubuntu-latest
+    environment:
+      name: stage
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ref: dev
+
+      - name: Create folder for deploy
+        run: ssh ${{ secrets.HOST_USERNAME }}@${{ secrets.HOST_IP }} mkdir -p ${{ env.DEPLOY_PATH }}/infra
+
+      - name: Copy dev folder to VPS
+        run: scp -r $GITHUB_WORKSPACE/infra/stage/ ${{ secrets.HOST_USERNAME }}@${{ secrets.HOST_IP }}:${{ env.DEPLOY_PATH }}/infra/
+
+      - name: Execute commands on VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_IP }}
+          username: ${{ secrets.HOST_USERNAME }}
+          key: ${{ secrets.HOST_SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ env.DEPLOY_PATH }}
+
+            rm .env
+            touch .env
+
+            echo HOST_NG=Hello-world >> .env
+
+          # echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env
+          # echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
+          # echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
+          # echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
+          # echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+          # echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+          # echo BASE_URL=${{ secrets.BASE_URL }} >> .env
+          # echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+          # echo DEBUG=${{ secrets.DEBUG }} >> .env
+          # echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
+          # echo CSRF_TRUSTED_ORIGINS=${{ secrets.CSRF_TRUSTED_ORIGINS }} >> .env
+          # echo TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }} >> .env
+          # echo DJANGO_SUPERUSER_USERNAME=${{ secrets.DJANGO_SUPERUSER_USERNAME }} >> .env
+          # echo DJANGO_SUPERUSER_EMAIL=${{ secrets.HOST_DJANGO_SUPERUSER_EMAILNG }} >> .env
+          # echo DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD }} >> .env
+          # echo DJANGO_SUPERUSER_FIRSTNAME=${{ secrets.DJANGO_SUPERUSER_FIRSTNAME }} >> .env
+          # echo DJANGO_SUPERUSER_LASTNAME=${{ secrets.DJANGO_SUPERUSER_LASTNAME }} >> .env
+          # echo DJANGO_SUPERUSER_PHONE=${{ secrets.DJANGO_SUPERUSER_PHONE }} >> .env
+          # echo EMAIL_BACKEND=${{ secrets.EMAIL_BACKEND }} >> .env
+          # echo EMAIL_HOST=${{ secrets.EMAIL_HOST }} >> .env
+          # echo EMAIL_PORT=${{ secrets.EMAIL_PORT }} >> .env
+          # echo EMAIL_ACCOUNT=${{ secrets.EMAIL_ACCOUNT }} >> .env
+          # echo EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} >> .env
+          # echo DEFAULT_EMAIL_ADDRESS=${{ secrets.DEFAULT_EMAIL_ADDRESS }} >> .env
+          # echo NGINX_PORT=${{ secrets.NGINX_PORT }} >> .env
+          # # удалить после мержа в dev
+          # echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+          # echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
+          # echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+          # echo HOST_NG=${{ secrets.HOST_NG }} >> .env
+
+          # cd infra/prod
+
+          # # Настройка автоматического перезапуска приложения при сбое сервера
+          # sudo cp -f /home/goodstartuser/Goodstart_telegram_bot/infra/prod/goodstart_bot.service /etc/systemd/system/goodstart_bot.service
+          # sudo systemctl daemon-reload
+          # sudo systemctl restart goodstart_bot.service
+
+          # sleep 10
+          # docker compose -f docker-compose.prod.yaml exec backend sh -c "export RUN_BOT=false"
+          # docker compose -f docker-compose.prod.yaml exec backend python manage.py collectstatic
+          # docker compose -f docker-compose.prod.yaml exec backend python manage.py migrate
+          # docker compose -f docker-compose.prod.yaml exec backend sh -c "export RUN_BOT=true"
