@@ -1,16 +1,15 @@
 FROM python:3.12
 
-RUN pip install poetry
-
 WORKDIR /app
 
-COPY pyproject.toml .
-COPY poetry.lock .
+COPY requirements/dev.txt .
+RUN pip install -r dev.txt --no-cache-dir
 
 # Copy source code
-COPY src/. /app/
+COPY . .
 
-RUN poetry config virtualenvs.create false \
-    && poetry install --without dev --no-root
+WORKDIR ./src
 
-CMD ["poetry", "run", "uvicorn", "core.asgi_prod:application", "--lifespan", "on", "--host", "0.0.0.0", "--port", "8000"]
+RUN export RUN_BOT=true
+
+CMD ["uvicorn", "core.asgi_dev:application", "--lifespan", "on", "--host", "0.0.0.0", "--port", "8000"]

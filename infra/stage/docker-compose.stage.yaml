@@ -1,48 +1,53 @@
-
-volumes:
-  pg_data:
-  static_volume:
-
 services:
   db:
     image: postgres:latest
-    env_file: ../../.env
-    restart: always
     container_name: GoodStart-DB
-    volumes:
-      - pg_data:/var/lib/postgresql/data
+    env_file:
+      - ../../.env
     ports:
       - 5432:5432
+    restart: always
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ../../logs/db/:/var/log/postgres
 
-  backend:
+  bot:
     image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:dev
-    container_name: backend
+    # build:
+    #   context: ../..
+    #   dockerfile: infra/dev/dev.Dockerfile
+    container_name: goodstart-bot
     env_file: ../../.env
     restart: always
     depends_on:
       - db
     volumes:
       - static_volume:/app/static/
-    ports:
-      - 8002:8000
 
-  gateway:
-    image: lscr.io/linuxserver/swag:latest
+  swag:
+    image: lscr.io/linuxserver/swag
     container_name: swag
     cap_add:
       - NET_ADMIN
     environment:
-      - PUID=1001 # uid=1001(develop) на stage
-      - PGID=1002 # gid=1002(google-sudoers) на stage
-      - TZ=Europe/Moscow
-      - URL=jetrai.ru
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - URL=raikhert.duckdns.org
+      - VALIDATION=duckdns
+      - DUCKDNSTOKEN=4ee0a66c-5935-4bdb-8550-88c2c52a817b
     volumes:
       - /home/aptalca/appdata/swag:/config
-      - ./nginx.conf:/config/nginx/site-confs/default.conf:ro
-      - static_volume:/static/
-    depends_on:
-      - backend
+      - ./nginx.stage.conf.template:/etc/nginx/templates/default.conf.template
+      - static_volume:/var/html/static/
+      - ../../logs/nginx/:/var/log/nginx/
     ports:
       - 443:443
       - 80:80
+    depends_on:
+      - bot
     restart: unless-stopped
+
+volumes:
+  pg_data:
+  static_volume:
