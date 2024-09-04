@@ -30,8 +30,8 @@ services:
     cap_add:
       - NET_ADMIN
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=1001
+      - PGID=1004
       - TZ=Etc/UTC
       - URL=raikhert.duckdns.org
       - VALIDATION=duckdns
