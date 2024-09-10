@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<main class="mx-auto p-2" align="center" style="max-width: 550px">
+  <div class="card">
+    <h2 class="card-header">
+      Вы уверены, что хотите оставить заявку на отмену занятия?
+    </h2>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn main-button danger-button second-button">Уверены?</button>
+      <button type="button" class="btn main-button" style="width: 100%; margin-top: 1px; background-color: #d0d0d0; color: #000;"
+      onmouseover="this.style.background='#879099';"
+      onmouseout="this.style.background='#d0d0d0';" onclick="window.history.back()">Назад</button>
+    </form>
+  </div>
+</main>
+{% endblock content %}

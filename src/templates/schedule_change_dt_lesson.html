@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<main class="mx-auto p-2" style="max-width: 550px; text-align: center;">
+  <div class="card">
+    <h2 class="card-header">
+      Новая дата <br>и время занятия
+    </h2>
+    <form method="post">
+      {% csrf_token %}
+      <input type="datetime-local" name="dt_field" id="id_dt_field" class="form-control" placeholder="Новая дата и время занятия" required>
+      <button type="submit" class="btn main-button second-button">Отправить</button>
+      <button type="button" class="btn main-button" style="width: 100%; margin-top: 1px; background-color: #d0d0d0; color: #000;"
+      onmouseover="this.style.background='#879099';"
+      onmouseout="this.style.background='#d0d0d0';" onclick="window.history.back()">Назад</button>
+    </form>
+  </div>
+</main>
+{% endblock content %}

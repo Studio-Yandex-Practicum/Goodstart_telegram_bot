@@ -1,0 +1,18 @@
+version: "3.8"
+
+volumes:
+  pg_data:
+  static_volume:
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: postgres_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    container_name: GoodStart-DB
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"

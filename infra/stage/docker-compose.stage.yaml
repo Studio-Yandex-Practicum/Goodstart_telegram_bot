@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: GoodStart-DB
+    env_file:
+      - ../../.env
+    ports:
+      - 5432:5432
+    restart: always
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ../../logs/db/:/var/log/postgres
+
+  bot:
+    image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:dev
+    container_name: goodstart-bot
+    env_file: ../../.env
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - static_volume:/app/static/
+
+  swag:
+    image: lscr.io/linuxserver/swag
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1001
+      - PGID=1004
+      - TZ=Etc/UTC
+      - URL=jetrai.ru
+    volumes:
+      - /home/aptalca/appdata/swag:/config
+      - ./nginx.stage.conf.template:/config/nginx/site-confs/default.conf:ro
+      - static_volume:/var/html/static/
+      - ../../logs/nginx/:/var/log/nginx/
+    ports:
+      - 443:443
+      - 80:80
+    depends_on:
+      - bot
+    restart: unless-stopped
+
+volumes:
+  pg_data:
+  static_volume:

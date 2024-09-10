@@ -1,0 +1,58 @@
+
+version: '3'
+
+volumes:
+  pg_data:
+  static_volume:
+
+services:
+  db:
+    image: postgres:latest
+    env_file: ../../.env
+    restart: always
+    container_name: GoodStart-DB
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  backend:
+    # для тестовой отправки на сервер:
+    image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:mastertmp
+    # для финальной отправки на сервер:
+    # image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:master    
+    env_file: ../../.env
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - static_volume:/app/static/
+    ports:
+      - 8002:8000
+  gateway:
+    image: lscr.io/linuxserver/swag:latest
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000 # id goodstartuser на проде
+      - PGID=1000 # id goodstartuser group на проде
+      - TZ=Europe/Moscow
+      - URL=${HOST_NG}
+      - VALIDATION=http
+      - SUBDOMAINS=www,bot #optional
+      - CERTPROVIDER= #optional
+      - DNSPLUGIN=cloudflare #optional
+      - PROPAGATION= #optional
+      - EMAIL= #optional
+      - ONLY_SUBDOMAINS=false #optional
+      - EXTRA_DOMAINS= #optional
+      - STAGING=false #optional
+    volumes:
+      - ./nginx.conf:/config/nginx/site-confs/default.conf:ro
+      - static_volume:/static/
+    depends_on:
+      - backend
+    ports:
+      - 8001:80
+      - 443:443
+    restart: unless-stopped

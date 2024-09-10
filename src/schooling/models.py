@@ -1,0 +1,248 @@
+from datetime import timedelta
+
+from django.core.exceptions import ValidationError
+from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
+
+from bot.states import UserStates
+from schooling.validators.phone_validators import validate_phone_number
+
+
+MAX_LEN_NAME_SURNAME = 150
+MAX_LEN_CITY = 50
+MAX_LEN_STATE = 50
+MAX_COUNT_STUDENTS = 30
+MAX_COUNT_CLASSES = 5
+MAX_COUNT_SUBJECTS = 3
+
+
+class GeneralUserModel(models.Model):
+    """Базовая, абстрактная модель пользователя."""
+
+    telegram_id = models.BigIntegerField('Telegram ID', unique=True)
+    name = models.CharField('Имя', max_length=MAX_LEN_NAME_SURNAME)
+    surname = models.CharField('Фамилия', max_length=MAX_LEN_NAME_SURNAME)
+    city = models.CharField('Город', max_length=MAX_LEN_CITY)
+    phone_number = PhoneNumberField(
+        'Номер телефона',
+        validators=[validate_phone_number],
+        help_text='Формат +7XXXXXXXXXX',
+    )
+    last_login_date = models.DateField('Последнее посещение', auto_now=True)
+    registration_date = models.DateField('Дата регистрации', auto_now_add=True)
+    state = models.CharField(
+        'Состояние пользователя',
+        max_length=MAX_LEN_STATE,
+        choices=UserStates.choices,
+        default=UserStates.START,
+    )
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        """Возвращает общее строковое представление пользователя."""
+        return f'{self.name} {self.surname} {self.telegram_id}'
+
+
+class Teacher(GeneralUserModel):
+    """Модель преподавателя."""
+
+    competence = models.ManyToManyField(
+        'Subject',
+        verbose_name='Предмет',
+    )
+    study_classes = models.ManyToManyField(
+        'StudyClass',
+        verbose_name='Учебный класс',
+    )
+
+    class Meta:
+        verbose_name = 'Преподаватель'
+        verbose_name_plural = 'Преподаватели'
+
+    def __str__(self):
+        """Возвращает полное имя преподавателя."""
+        return f'{self.name} {self.surname}'
+
+    def clean(self):
+        """
+        Проверка на максимальное количество классов и предметов.
+
+        Осуществляется на одного преподавателя.
+        """
+        current_classes_count = self.study_classes.count()
+        current_subjects_count = self.competence.count()
+
+        if current_classes_count > MAX_COUNT_CLASSES:
+            raise ValidationError(
+                f'Преподаватель {self.name} {self.surname} уже '
+                f'ведет максимальное количество классов.')
+
+        if current_subjects_count > MAX_COUNT_SUBJECTS:
+            raise ValidationError(
+                f'Преподаватель {self.name} {self.surname} уже '
+                f'ведет максимальное количество предметов.')
+
+
+class Student(GeneralUserModel):
+    """Модель студента."""
+
+    study_class_id = models.ForeignKey(
+        'StudyClass',
+        on_delete=models.PROTECT,
+        verbose_name='ID учебного класса',
+        related_name='students',
+        null=True,
+    )
+    paid_lessons = models.PositiveIntegerField(
+        'Оплаченые занятия',
+        default=0,
+    )
+    parents_contacts = models.CharField(
+        max_length=256,
+        verbose_name='Контакты представителей',
+    )
+    subjects = models.ManyToManyField(
+        'Subject',
+        verbose_name='Предмет',
+    )
+
+    class Meta:
+
+        verbose_name = 'Студент'
+        verbose_name_plural = 'Студенты'
+
+    def __str__(self):
+        """Возвращает строковое представление студента."""
+        return f'{self.name} {self.surname}'
+
+
+class Subject(models.Model):
+    """Модель для хранения школьных предметов."""
+
+    name = models.CharField(
+        max_length=128,
+        unique=True,
+        verbose_name='Название предмета',
+    )
+    subject_key = models.CharField(
+        max_length=128,
+        unique=True,
+        blank=True,
+        null=True,
+    )
+
+    class Meta:
+        verbose_name = 'название предмета'
+        verbose_name_plural = 'Названия предметов'
+
+    def __str__(self):
+        """Возвращает строковое представление предмета."""
+        return self.name
+
+
+class StudyClass(models.Model):
+    """Модель для хранения школьных классов."""
+
+    study_class_name = models.CharField(
+        max_length=64,
+        unique=True,
+        verbose_name='Название учебного класса',
+    )
+    study_class_number = models.PositiveIntegerField(
+        verbose_name='Номер учебного класса',
+    )
+
+    class Meta:
+        verbose_name = 'учебный класс'
+        verbose_name_plural = 'Учебные классы'
+
+    def __str__(self):
+        """Возвращает название учебного класса."""
+        return self.study_class_name
+
+    def clean(self):
+        """Проверка на максимальное количество студентов в одном классе."""
+        current_students_count = self.students.count()
+
+        if current_students_count > MAX_COUNT_STUDENTS:
+            raise ValidationError(
+                f'Максимальное количество студентов в классе '
+                f'"{self.study_class_name}" уже достигнуто.',
+            )
+
+
+class Lesson(models.Model):
+    """Модель для хранения информации о занятиях."""
+
+    name = models.CharField('Название занятия', max_length=256)
+    subject = models.ForeignKey(
+        'Subject',
+        on_delete=models.CASCADE,
+        verbose_name='Предмет',
+        related_name='lessons',
+    )
+    teacher_id = models.ForeignKey(
+        'Teacher',
+        on_delete=models.CASCADE,
+        verbose_name='Преподаватель',
+        related_name='lessons',
+    )
+    student_id = models.ForeignKey(
+        'Student',
+        on_delete=models.CASCADE,
+        verbose_name='Студент',
+        related_name='lessons',
+    )
+    datetime_start = models.DateTimeField('Время начала занятия')
+    duration = models.PositiveIntegerField(
+        'Продолжительность занятия',
+        help_text='Продолжительность занятия в минутах.',
+        default=45,
+    )
+    is_passed = models.BooleanField('Занятие прошло', default=False)
+    is_passed_teacher = models.BooleanField(
+        'Занятие подтверждено учителем', default=False,
+    )
+    is_passed_student = models.BooleanField(
+        'Занятие подтверждено учеником', default=False,
+    )
+    test_lesson = models.BooleanField('Пробное занятие', default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=[
+                    'name',
+                    'subject',
+                    'teacher_id',
+                    'student_id',
+                    'datetime_start',
+                    'duration',
+                ],
+                name='unique_lesson',
+            ),
+        ]
+        unique_together = ('name', 'datetime_start')
+        verbose_name = 'занятие'
+        verbose_name_plural = 'Занятия'
+
+    def __str__(self):
+        """Возвращает строковое представление занятия."""
+        return f'{self.name} {self.subject.name}'
+
+    def clean(self):
+        """Проверка на совпадение занятия с уже существующими."""
+        if Lesson.objects.filter(
+            name=self.name,
+            datetime_start__date=self.datetime_start.date(),
+        ).exclude(pk=self.pk).exists():
+            raise ValidationError(
+                'Урок с таким названием уже существует в этот день.',
+            )
+
+    @property
+    def datetime_end(self):
+        """Возвращает дату и время окончания урока."""
+        return self.datetime_start + timedelta(minutes=self.duration)

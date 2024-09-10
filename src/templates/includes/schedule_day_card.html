@@ -1,0 +1,43 @@
+<div id="{{ id }}" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+  <div class="accordion-body">
+    {% if not schedule_day %}
+    <table class="table text-center table-bordered align-middle m-0">
+      <thead class="table-secondary">
+        <tr>
+          <th scope="col">Занятий нет</th>
+        </tr>
+      </thead>
+    </table>
+    {% else %}
+    <table class="table text-center table-bordered align-middle m-0">
+      <thead class="table-secondary">
+        <tr>
+          <th scope="col">Время</th>
+          <th scope="col">Предмет</th>
+        </tr>
+      </thead>
+      {% for lesson in schedule_day %}
+      <tbody>
+        <tr>
+          <td class="text-nowrap">{{ lesson.datetime_start.time }} - {{ lesson.datetime_end.time }}</td>
+          <td>
+            <a href="{% url 'schedule:details_schedule' user_tg_id lesson.id %}" class="text-decoration-none position-relative">
+              <div class="p-2 button-style">
+                <div class="text-center">
+                  {{ lesson.name }}<br />
+                  {{ lesson.subject }}<br />
+                  {% if role == 'Student' %} {{ lesson.teacher_id }}<br />
+                  {% else %} {{ lesson.student_id }}<br />
+                  {% endif %}
+                </div>
+                <i class="bi bi-pencil-fill edit-icon"></i>
+              </div>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+      {% endfor %}
+    </table>
+    {% endif %}
+  </div>
+</div>

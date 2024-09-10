@@ -1,0 +1,94 @@
+name: Bot stage deploy
+
+on:
+  workflow_run:
+    workflows:
+      - Build and push Docker image
+    types:
+      - completed
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  DEPLOY_PATH: Goodstart_telegram_bot
+
+defaults:
+  run:
+    working-directory: .
+
+jobs:
+  deploy:
+    name: Deploy changes on server
+    runs-on: ubuntu-latest
+    environment:
+      name: stage
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ref: dev
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          echo "${{ secrets.HOST_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Create folder for deploy
+        run: ssh ${{ secrets.HOST_USERNAME }}@${{ secrets.HOST_IP }} mkdir -p ${{ env.DEPLOY_PATH }}/infra
+
+      - name: Copy dev folder to VPS
+        run: scp -r $GITHUB_WORKSPACE/infra/stage/ ${{ secrets.HOST_USERNAME }}@${{ secrets.HOST_IP }}:${{ env.DEPLOY_PATH }}/infra/
+
+      - name: Execute commands on VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_IP }}
+          username: ${{ secrets.HOST_USERNAME }}
+          key: ${{ secrets.HOST_SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ env.DEPLOY_PATH }}
+
+            rm .env
+            touch .env
+
+            echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env
+            echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
+            echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
+            echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
+            echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+            echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+            echo BASE_URL=${{ secrets.BASE_URL }} >> .env
+            echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+            echo DEBUG=${{ secrets.DEBUG }} >> .env
+            echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
+            echo CSRF_TRUSTED_ORIGINS=${{ secrets.CSRF_TRUSTED_ORIGINS }} >> .env
+            echo TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }} >> .env
+            echo EMAIL_BACKEND=${{ secrets.EMAIL_BACKEND }} >> .env
+            echo EMAIL_HOST=${{ secrets.EMAIL_HOST }} >> .env
+            echo EMAIL_PORT=${{ secrets.EMAIL_PORT }} >> .env
+            echo EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }} >> .env
+            echo EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }} >> .env
+            echo DEFAULT_EMAIL_ADDRESS=${{ secrets.DEFAULT_EMAIL_ADDRESS }} >> .env
+            echo NGINX_PORT=${{ secrets.NGINX_PORT }} >> .env
+            # удалить после мержа в dev
+            echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+            echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
+            echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+            echo RUN_BOT=${{ secrets.RUN_BOT }} >> .env
+
+            # Installing defend service for app
+            sudo cp -f /home/dev/Goodstart_telegram_bot/infra/stage/goodstart_bot.service /etc/systemd/system/goodstart_bot.service
+            sudo systemctl daemon-reload
+            sudo systemctl restart goodstart_bot.service
+
+
+            sleep 10
+            cd infra/stage
+            docker-compose -f docker-compose.stage.yaml exec goodstart-bot sh -c "export RUN_BOT=false"
+            docker-compose -f docker-compose.stage.yaml exec goodstart-bot python manage.py collectstatic --noinput
+            docker-compose -f docker-compose.stage.yaml exec goodstart-bot cd .. && cd static/material/admin/css/ && sed -i 's/readonly-label{width:170px;height:10px}/readonly-label{width:170px;height:auto}/' change_form.min.css
+            docker-compose -f docker-compose.stage.yaml exec goodstart-bot python manage.py migrate
+            docker-compose -f docker-compose.stage.yaml exec goodstart-bot sh -c "export RUN_BOT=true"

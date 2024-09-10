@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .email-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background-color: #f0f0f0;
+            padding: 10px;
+            text-align: left;
+            width: 15%;
+        }
+        td {
+            padding: 10px;
+            width: 85%;
+        }
+        .footer {
+            font-size: 14px;
+            color: #666666;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <h1>Заявка на регистрацию нового пользователя:</h1>
+        <table>
+            <tr>
+                <th>ФИО:</th>
+                <td>{{ surname }} {{ name }}</td>
+            </tr>
+            <tr>
+                <th>Город:</th>
+                <td>{{ city }}</td>
+            </tr>
+            <tr>
+                <th>Телефон:</th>
+                <td>{{ phone_number }}</td>
+            </tr>
+            <tr>
+                <th>Роль:</th>
+                <td>{{ role }}</td>
+            </tr>
+        </table>
+        <p>Пожалуйста, войдите в систему для завершения регистрации пользователя.</p>
+    </div>
+    <p class="footer">Это автоматически сгенерированное сообщение, пожалуйста, не отвечайте на него.</p>
+</body>
+</html>
