@@ -2,7 +2,7 @@
 
 from core.config.settings_base import *  # noqa
 
-DEBUG = False
+DEBUG = env('DEBUG')
 
 DATABASES = {
     'default': {
