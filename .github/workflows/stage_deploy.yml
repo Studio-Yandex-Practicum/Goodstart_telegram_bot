@@ -80,9 +80,9 @@ jobs:
             echo RUN_BOT=${{ secrets.RUN_BOT }} >> .env
 
             # Installing defend service for app
-            cp -f /home/dev/Goodstart_telegram_bot/infra/stage/goodstart_bot.service /etc/systemd/system/goodstart_bot.service
-            systemctl daemon-reload
-            systemctl restart random_coffee_bot.service
+            sudo cp -f /home/dev/Goodstart_telegram_bot/infra/stage/goodstart_bot.service /etc/systemd/system/goodstart_bot.service
+            sudo systemctl daemon-reload
+            sudo systemctl restart goodstart_bot.service
 
 
             sleep 10
