@@ -2,7 +2,7 @@
 
 from core.config.settings_base import *  # noqa
 
-DEBUG = False
+DEBUG = env('DEBUG')
 
 # WARNING!!!
 # You will probably need to make some minor changes to the `.env` file.
