@@ -1,4 +1,4 @@
-name: Bot stage deploy
+name: Bot prod deploy
 
 on:
   workflow_run:
@@ -21,12 +21,12 @@ jobs:
     name: Deploy changes on server
     runs-on: ubuntu-latest
     environment:
-      name: stage
+      name: prod
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          ref: dev
+          ref: master
 
       - name: Set up SSH
         run: |
@@ -40,7 +40,7 @@ jobs:
         run: ssh ${{ secrets.HOST_USERNAME }}@${{ secrets.HOST_IP }} mkdir -p ${{ env.DEPLOY_PATH }}/infra
 
       - name: Copy dev folder to VPS
-        run: scp -r $GITHUB_WORKSPACE/infra/stage/ ${{ secrets.HOST_USERNAME }}@${{ secrets.HOST_IP }}:${{ env.DEPLOY_PATH }}/infra/
+        run: scp -r $GITHUB_WORKSPACE/infra/prod/ ${{ secrets.HOST_USERNAME }}@${{ secrets.HOST_IP }}:${{ env.DEPLOY_PATH }}/infra/
 
       - name: Execute commands on VPS
         uses: appleboy/ssh-action@master
@@ -79,15 +79,15 @@ jobs:
             echo RUN_BOT=${{ secrets.RUN_BOT }} >> .env
 
             # Installing defend service for app
-            sudo cp -f /home/dev/Goodstart_telegram_bot/infra/stage/goodstart_bot.service /etc/systemd/system/goodstart_bot.service
+            sudo cp -f /home/dev/Goodstart_telegram_bot/infra/prod/goodstart_bot.service /etc/systemd/system/goodstart_bot.service
             sudo systemctl daemon-reload
             # sudo systemctl restart goodstart_bot.service
 
 
             # sleep 10
-            # cd infra/stage
-            # docker-compose -f docker-compose.stage.yaml exec goodstart-bot sh -c "export RUN_BOT=false"
-            # docker-compose -f docker-compose.stage.yaml exec goodstart-bot python manage.py collectstatic --noinput
-            # docker-compose -f docker-compose.stage.yaml exec goodstart-bot cd .. && cd static/material/admin/css/ && sed -i 's/readonly-label{width:170px;height:10px}/readonly-label{width:170px;height:auto}/' change_form.min.css
-            # docker-compose -f docker-compose.stage.yaml exec goodstart-bot python manage.py migrate
-            # docker-compose -f docker-compose.stage.yaml exec goodstart-bot sh -c "export RUN_BOT=true"
+            # cd infra/prod
+            # docker compose -f docker-compose.prod.yaml exec goodstart-bot sh -c "export RUN_BOT=false"
+            # docker compose -f docker-compose.prod.yaml exec goodstart-bot python manage.py collectstatic --noinput
+            # docker compose -f docker-compose.prod.yaml exec goodstart-bot cd .. && cd static/material/admin/css/ && sed -i 's/readonly-label{width:170px;height:10px}/readonly-label{width:170px;height:auto}/' change_form.min.css
+            # docker compose -f docker-compose.prod.yaml exec goodstart-bot python manage.py migrate
+            # docker compose -f docker-compose.prod.yaml exec goodstart-bot sh -c "export RUN_BOT=true"

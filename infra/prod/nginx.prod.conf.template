@@ -1,0 +1,52 @@
+server {
+
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+
+    keepalive_timeout          45;
+    reset_timedout_connection  on;
+    client_body_timeout        35;
+    send_timeout               30;
+
+    server_name goodstart-education-bot.ru;
+
+    include /config/nginx/ssl.conf;
+
+    client_max_body_size 10M;
+
+    location /admin {
+      proxy_set_header Host $http_host;
+      proxy_set_header        X-Real-IP $remote_addr;
+      proxy_set_header        X-Forwarded-Proto $scheme;
+      proxy_pass http://bot:8000/admin;
+    }
+
+    location /static {
+      root /var/html/;
+    }
+
+    location /registration {
+      proxy_set_header Host $http_host;
+      proxy_set_header        X-Real-IP $remote_addr;
+      proxy_set_header        X-Forwarded-Proto $scheme;
+      proxy_pass http://bot:8000/registration;
+    }
+    location / {
+          alias /static/;
+          autoindex on;
+          proxy_set_header Host $host;
+        }
+}
+
+
+server {
+    if ($host = goodstart-education-bot.ru) {
+        return 301 https://$host$request_uri;
+    }
+
+  listen 80;
+  server_name goodstart-education-bot.ru;
+    return 301 https://$host$request_uri;
+
+}

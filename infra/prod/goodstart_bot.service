@@ -9,12 +9,12 @@ After=docker.service
 Restart=always
 RestartSec=5
 TimeOutStartSec=1200
-User=goodstartuser
+User=prod
 
-WorkingDirectory=/home/goodstartuser/Goodstart_telegram_bot/infra/prod/
+WorkingDirectory=/home/prod/Goodstart_telegram_bot/infra/prod/
 
 # Выполняет pull образов с Docker Hub
-ExecStartPre=sudo docker compose -f docker-compose.prod.yaml pull
+ExecStartPre=sudo docker compose -f docker compose.prod.yaml pull
 
 # Перезапускает все контейнеры в Docker Compose
 ExecStartPre=docker compose -f docker-compose.prod.yaml down
