@@ -11,14 +11,14 @@ RestartSec=5
 TimeOutStartSec=1200
 User=dev
 
-WorkingDirectory=/home/develop/Goodstart_telegram_bot/infra/stage/
+WorkingDirectory=/home/dev/Goodstart_telegram_bot/infra/stage/
 
 # Выполняет pull образов с Docker Hub
-ExecStartPre=docker compose -f docker-compose.stage.yaml pull
+ExecStartPre=docker-compose -f docker-compose.stage.yaml pull
 
 # Перезапускает все контейнеры в Docker Compose
-ExecStartPre=docker compose -f docker-compose.stage.yaml down
-ExecStart=docker compose -f docker-compose.stage.yaml up -d
+ExecStartPre=docker-compose -f docker-compose.stage.yaml down
+ExecStart=docker-compose -f docker-compose.stage.yaml up -d
 
 # Выполняет удаление старых образов
 ExecStartPost=docker system prune --force

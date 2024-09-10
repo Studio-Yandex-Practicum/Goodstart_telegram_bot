@@ -86,6 +86,7 @@ jobs:
 
 
             sleep 10
+            cd infra/stage
             docker-compose -f docker-compose.stage.yaml exec goodstart-bot sh -c "export RUN_BOT=false"
             docker-compose -f docker-compose.stage.yaml exec goodstart-bot python manage.py collectstatic --noinput
             docker-compose -f docker-compose.stage.yaml exec goodstart-bot cd .. && cd static/material/admin/css/ && sed -i 's/readonly-label{width:170px;height:10px}/readonly-label{width:170px;height:auto}/' change_form.min.css
