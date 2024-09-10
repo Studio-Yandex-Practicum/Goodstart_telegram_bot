@@ -33,12 +33,10 @@ services:
       - PUID=1001
       - PGID=1004
       - TZ=Etc/UTC
-      - URL=raikhert.duckdns.org
-      - VALIDATION=duckdns
-      - DUCKDNSTOKEN=4ee0a66c-5935-4bdb-8550-88c2c52a817b
+      - URL=jetrai.ru
     volumes:
       - /home/aptalca/appdata/swag:/config
-      - ./nginx.stage.conf.template:/etc/nginx/templates/default.conf.template
+      - ./nginx.stage.conf.template:/config/nginx/site-confs/default.conf:ro
       - static_volume:/var/html/static/
       - ../../logs/nginx/:/var/log/nginx/
     ports:
