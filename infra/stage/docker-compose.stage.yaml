@@ -13,9 +13,6 @@ services:
 
   bot:
     image: ghcr.io/studio-yandex-practicum/goodstart_telegram_bot:dev
-    # build:
-    #   context: ../..
-    #   dockerfile: infra/dev/dev.Dockerfile
     container_name: goodstart-bot
     env_file: ../../.env
     restart: always

@@ -79,15 +79,14 @@ jobs:
             echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
             echo RUN_BOT=${{ secrets.RUN_BOT }} >> .env
 
-          # cd infra/prod
+            # Installing defend service for app
+            cp -f /home/dev/Goodstart_telegram_bot/infra/stage/goodstart_bot.service /etc/systemd/system/goodstart_bot.service
+            systemctl daemon-reload
+            systemctl restart random_coffee_bot.service
 
-          # # Настройка автоматического перезапуска приложения при сбое сервера
-          # sudo cp -f /home/goodstartuser/Goodstart_telegram_bot/infra/prod/goodstart_bot.service /etc/systemd/system/goodstart_bot.service
-          # sudo systemctl daemon-reload
-          # sudo systemctl restart goodstart_bot.service
 
-          # sleep 10
-          # docker compose -f docker-compose.prod.yaml exec backend sh -c "export RUN_BOT=false"
-          # docker compose -f docker-compose.prod.yaml exec backend python manage.py collectstatic
-          # docker compose -f docker-compose.prod.yaml exec backend python manage.py migrate
-          # docker compose -f docker-compose.prod.yaml exec backend sh -c "export RUN_BOT=true"
+            sleep 10
+            docker compose -f docker-compose.stage.yaml exec backend sh -c "export RUN_BOT=false"
+            docker compose -f docker-compose.stage.yaml exec backend python manage.py collectstatic
+            docker compose -f docker-compose.stage.yaml exec backend python manage.py migrate
+            docker compose -f docker-compose.stage.yaml exec backend sh -c "export RUN_BOT=true"

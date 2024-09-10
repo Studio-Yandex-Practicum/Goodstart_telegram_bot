@@ -178,7 +178,7 @@ class Bot:
         """Периодически обновлять команды бота."""
         while not self._stop_event.is_set():
             await self._update_bot_commands(self._app)
-            await asyncio.sleep(360)  # Обновлять команды каждые 10 секунд
+            await asyncio.sleep(180)  # Обновлять команды каждые 30 минут
 
     async def get_app(self):
         """Public method to get the application instance."""
