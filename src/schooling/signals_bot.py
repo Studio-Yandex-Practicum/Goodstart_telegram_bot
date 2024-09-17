@@ -123,6 +123,8 @@ async def get_message_text(instance):
         f'Тема: {instance.name}.\n'
         f'Преподаватель: {instance.teacher_id}\n'
         f'Ученик: {instance.student_id}\n'
+        f'Ссылка на встречу: {instance.video_meeting_url}\n'
+        f'Домашнее задание: {instance.homework_url}\n'
     )
     test_msg = f'{instance._meta.get_field('test_lesson').verbose_name}'
     if instance.test_lesson:

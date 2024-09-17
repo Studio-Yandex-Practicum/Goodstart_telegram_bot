@@ -202,6 +202,16 @@ class Lesson(models.Model):
         default=45,
     )
     is_passed = models.BooleanField('Занятие прошло', default=False)
+    video_meeting_url = models.URLField(
+        'Ссылка на проведение урока',
+        help_text='Там, где будет проходить встреча',
+        null=True,
+    )
+    homework_url = models.URLField(
+        'Ссылка на домашнее задание',
+        help_text='Там, где размещено домашнее задание',
+        null=True,
+    )
     is_passed_teacher = models.BooleanField(
         'Занятие подтверждено учителем', default=False,
     )

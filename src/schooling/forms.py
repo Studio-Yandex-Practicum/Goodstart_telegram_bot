@@ -14,8 +14,16 @@ class LessonForm(forms.ModelForm):
     class Meta:
         model = Lesson
         fields = (
-            'name', 'subject', 'teacher_id', 'student_id',
-            'datetime_start', 'duration', 'is_passed', 'test_lesson',
+            'name',
+            'subject',
+            'teacher_id',
+            'student_id',
+            'video_meeting_url',
+            'homework_url',
+            'datetime_start',
+            'duration',
+            'is_passed',
+            'test_lesson',
         )
 
     def clean(self):
