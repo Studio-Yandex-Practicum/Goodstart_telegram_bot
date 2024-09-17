@@ -119,7 +119,7 @@ async def get_message_text(instance):
 
     message_text = (
         f'Вам назначено занятие на {start_time_formatted}, '
-        f'продолжительность занятия {duration}.\n'
+        f'продолжительность занятия {duration} минут.\n'
         f'Тема: {instance.name}.\n'
         f'Преподаватель: {instance.teacher_id}\n'
         f'Ученик: {instance.student_id}\n'
