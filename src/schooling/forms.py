@@ -2,7 +2,7 @@ from django import forms
 
 from schooling.models import Lesson
 from schooling.validators.form_validators import (
-    validate_intersections_time_periods, validate_lesson_datetime,
+    validate_intersections_time_periods,
     validate_lesson_duration, validate_paid_lessons,
     validate_student_last_login, validate_teacher_last_login,
     validate_teacher_subjects)
@@ -14,8 +14,16 @@ class LessonForm(forms.ModelForm):
     class Meta:
         model = Lesson
         fields = (
-            'name', 'subject', 'teacher_id', 'student_id',
-            'datetime_start', 'duration', 'is_passed', 'test_lesson',
+            'name',
+            'subject',
+            'teacher_id',
+            'student_id',
+            'video_meeting_url',
+            'homework_url',
+            'datetime_start',
+            'duration',
+            'is_passed',
+            'test_lesson',
         )
 
     def clean(self):
@@ -48,9 +56,7 @@ class LessonForm(forms.ModelForm):
         test_lesson = cleaned_data.get('test_lesson')
 
         # Валидация даты и времени начала урока
-        if datetime_start:
-            validate_lesson_datetime(datetime_start)
-        else:
+        if not datetime_start:
             raise forms.ValidationError(
                 'Дата и время начала урока обязательны для заполнения.')
 

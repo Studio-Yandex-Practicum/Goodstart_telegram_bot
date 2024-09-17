@@ -15,6 +15,8 @@
         <p class="card-text"><strong>Преподаватель:</strong> {{ user_full_name }}</p>
       {% endif %}
       <p class="card-text"><strong>Время и дата:</strong><br>{{ lesson.datetime_start|date:"d.m.Y H:i" }} - {{ lesson.datetime_end|date:"d.m.Y H:i" }}</p>
+      <p class="card-text"><strong>Ссылка на встречу:</strong> <a href="{{ lesson.video_meeting_url }}">тут</a></p>
+      <p class="card-text"><strong>Ссылка на домашнее задание:</strong> <a href="{{ lesson.homework_url }}">тут</a></p>
       <a class="btn main-button" style="width: 40%;" href="{% url 'schedule:change_datetime_lesson' user_tg_id lesson.id %}" role="button">
         Перенести
       </a>

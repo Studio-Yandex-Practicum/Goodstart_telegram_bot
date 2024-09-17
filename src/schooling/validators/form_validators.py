@@ -87,13 +87,6 @@ def validate_teacher_subjects(subject: str, teacher: Teacher) -> None:
         )
 
 
-def validate_lesson_datetime(datetime_start):
-    """Валидация даты и времени начала урока."""
-    if datetime_start < timezone.now():
-        raise ValidationError(
-            'Дата и время начала урока должны быть в будущем.')
-
-
 def validate_lesson_duration(duration):
     """Валидация продолжительности урока."""
     if duration < 30 or duration > 180:

@@ -1,6 +1,9 @@
+from babel.dates import format_datetime as form_date
+
 def format_datetime(dt):
     """Функция для форматирования даты и времени в удобный формат."""
-    return dt.strftime('%d %B, в %H.%M')
+    date = form_date(dt, locale='ru')
+    return date
 
 
 def format_lesson_duration(start_time, end_time):

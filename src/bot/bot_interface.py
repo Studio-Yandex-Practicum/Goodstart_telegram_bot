@@ -203,20 +203,20 @@ async def build_main_handler():
             ],
             UserStates.HELP: [
                 CallbackQueryHandler(
-                    start_handler,
-                    pattern=f'^{UserStates.START.value}$',
+                    help_handler,
+                    pattern=f'^{UserStates.HELP.value}$',
                 ),
             ],
             UserStates.SCHEDULE: [
                 CallbackQueryHandler(
-                    start_handler,
-                    pattern=f'^{UserStates.START.value}$',
+                    schedule_handler,
+                    pattern=f'^{UserStates.SCHEDULE.value}$',
                 ),
             ],
             UserStates.LEFT_LESSONS: [
                 CallbackQueryHandler(
                     left_lessons_handler,
-                    pattern=f'^{UserStates.START.value}$',
+                    pattern=f'^{UserStates.LEFT_LESSONS.value}$',
                 ),
             ],
             UserStates.FEEDBACK_SUBJECT: [
