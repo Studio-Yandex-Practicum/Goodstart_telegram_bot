@@ -179,7 +179,6 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
             lambda: instance.teacher_old.telegram_id,
         )()
         chat_ids = (student_telegram_id, teacher_old_telegram_id)
-        msg_teacher = await get_message_text(instance)
         msg_text = (
             f'Ваше занятие на тему "{instance.name}" '
             f'проведёт преподаватель {instance.teacher_id}\n'
@@ -205,7 +204,6 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
                 await sync_to_async(lambda: instance.student_id.telegram_id)(),
                 await sync_to_async(lambda: instance.teacher_id.telegram_id)(),
             )
-            chat_id = None
 
         elif instance.teacher_old != instance.teacher_id:
             message_text = msg_text
@@ -228,12 +226,6 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
                 chat_ids=chat_ids,
                 message_text=message_text,
                 reply_markup=reply_markup,
-            )
-
-        if chat_id:
-            bot_token = settings.TELEGRAM_TOKEN
-            await send_message_to_user(
-                bot_token, chat_id, msg_teacher, reply_markup,
             )
 
 

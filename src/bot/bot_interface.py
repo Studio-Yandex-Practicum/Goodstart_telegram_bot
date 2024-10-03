@@ -17,7 +17,7 @@ from bot.handlers import (feedback_handler, help_handler, left_lessons_handler,
                           lesson_end_handler, schedule_handler, start_handler,
                           success_registration_webapp_handler,
                           unknown_command_handler)
-from bot.handlers.conversation import help, schedule
+from bot.handlers.conversation import help
 from bot.handlers.feedback import body, subject
 from bot.persistence import DjangoPersistence
 from bot.states import UserStates
@@ -79,7 +79,7 @@ class Bot:
             start_handler,
             help_handler,
             success_registration_webapp_handler,
-            unknown_command_handler,  # Переименованный echo handler
+            unknown_command_handler,
             feedback_handler,
             schedule_handler,
             lesson_end_handler,
@@ -195,10 +195,10 @@ async def build_main_handler():
         persistent=True,
         states={
             UserStates.START: [
-                feedback_handler,
+                start_handler,
                 CallbackQueryHandler(help,
                                      pattern=f'^{UserStates.HELP.value}$'),
-                CallbackQueryHandler(schedule,
+                CallbackQueryHandler(schedule_handler,
                                      pattern=f'^{UserStates.SCHEDULE.value}$'),
             ],
             UserStates.HELP: [

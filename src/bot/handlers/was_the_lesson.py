@@ -4,7 +4,7 @@ from telegram import (
 )
 from telegram.ext import CallbackContext, CallbackQueryHandler
 
-from schooling.models import Lesson
+from schooling.models import Lesson, Student
 from bot.states import UserStates
 from bot.messages_texts.constants import (
     UNCOMPLETED_LESSON_FEEDBACK_MSG,
@@ -80,6 +80,9 @@ async def was_the_lesson_completed(update: Update, context: CallbackContext):
     if lesson.is_passed_teacher and lesson.is_passed_student:
         lesson.is_passed = True
         await lesson.asave()
+        student = await Student.objects.aget(telegram_id=student_tg_id)
+        student.paid_lessons -= 1
+        await student.asave()
         context.user_data['lesson_responses'].clear()
 
     if teacher_answ == 'no' or student_answ == 'no':
