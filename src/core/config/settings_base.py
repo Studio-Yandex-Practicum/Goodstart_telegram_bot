@@ -131,8 +131,8 @@ DEFAULT_RECEIVER = env.str('DEFAULT_EMAIL_ADDRESS', default='NOT_SET')
 BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:8000')
 
 JAZZMIN_SETTINGS = {
-    "site_title": "GoodStart Admin",
-    "site_header": "GoodStart",
-    "welcome_sign": "Добро пожаловать в панель администратора!",
-    "show_ui_builder": False,
+    'site_title': 'GoodStart Admin',
+    'site_header': 'GoodStart',
+    'welcome_sign': 'Добро пожаловать в панель администратора!',
+    'show_ui_builder': False,
 }
