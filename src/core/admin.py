@@ -1,7 +1,7 @@
-from material.admin.sites import MaterialAdminSite
+from django.contrib.admin import AdminSite
 
 
-class CustomAdminSite(MaterialAdminSite):
+class CustomAdminSite(AdminSite):
     """Необходим для оверрайда списка приложений в админке."""
 
     def get_app_list(self, request, app_label=None):
