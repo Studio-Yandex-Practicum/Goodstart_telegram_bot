@@ -218,7 +218,6 @@ class Lesson(models.Model):
     is_passed_student = models.BooleanField(
         'Занятие подтверждено учеником', default=False,
     )
-    test_lesson = models.BooleanField('Пробное занятие', default=False)
 
     class Meta:
         constraints = [
