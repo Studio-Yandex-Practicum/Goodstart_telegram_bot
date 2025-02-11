@@ -4,7 +4,7 @@ from schooling.models import Lesson
 from schooling.validators.form_validators import (
     validate_intersections_time_periods, validate_lesson_duration,
     validate_student_last_login, validate_teacher_last_login,
-    validate_teacher_subjects)
+    validate_teacher_subjects, validate_paid_lessons)
 
 
 class LessonForm(forms.ModelForm):
@@ -79,6 +79,7 @@ class LessonForm(forms.ModelForm):
 
         # Проведение остальных проверок
         try:
+            validate_paid_lessons(student=student)
             validate_teacher_subjects(subject=subject, teacher=teacher)
             validate_intersections_time_periods(
                 user=student,

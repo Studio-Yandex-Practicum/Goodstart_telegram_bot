@@ -74,6 +74,17 @@ def validate_teacher_subjects(subject: str, teacher: Teacher) -> None:
         )
 
 
+def validate_paid_lessons(student: Student) -> None:
+    lessons_count = Lesson.objects.filter(
+        student_id=student,
+        is_passed=False,
+    ).count()
+    if lessons_count >= student.paid_lessons:
+        raise forms.ValidationError(
+            {'student_id': _('Исчерпан лимит оплаченных занятий!')},
+        )
+
+
 def validate_lesson_duration(duration):
     """Валидация продолжительности урока."""
     if duration < 30 or duration > 180:
