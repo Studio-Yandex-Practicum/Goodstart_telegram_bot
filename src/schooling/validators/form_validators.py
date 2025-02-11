@@ -67,13 +67,6 @@ def validate_intersections_time_periods(
             )
 
 
-def validate_teacher_subjects(subject: str, teacher: Teacher) -> None:
-    if subject not in teacher.competence.all():
-        raise forms.ValidationError(
-            {'subject': _('Предмет преподаёт другой преподаватель!')},
-        )
-
-
 def validate_paid_lessons(student: Student) -> None:
     lessons_count = Lesson.objects.filter(
         student_id=student,
@@ -82,6 +75,13 @@ def validate_paid_lessons(student: Student) -> None:
     if lessons_count >= student.paid_lessons:
         raise forms.ValidationError(
             {'student_id': _('Исчерпан лимит оплаченных занятий!')},
+        )
+
+
+def validate_teacher_subjects(subject: str, teacher: Teacher) -> None:
+    if subject not in teacher.competence.all():
+        raise forms.ValidationError(
+            {'subject': _('Предмет преподаёт другой преподаватель!')},
         )
 
 
