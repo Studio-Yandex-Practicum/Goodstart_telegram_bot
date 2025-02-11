@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 import environ
-from django.utils.translation import gettext_lazy as _
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ROOT_DIR = BASE_DIR.parent
@@ -39,8 +39,8 @@ LOCAL_APPS = [
 ]
 
 EXTERNAL_APPS = [
-    'material',
-    'core.apps.CustomAdminConfig',
+    'jazzmin',
+    'django.contrib.admin',
     'phonenumber_field',
     'django_bootstrap5',
 ]
@@ -130,10 +130,9 @@ DEFAULT_RECEIVER = env.str('DEFAULT_EMAIL_ADDRESS', default='NOT_SET')
 
 BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:8000')
 
-MATERIAL_ADMIN_SITE = {
-    'HEADER':  _('GoodStart школа'),  # Admin site header
-    'TITLE':  _('Администрирование'),  # Admin site title
-    'SHOW_THEMES':  True,  # Show default admin themes button
-    'NAVBAR_REVERSE': True,  # Hide side navbar by default
-    'SHOW_COUNTS': True,  # Show instances counts for each model
+JAZZMIN_SETTINGS = {
+    'site_title': 'GoodStart Admin',
+    'site_header': 'GoodStart',
+    'welcome_sign': 'Добро пожаловать в панель администратора!',
+    'show_ui_builder': False,
 }
