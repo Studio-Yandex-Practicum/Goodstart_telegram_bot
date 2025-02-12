@@ -111,9 +111,3 @@ def validate_teacher_last_login(teacher):
     if not hasattr(teacher, 'last_login_date'):
         raise ValidationError(
             'У преподавателя отсутствует информация о последнем посещении.')
-    if teacher.last_login_date + timedelta(days=60) < timezone.now().date():
-        raise ValidationError(
-            f'Преподаватель не проводил занятия '
-            f'в течение последних двух месяцев.\n'
-            f'Последнее посещение: {teacher.last_login_date}.',
-        )
