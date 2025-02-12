@@ -14,6 +14,7 @@ MAX_LEN_STATE = 50
 MAX_COUNT_STUDENTS = 30
 MAX_COUNT_CLASSES = 5
 MAX_COUNT_SUBJECTS = 3
+DEFAULT_LESSON_DURATION = 60
 
 
 class GeneralUserModel(models.Model):
@@ -200,7 +201,7 @@ class Lesson(models.Model):
     duration = models.PositiveIntegerField(
         'Продолжительность занятия',
         help_text='Продолжительность занятия в минутах.',
-        default=45,
+        default=DEFAULT_LESSON_DURATION,
     )
     is_passed = models.BooleanField('Занятие прошло', default=False)
     video_meeting_url = models.URLField(
