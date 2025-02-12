@@ -100,7 +100,6 @@ class LessonFactory(DjangoModelFactory):
     teacher_id = factory.SubFactory(TeacherFactory)
     student_id = factory.SubFactory(StudentFactory)
     is_passed = factory.LazyAttribute(lambda o: random.choice([True, False]))
-    test_lesson = factory.LazyAttribute(lambda o: random.choice([True, False]))
     datetime_start = timezone.now()
     duration = 60
 
