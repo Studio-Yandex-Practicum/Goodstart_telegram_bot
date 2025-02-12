@@ -60,6 +60,7 @@ class Teacher(GeneralUserModel):
     class Meta:
         verbose_name = 'Преподаватель'
         verbose_name_plural = 'Преподаватели'
+        ordering = ['name', 'surname']
 
     def __str__(self):
         """Возвращает полное имя преподавателя."""
@@ -112,6 +113,7 @@ class Student(GeneralUserModel):
 
         verbose_name = 'Студент'
         verbose_name_plural = 'Студенты'
+        ordering = ['name', 'surname']
 
     def __str__(self):
         """Возвращает строковое представление студента."""
