@@ -185,9 +185,10 @@ class Lesson(models.Model):
     )
     teacher_id = models.ForeignKey(
         'Teacher',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         verbose_name='Преподаватель',
         related_name='lessons',
+        null=True,
     )
     student_id = models.ForeignKey(
         'Student',
