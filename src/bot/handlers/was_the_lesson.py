@@ -59,9 +59,6 @@ async def was_the_lesson_completed(update: Update, context: CallbackContext):
     teacher_answ = (
         context.user_data['lesson_responses'].get('teacher_answ')
     )
-    student_answ = (
-        context.user_data['lesson_responses'].get('student_answ')
-    )
 
     if teacher_answ == 'yes':
         lesson.is_passed_teacher = True
@@ -70,14 +67,7 @@ async def was_the_lesson_completed(update: Update, context: CallbackContext):
             text=SUCCESS_LESSON_MSG,
         )
 
-    if student_answ == 'yes':
-        lesson.is_passed_student = True
-        await lesson.asave()
-        await query.edit_message_text(
-            text=SUCCESS_LESSON_MSG,
-        )
-
-    if lesson.is_passed_teacher and lesson.is_passed_student:
+    if lesson.is_passed_teacher:
         lesson.is_passed = True
         await lesson.asave()
         student = await Student.objects.aget(telegram_id=student_tg_id)
@@ -85,7 +75,7 @@ async def was_the_lesson_completed(update: Update, context: CallbackContext):
         await student.asave()
         context.user_data['lesson_responses'].clear()
 
-    if teacher_answ == 'no' or student_answ == 'no':
+    if teacher_answ == 'no':
         await no_answ_lesson_response(
                 query=query,
                 update=update,
