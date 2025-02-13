@@ -1,7 +1,9 @@
 from django.contrib import admin
 
+from schooling.constants import LessonCategories, LESSON_MARKED_AS_PAST_MESSAGE
 from schooling.models import Student, Teacher, Subject, StudyClass, Lesson
 from schooling.forms import LessonForm
+from schooling.utils import pluralize_ru
 
 
 @admin.register(Teacher)
@@ -72,8 +74,25 @@ class LessonAdmin(admin.ModelAdmin):
         'teacher_id__name', 'student_id__name',
     )
     icon_name = 'access_time'
+    actions = ['mark_as_passed']
 
     @admin.display(description='Начало', ordering='datetime_start')
     def start_time(self, obj):
         """Обрабатывает поле datetime_start."""
         return obj.datetime_start
+
+    @admin.action(description='Отметить выбранные занятия как прошедшие')
+    def mark_as_passed(self, request, queryset):
+        """Помечает выбранные занятия как прошедшие."""
+        updated = queryset.update(is_passed=True)
+
+        word = pluralize_ru(updated, ('занятие', 'занятия', 'занятий'))
+
+        self.message_user(
+            request,
+            LESSON_MARKED_AS_PAST_MESSAGE.format(
+                updated=updated,
+                word=word,
+                category=LessonCategories.IS_PASSED.value,
+            ),
+        )
