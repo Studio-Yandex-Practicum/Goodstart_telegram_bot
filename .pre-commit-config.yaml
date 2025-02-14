@@ -31,11 +31,11 @@ repos:
         name: Export dev Dependencies
         language: system
         pass_filenames: false
-        entry: poetry export --without-hashes --dev --output requirements/dev.txt && git add requirements/dev.txt
+        entry: poetry export --without-hashes --dev --output requirements/dev.txt
         files: ^(pyproject.toml|poetry.lock)$
       - id: export-prod-dependencies
         name: Export prod Dependencies
         language: system
         pass_filenames: false
-        entry: poetry export --without-hashes --output requirements/prod.txt && git add requirements/prod.txt
+        entry: poetry export --without-hashes --output requirements/prod.txt
         files: ^(pyproject.toml|poetry.lock)$
