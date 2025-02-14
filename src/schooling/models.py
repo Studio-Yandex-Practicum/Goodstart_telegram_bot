@@ -292,7 +292,11 @@ class Lesson(models.Model):
             raise ValidationError(
                 'Количество создаваемых занятий должно быть больше 0.'
             )
-        lesson_group = LessonGroup.objects.create(student=self.student_id)
+        lesson_group = LessonGroup.objects.filter(
+            student=self.student_id
+        ).first()
+        if not lesson_group:
+            lesson_group = LessonGroup.objects.create(student=self.student_id)
         lessons = [
             Lesson(
                 name=self.name,

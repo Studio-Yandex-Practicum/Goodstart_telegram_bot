@@ -86,6 +86,7 @@ class LessonInline(admin.StackedInline):
     extra = 1  # Количество пустых форм для добавления новых записей
     fields = (
         'name', 'subject', 'teacher_id',
+        'video_meeting_url', 'homework_url',
         'datetime_start', 'duration', 'is_passed'
     )
 
