@@ -24,6 +24,7 @@ class LessonForm(forms.ModelForm):
             'duration',
             'is_passed',
             'test_lesson',
+            'lesson_count',
         )
 
     def clean(self):

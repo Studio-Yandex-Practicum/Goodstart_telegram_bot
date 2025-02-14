@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from schooling.models import Student, Teacher, Subject, StudyClass, Lesson
+from schooling.models import (Student, Teacher, Subject, StudyClass,
+                              Lesson, LessonGroup)
 from schooling.forms import LessonForm
 
 
@@ -62,6 +63,7 @@ class LessonAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'subject', 'teacher_id', 'student_id',
         'start_time', 'duration', 'is_passed', 'test_lesson',
+        'lesson_count'
     )
     list_filter = (
         'subject', 'teacher_id', 'student_id',
@@ -77,3 +79,22 @@ class LessonAdmin(admin.ModelAdmin):
     def start_time(self, obj):
         """Обрабатывает поле datetime_start."""
         return obj.datetime_start
+
+
+class LessonInline(admin.StackedInline):
+    model = Lesson
+    extra = 1  # Количество пустых форм для добавления новых записей
+    fields = (
+        'name', 'subject', 'teacher_id',
+        'datetime_start', 'duration', 'is_passed'
+    )
+
+
+@admin.register(LessonGroup)
+class LessonGroupAdmin(admin.ModelAdmin):
+    """Управление группами занятий для студента."""
+
+    list_display = ('student', 'created_at')
+    inlines = [LessonInline]
+    icon_name = 'lesson_group'
+    ordering = ('student',)
