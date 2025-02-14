@@ -89,6 +89,7 @@ class LessonInline(admin.StackedInline):
         'video_meeting_url', 'homework_url',
         'datetime_start', 'duration', 'is_passed'
     )
+    ordering = ('-datetime_start',)
 
 
 @admin.register(LessonGroup)
@@ -98,4 +99,8 @@ class LessonGroupAdmin(admin.ModelAdmin):
     list_display = ('student', 'created_at')
     inlines = [LessonInline]
     icon_name = 'lesson_group'
-    ordering = ('student',)
+    ordering = ('-created_at',)
+
+    def has_add_permission(self, request, obj=None):
+        """Запрещает добавление новых групп."""
+        return False
