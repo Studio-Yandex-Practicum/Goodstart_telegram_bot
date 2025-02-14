@@ -17,12 +17,6 @@
       <p class="card-text"><strong>Время и дата:</strong><br>{{ lesson.datetime_start|date:"d.m.Y H:i" }} - {{ lesson.datetime_end|date:"d.m.Y H:i" }}</p>
       <p class="card-text"><strong>Ссылка на встречу:</strong> <a href="{{ lesson.video_meeting_url }}">тут</a></p>
       <p class="card-text"><strong>Ссылка на домашнее задание:</strong> <a href="{{ lesson.homework_url }}">тут</a></p>
-      <a class="btn main-button" style="width: 40%;" href="{% url 'schedule:change_datetime_lesson' user_tg_id lesson.id %}" role="button">
-        Перенести
-      </a>
-      <a class="btn main-button danger-button" style="width: 40%;" href="{% url 'schedule:cancel_lesson' user_tg_id lesson.id %}" role="button">
-        Отменить
-      </a>
       <a class="btn main-button" style="width: 30%; margin-top: 10px; background-color: #d0d0d0; color: #000;"
         onmouseover="this.style.background='#879099';"
         onmouseout="this.style.background='#d0d0d0';"
