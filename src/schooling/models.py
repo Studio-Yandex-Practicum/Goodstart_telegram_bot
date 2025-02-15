@@ -312,45 +312,25 @@ class Lesson(models.Model):
                 'Количество создаваемых занятий должно быть больше 0.'
             )
         lesson_group = self.get_or_create_group()
-        if self.regular_lesson:
-            lessons = [
-                Lesson(
-                    name=self.name,
-                    subject=self.subject,
-                    teacher_id=self.teacher_id,
-                    student_id=self.student_id,
-                    group=lesson_group,
-                    datetime_start=self.datetime_start + timedelta(days=i + 1),
-                    duration=self.duration,
-                    is_passed=False,
-                    video_meeting_url=self.video_meeting_url,
-                    homework_url=self.homework_url,
-                    is_passed_teacher=False,
-                    is_passed_student=False,
-                    test_lesson=self.test_lesson,
-                    regular_lesson=True
-                )
-                for i in range(self.lesson_count - 1)
-            ]
-        else:
-            lessons = [
-                Lesson(
-                    name=self.name,
-                    subject=self.subject,
-                    teacher_id=self.teacher_id,
-                    student_id=self.student_id,
-                    group=lesson_group,
-                    datetime_start=self.datetime_start + timedelta(days=i + 1),
-                    duration=self.duration,
-                    is_passed=False,
-                    video_meeting_url=self.video_meeting_url,
-                    homework_url=self.homework_url,
-                    is_passed_teacher=False,
-                    is_passed_student=False,
-                    test_lesson=self.test_lesson,
-                )
-                for i in range(self.lesson_count - 1)
-            ]
+        lessons = [
+            Lesson(
+                name=self.name,
+                subject=self.subject,
+                teacher_id=self.teacher_id,
+                student_id=self.student_id,
+                group=lesson_group,
+                datetime_start=self.datetime_start + timedelta(days=i + 1),
+                duration=self.duration,
+                is_passed=False,
+                video_meeting_url=self.video_meeting_url,
+                homework_url=self.homework_url,
+                is_passed_teacher=False,
+                is_passed_student=False,
+                test_lesson=self.test_lesson,
+                regular_lesson=self.regular_lesson
+            )
+            for i in range(self.lesson_count - 1)
+        ]
         Lesson.objects.bulk_create(lessons)
 
     def save(self, *args, **kwargs):
