@@ -176,14 +176,15 @@ class StudyClass(models.Model):
 
 class LessonGroup(models.Model):
     """Модель группы занятий, связывающая студента с его занятиями."""
+
     student = models.ForeignKey(
         'Student',
         on_delete=models.CASCADE,
         verbose_name='Студент',
-        related_name='lesson_groups'
+        related_name='lesson_groups',
     )
     created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name='Дата создания'
+        auto_now_add=True, verbose_name='Дата создания',
     )
 
     class Meta:
@@ -191,6 +192,7 @@ class LessonGroup(models.Model):
         verbose_name_plural = 'Группы занятий'
 
     def __str__(self):
+        """Возвращает строковое представление группы занятий."""
         return f'Группа занятий {self.student.name} {self.student.surname}'
 
 
@@ -221,7 +223,7 @@ class Lesson(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Группа занятий',
         related_name='lessons',
-        null=True
+        null=True,
     )
     datetime_start = models.DateTimeField('Время начала занятия')
     duration = models.PositiveIntegerField(
@@ -253,7 +255,7 @@ class Lesson(models.Model):
     )
     test_lesson = models.BooleanField('Пробное занятие', default=False)
     regular_lesson = models.BooleanField(
-        'Регулярное занятие', default=False
+        'Регулярное занятие', default=False,
     )
 
     class Meta:
@@ -292,12 +294,25 @@ class Lesson(models.Model):
     def datetime_end(self):
         """Возвращает дату и время окончания урока."""
         return self.datetime_start + timedelta(minutes=self.duration)
-    
+
+    def save(self, *args, **kwargs):
+        """
+        Сохранение занятия.
+        
+        Проверка на группу и на создание повторяющихся занятий.
+        """
+
+        if not self.group:
+            self.group = self.get_or_create_group()
+        super().save(*args, **kwargs)
+        if self.lesson_count > 1:
+            self.create_lessons()
+
     def get_or_create_group(self):
         """Возвращает существующую группу студента или создаёт новую."""
         group = LessonGroup.objects.filter(
             student=self.student_id,
-            lessons__subject=self.subject
+            lessons__subject=self.subject,
         ).first()
         if not group:
             group = LessonGroup.objects.create(student=self.student_id)
@@ -307,7 +322,7 @@ class Lesson(models.Model):
         """Создаёт несколько занятий на основе lesson_count."""
         if self.lesson_count < 1:
             raise ValidationError(
-                'Количество создаваемых занятий должно быть больше 0.'
+                'Количество создаваемых занятий должно быть больше 0.',
             )
         lesson_group = self.get_or_create_group()
         lessons = [
@@ -325,19 +340,10 @@ class Lesson(models.Model):
                 is_passed_teacher=False,
                 is_passed_student=False,
                 test_lesson=self.test_lesson,
-                regular_lesson=self.regular_lesson
+                regular_lesson=self.regular_lesson,
             )
             for i in range(self.lesson_count - 1)
         ]
         Lesson.objects.bulk_create(lessons)
 
-    def save(self, *args, **kwargs):
-        """Сохранение занятия.
-        
-        Проверка на группу и на создание повторяющихся занятий.
-        """
-        if not self.group:
-            self.group = self.get_or_create_group()
-        super().save(*args, **kwargs)
-        if self.lesson_count > 1:
-            self.create_lessons()
+    

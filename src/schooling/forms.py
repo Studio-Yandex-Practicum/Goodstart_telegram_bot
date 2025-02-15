@@ -82,7 +82,7 @@ class LessonForm(forms.ModelForm):
         else:
             raise forms.ValidationError(
                 'Информация о преподавателе обязательна.')
-        
+
         # Проведение остальных проверок
         try:
             if not regular_lesson:

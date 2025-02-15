@@ -11,7 +11,7 @@ RU_MONTHS = {
     'January': 'Январь', 'February': 'Февраль', 'March': 'Март',
     'April': 'Апрель', 'May': 'Май', 'June': 'Июнь',
     'July': 'Июль', 'August': 'Август', 'September': 'Сентябрь',
-    'October': 'Октябрь', 'November': 'Ноябрь', 'December': 'Декабрь'
+    'October': 'Октябрь', 'November': 'Ноябрь', 'December': 'Декабрь',
 }
 
 RU_WEEKDAYS = {
@@ -21,12 +21,12 @@ RU_WEEKDAYS = {
     'Thursday': 'Четверг',
     'Friday': 'Пятница',
     'Saturday': 'Суббота',
-    'Sunday': 'Воскресенье'
+    'Sunday': 'Воскресенье',
 }
 
 RU_WEEK_NAMES = [
     'Первая неделя', 'Вторая неделя', 'Третья неделя',
-    'Четвертая неделя', 'Пятая неделя', 'Шестая неделя'
+    'Четвертая неделя', 'Пятая неделя', 'Шестая неделя',
 ]
 
 
@@ -88,7 +88,7 @@ class LessonAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'subject', 'teacher_id', 'student_id',
         'start_time', 'duration', 'is_passed', 'test_lesson',
-        'regular_lesson','lesson_count'
+        'regular_lesson','lesson_count',
     )
     list_filter = (
         'subject', 'teacher_id', 'student_id',
@@ -107,12 +107,14 @@ class LessonAdmin(admin.ModelAdmin):
 
 
 class LessonInline(admin.StackedInline):
+    """Для отображения занятий привязанных к студенту."""
+
     model = Lesson
     extra = 1  # Количество пустых форм для добавления новых записей
     fields = (
         'name', 'subject', 'student_id', 'teacher_id',
         'video_meeting_url', 'homework_url',
-        'datetime_start', 'duration', 'regular_lesson', 'is_passed'
+        'datetime_start', 'duration', 'regular_lesson', 'is_passed',
     )
     ordering = ('datetime_start',)
 
@@ -123,7 +125,7 @@ class LessonGroupAdmin(admin.ModelAdmin):
 
     list_display = (
         'student', 'created_at', 'schedule',
-        'paid_lessons', 'unpaid_lessons', 'current_lessons'
+        'paid_lessons', 'unpaid_lessons', 'current_lessons',
     )
     inlines = [LessonInline]
     icon_name = 'lesson_group'
@@ -132,12 +134,12 @@ class LessonGroupAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
         """Запрещает добавление новых групп."""
         return False
-    
+
     @admin.display(description='Оплаченные занятия')
     def paid_lessons(self, obj):
         """Оплаченные занятия."""
         return obj.student.paid_lessons
-    
+
     @admin.display(description='Неоплаченные занятия')
     def unpaid_lessons(self, obj):
         """Неоплаченные занятия."""
@@ -145,17 +147,19 @@ class LessonGroupAdmin(admin.ModelAdmin):
         if unpaid_lessons <= 0:
             return 0
         return unpaid_lessons
-    
+
     @admin.display(description='Запланированные занятия')
     def current_lessons(self, obj):
         """Запланированные занятия."""
         return obj.lessons.all().count()
-    
+
     @admin.display(description='Расписание')
     def schedule(self, obj):
         """Группированное расписание занятий по месяцам и неделям."""
-        lessons = sorted(obj.lessons.all(), key=lambda l: l.datetime_start)
-        
+        lessons = sorted(
+            obj.lessons.all(), key=lambda lesson: lesson.datetime_start
+        )
+
         # Группировка по месяцам
         schedule_html = ''
         last_month = None
@@ -178,8 +182,8 @@ class LessonGroupAdmin(admin.ModelAdmin):
 
             # Если неделя изменилась, добавляем заголовок недели
             if week_number != last_week:
-                week_name = (RU_WEEK_NAMES[
-                    week_number] 
+                week_name = (
+                    RU_WEEK_NAMES[week_number]
                     if week_number < len(RU_WEEK_NAMES)
                     else f'{week_number + 1}-я неделя'
                 )
