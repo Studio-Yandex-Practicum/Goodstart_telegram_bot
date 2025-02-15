@@ -194,7 +194,10 @@ class LessonGroupAdmin(admin.ModelAdmin):
                 last_day = day_label
 
             # Добавляем запись занятия
-            time_str = lesson.datetime_start.strftime('%d.%m.%Y %H:%M')
+            date = lesson.datetime_start.strftime('%d.%m.%Y')
+            start_time = lesson.datetime_start.strftime('%H:%M')
+            end_time = lesson.datetime_end.strftime('%H:%M')
             schedule_html += (f'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-                              f'{time_str} - {lesson.subject}<br>')
+                              f'{date} ({start_time} - {end_time}) '
+                              f'- {lesson.subject}<br>')
         return mark_safe(schedule_html)
