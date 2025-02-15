@@ -61,6 +61,7 @@ class Teacher(GeneralUserModel):
     class Meta:
         verbose_name = 'Преподаватель'
         verbose_name_plural = 'Преподаватели'
+        ordering = ['name', 'surname']
 
     def __str__(self):
         """Возвращает полное имя преподавателя."""
@@ -113,6 +114,7 @@ class Student(GeneralUserModel):
 
         verbose_name = 'Студент'
         verbose_name_plural = 'Студенты'
+        ordering = ['name', 'surname']
 
     def __str__(self):
         """Возвращает строковое представление студента."""
@@ -186,9 +188,10 @@ class Lesson(models.Model):
     )
     teacher_id = models.ForeignKey(
         'Teacher',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         verbose_name='Преподаватель',
         related_name='lessons',
+        null=True,
     )
     student_id = models.ForeignKey(
         'Student',

@@ -225,6 +225,8 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
 @receiver(pre_delete, sender=Lesson)
 async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
     """Отправляет уведомление об отмене занятия."""
+    if instance.teacher_id is None:
+        return
     start_time_formatted = format_datetime(instance.datetime_start)
     duration = format_lesson_duration(
         instance.datetime_start, instance.datetime_end)
