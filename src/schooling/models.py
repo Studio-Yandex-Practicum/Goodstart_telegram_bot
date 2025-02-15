@@ -290,11 +290,6 @@ class Lesson(models.Model):
                 'Урок с таким названием уже существует в этот день.',
             )
 
-    @property
-    def datetime_end(self):
-        """Возвращает дату и время окончания урока."""
-        return self.datetime_start + timedelta(minutes=self.duration)
-
     def save(self, *args, **kwargs):
         """Проверка на группу и на создание повторяющихся занятий."""
         if not self.group:
@@ -302,6 +297,11 @@ class Lesson(models.Model):
         super().save(*args, **kwargs)
         if self.lesson_count > 1:
             self.create_lessons()
+
+    @property
+    def datetime_end(self):
+        """Возвращает дату и время окончания урока."""
+        return self.datetime_start + timedelta(minutes=self.duration)
 
     def get_or_create_group(self):
         """Возвращает существующую группу студента или создаёт новую."""
