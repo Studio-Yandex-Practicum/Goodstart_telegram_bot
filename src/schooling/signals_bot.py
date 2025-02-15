@@ -53,7 +53,6 @@ async def gather_send_messages_to_users(
 async def send_lesson_end_notification(context: CallbackContext):
     """Отправка сообщения с выбором 'Да' / 'Нет' прошло ли занятие."""
     teacher_chat_id = context.job.data.get('teacher_chat_id')
-    student_chat_id = context.job.data.get('student_chat_id')
     lesson_id = context.job.data.get('lesson_id')
 
     keyboard = [[
@@ -64,7 +63,7 @@ async def send_lesson_end_notification(context: CallbackContext):
 
     message_text = 'Было ли занятие?'
 
-    chat_ids = (teacher_chat_id, student_chat_id)
+    chat_ids = (teacher_chat_id,)
     await gather_send_messages_to_users(
         chat_ids, message_text, reply_markup,
     )
@@ -86,9 +85,6 @@ async def schedule_lesson_end_notification(sender, instance, **kwargs):
                 data={
                     'teacher_chat_id': await sync_to_async(
                         lambda: instance.teacher_id.telegram_id,
-                    )(),
-                    'student_chat_id': await sync_to_async(
-                        lambda: instance.student_id.telegram_id,
                     )(),
                     'lesson_id': instance.id,
                 },
@@ -126,9 +122,6 @@ async def get_message_text(instance):
         f'Ссылка на встречу: {instance.video_meeting_url}\n'
         f'Домашнее задание: {instance.homework_url}\n'
     )
-    test_msg = f'{instance._meta.get_field('test_lesson').verbose_name}'
-    if instance.test_lesson:
-        message_text = message_text + test_msg
     return message_text
 
 
@@ -232,6 +225,8 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
 @receiver(pre_delete, sender=Lesson)
 async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
     """Отправляет уведомление об отмене занятия."""
+    if instance.teacher_id is None:
+        return
     start_time_formatted = format_datetime(instance.datetime_start)
     duration = format_lesson_duration(
         instance.datetime_start, instance.datetime_end)

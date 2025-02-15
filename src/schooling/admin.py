@@ -87,12 +87,12 @@ class LessonAdmin(admin.ModelAdmin):
     form = LessonForm
     list_display = (
         'name', 'subject', 'teacher_id', 'student_id',
-        'start_time', 'duration', 'is_passed', 'test_lesson',
+        'start_time', 'duration', 'is_passed',
         'regular_lesson','lesson_count',
     )
     list_filter = (
         'subject', 'teacher_id', 'student_id',
-        'datetime_start', 'is_passed', 'test_lesson',
+        'datetime_start', 'is_passed',
     )
     search_fields = (
         'name', 'subject__name',

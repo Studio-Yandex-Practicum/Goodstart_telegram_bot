@@ -24,7 +24,6 @@ class LessonForm(forms.ModelForm):
             'duration',
             'regular_lesson',
             'is_passed',
-            'test_lesson',
             'lesson_count',
         )
 
@@ -44,7 +43,7 @@ class LessonForm(forms.ModelForm):
         # Проверка наличия необходимых данных
         required_fields = ['datetime_start', 'duration',
                            'student_id', 'teacher_id',
-                           'subject', 'test_lesson']
+                           'subject',]
         for field in required_fields:
             if field not in cleaned_data:
                 raise forms.ValidationError(
@@ -55,7 +54,6 @@ class LessonForm(forms.ModelForm):
         student = cleaned_data.get('student_id')
         teacher = cleaned_data.get('teacher_id')
         subject = cleaned_data.get('subject')
-        test_lesson = cleaned_data.get('test_lesson')
         regular_lesson = cleaned_data.get('regular_lesson')
 
         # Валидация даты и времени начала урока
@@ -86,7 +84,7 @@ class LessonForm(forms.ModelForm):
         # Проведение остальных проверок
         try:
             if not regular_lesson:
-                validate_paid_lessons(student=student, test_lesson=test_lesson)
+                validate_paid_lessons(student=student)
             validate_teacher_subjects(subject=subject, teacher=teacher)
             validate_intersections_time_periods(
                 user=student,
