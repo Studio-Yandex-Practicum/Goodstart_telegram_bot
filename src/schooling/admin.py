@@ -52,13 +52,33 @@ class TeacherAdmin(admin.ModelAdmin):
 class StudentAdmin(admin.ModelAdmin):
     """Управление студентами."""
 
-    list_display = ('name', 'surname', 'paid_lessons')
+    list_display = (
+        'name', 'surname', 'paid_lessons', 'unpaid_lessons',
+        'current_lessons',
+    )
+    list_filter = (
+        'name', 'surname', 'paid_lessons',
+    )
     icon_name = 'school'
     exclude = ('state',)
+    
 
     def has_add_permission(self, request, obj=None):
         """Запрещает добавление новых студентов."""
         return False
+
+    @admin.display(description='Запланированные занятия')
+    def current_lessons(self, obj):
+        """Запланированные занятия."""
+        return obj.lessons.all().count()
+    
+    @admin.display(description='Неоплаченные занятия')
+    def unpaid_lessons(self, obj):
+        """Неоплаченные занятия."""
+        unpaid_lessons = obj.lessons.all().count() - obj.paid_lessons
+        if unpaid_lessons <= 0:
+            return 0
+        return unpaid_lessons
 
 
 @admin.register(Subject)
