@@ -110,9 +110,9 @@ class LessonInline(admin.StackedInline):
     model = Lesson
     extra = 1  # Количество пустых форм для добавления новых записей
     fields = (
-        'name', 'subject', 'teacher_id',
+        'name', 'subject', 'student_id', 'teacher_id',
         'video_meeting_url', 'homework_url',
-        'datetime_start', 'duration', 'is_passed'
+        'datetime_start', 'duration', 'regular_lesson', 'is_passed'
     )
     ordering = ('datetime_start',)
 
