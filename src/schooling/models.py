@@ -14,6 +14,7 @@ MAX_LEN_STATE = 50
 MAX_COUNT_STUDENTS = 30
 MAX_COUNT_CLASSES = 5
 MAX_COUNT_SUBJECTS = 3
+DEFAULT_LESSON_DURATION = 60
 
 
 class GeneralUserModel(models.Model):
@@ -60,6 +61,7 @@ class Teacher(GeneralUserModel):
     class Meta:
         verbose_name = 'Преподаватель'
         verbose_name_plural = 'Преподаватели'
+        ordering = ['name', 'surname']
 
     def __str__(self):
         """Возвращает полное имя преподавателя."""
@@ -112,6 +114,7 @@ class Student(GeneralUserModel):
 
         verbose_name = 'Студент'
         verbose_name_plural = 'Студенты'
+        ordering = ['name', 'surname']
 
     def __str__(self):
         """Возвращает строковое представление студента."""
@@ -185,9 +188,10 @@ class Lesson(models.Model):
     )
     teacher_id = models.ForeignKey(
         'Teacher',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         verbose_name='Преподаватель',
         related_name='lessons',
+        null=True,
     )
     student_id = models.ForeignKey(
         'Student',
@@ -199,7 +203,7 @@ class Lesson(models.Model):
     duration = models.PositiveIntegerField(
         'Продолжительность занятия',
         help_text='Продолжительность занятия в минутах.',
-        default=45,
+        default=DEFAULT_LESSON_DURATION,
     )
     is_passed = models.BooleanField('Занятие прошло', default=False)
     video_meeting_url = models.URLField(
@@ -214,9 +218,6 @@ class Lesson(models.Model):
     )
     is_passed_teacher = models.BooleanField(
         'Занятие подтверждено учителем', default=False,
-    )
-    is_passed_student = models.BooleanField(
-        'Занятие подтверждено учеником', default=False,
     )
     test_lesson = models.BooleanField('Пробное занятие', default=False)
 
