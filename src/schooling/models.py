@@ -177,9 +177,14 @@ class StudyClass(models.Model):
 class LessonGroup(models.Model):
     """Модель группы занятий, связывающая студента с его занятиями."""
     student = models.ForeignKey(
-        'Student', on_delete=models.CASCADE, verbose_name='Студент', related_name='lesson_groups'
+        'Student',
+        on_delete=models.CASCADE,
+        verbose_name='Студент',
+        related_name='lesson_groups'
     )
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата создания'
+    )
 
     class Meta:
         verbose_name = 'группа занятий'
