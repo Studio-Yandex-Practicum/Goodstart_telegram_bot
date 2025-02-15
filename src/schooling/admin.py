@@ -89,7 +89,7 @@ class LessonAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'subject', 'teacher_id', 'student_id',
         'start_time', 'duration', 'is_passed', 'test_lesson',
-        'lesson_count'
+        'regular_lesson','lesson_count'
     )
     list_filter = (
         'subject', 'teacher_id', 'student_id',

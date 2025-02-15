@@ -22,6 +22,7 @@ class LessonForm(forms.ModelForm):
             'homework_url',
             'datetime_start',
             'duration',
+            'regular_lesson',
             'is_passed',
             'test_lesson',
             'lesson_count',
@@ -55,6 +56,7 @@ class LessonForm(forms.ModelForm):
         teacher = cleaned_data.get('teacher_id')
         subject = cleaned_data.get('subject')
         test_lesson = cleaned_data.get('test_lesson')
+        regular_lesson = cleaned_data.get('regular_lesson')
 
         # Валидация даты и времени начала урока
         if not datetime_start:
@@ -80,10 +82,11 @@ class LessonForm(forms.ModelForm):
         else:
             raise forms.ValidationError(
                 'Информация о преподавателе обязательна.')
-
+        
         # Проведение остальных проверок
         try:
-            validate_paid_lessons(student=student, test_lesson=test_lesson)
+            if not regular_lesson:
+                validate_paid_lessons(student=student, test_lesson=test_lesson)
             validate_teacher_subjects(subject=subject, teacher=teacher)
             validate_intersections_time_periods(
                 user=student,
