@@ -25,6 +25,11 @@ RU_WEEKDAYS = {
     'Sunday': 'Воскресенье'
 }
 
+RU_WEEK_NAMES = [
+    'Первая неделя', 'Вторая неделя', 'Третья неделя',
+    'Четвертая неделя', 'Пятая неделя', 'Шестая неделя'
+]
+
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
@@ -149,51 +154,68 @@ class LessonGroupAdmin(admin.ModelAdmin):
     
     @admin.display(description='Расписание')
     def schedule(self, obj):
-        """Группированное расписание занятий по месяцам и дням недели."""
-        
-        # Получаем все занятия, отсортированные по дате
-        # lessons = sorted(
-        #     obj.lessons.all(),
-        #     key=lambda l: (l.datetime_start.month,
-        #                    l.datetime_start.weekday(),
-        #                    l.datetime_start))
+        """Группированное расписание занятий по месяцам и неделям."""
         lessons = sorted(obj.lessons.all(), key=lambda l: l.datetime_start)
         
         # Группировка по месяцам
         schedule_html = ''
         last_month = None
-        # for month, month_lessons in groupby(
-        #     lessons, key=lambda l: l.datetime_start.month
-        # ):
-        #     schedule_html += (f'<h3>'
-        #                       f'{RU_MONTHS.get(calendar.month_name[month])}'
-        #                       f'</h3><br>')
-            
-        #     # Группировка по дням недели
-        #     for day, day_lessons in groupby(
-        #         month_lessons,
-        #         key=lambda l: l.datetime_start.strftime('%A, %d')
-        #     ):
-        #         day = day.split(', ')
-        #         schedule_html += (f'&nbsp;&nbsp;<strong><em>'
-        #                           f'{RU_WEEKDAYS.get(day[0])}, '
-        #                           f'{day[1]}</em></strong><br>')
-        #         for lesson in day_lessons:
-        #             time_str = lesson.datetime_start.strftime('%H:%M')
-        #             schedule_html += (f'&nbsp;&nbsp;&nbsp;&nbsp;{time_str}'
-        #                              f' - {lesson.subject}<br>')
+        last_week = None
+        last_day = None
+        # for lesson in lessons:
+        #     month = lesson.datetime_start.month
+        #     week_number = (lesson.datetime_start.day - 1) // 7  # Определяем неделю в месяце
+        #     day_of_week = lesson.datetime_start.strftime('%A')
+        #     day_number = lesson.datetime_start.strftime('%d')  # День месяца (число)
+        #     day_label = f"{RU_WEEKDAYS[day_of_week]}, {day_number} {RU_MONTHS[calendar.month_name[month]]}"
+        #     if month != last_month:
+        #         year = lesson.datetime_start.strftime('%Y')
+        #         month = lesson.datetime_start.month
+        #         month_name = (f'{RU_MONTHS.get(calendar.month_name[month])}, '
+        #                       f'{year}')
+        #         schedule_html += f'<h3>{month_name}</h3><br>'
+        #         last_month = month
+        #         last_week = None
+        #     if week_number != last_week:
+        #         week_name = RU_WEEK_NAMES[week_number] if week_number < len(RU_WEEK_NAMES) else f'{week_number + 1}-я неделя'
+        #         schedule_html += f'<strong>{week_name}</strong><br>'
+        #         last_week = week_number
+        #     if day_label != last_day:
+        #         schedule_html += f'&nbsp;&nbsp;<strong>{day_label}</strong><br>'
+        #         last_day = day_label
+        #     date_str = (f'{RU_WEEKDAYS.get(
+        #                    lesson.datetime_start.strftime("%A"))}, '
+        #                 f'{lesson.datetime_start.strftime("%d")}')
+        #     schedule_html += f'&nbsp;&nbsp;{date_str} - {lesson.subject}<br>'
         for lesson in lessons:
             month = lesson.datetime_start.month
+            week_number = (lesson.datetime_start.day - 1) // 7  # Определяем неделю в месяце
+            day_of_week = lesson.datetime_start.strftime('%A')  # День недели (англ.)
+            day_number = lesson.datetime_start.strftime('%d')  # День месяца (число)
+            day_label = f'{RU_WEEKDAYS[day_of_week]}'
+
+            # Если месяц изменился, добавляем заголовок
             if month != last_month:
                 year = lesson.datetime_start.strftime('%Y')
-                month = lesson.datetime_start.month
                 month_name = (f'{RU_MONTHS.get(calendar.month_name[month])}, '
                               f'{year}')
                 schedule_html += f'<h3>{month_name}</h3><br>'
                 last_month = month
+                last_week = None  # Сбрасываем неделю при смене месяца
 
-            date_str = (f'{RU_WEEKDAYS.get(
-                           lesson.datetime_start.strftime("%A"))}, '
-                        f'{lesson.datetime_start.strftime("%d")}')
-            schedule_html += f'&nbsp;&nbsp;{date_str} - {lesson.subject}<br>'
+            # Если неделя изменилась, добавляем заголовок недели
+            if week_number != last_week:
+                week_name = RU_WEEK_NAMES[week_number] if week_number < len(RU_WEEK_NAMES) else f'{week_number + 1}-я неделя'
+                schedule_html += f'<strong>{week_name}</strong><br>'
+                last_week = week_number
+                last_day = None  # Сбрасываем день при смене недели
+
+            # Если день недели изменился, добавляем заголовок дня
+            if day_label != last_day:
+                schedule_html += f'&nbsp;&nbsp;&nbsp;&nbsp;<strong>{day_label}</strong><br>'
+                last_day = day_label
+
+            # Добавляем запись занятия
+            time_str = lesson.datetime_start.strftime('%d.%m.%Y %H:%M')
+            schedule_html += f'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{time_str} - {lesson.subject}<br>'
         return mark_safe(schedule_html)
