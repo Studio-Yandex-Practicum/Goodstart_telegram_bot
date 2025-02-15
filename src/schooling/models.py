@@ -276,6 +276,14 @@ class Lesson(models.Model):
         verbose_name = 'занятие'
         verbose_name_plural = 'Занятия'
 
+    def save(self, *args, **kwargs):
+        """Проверка на группу и на создание повторяющихся занятий."""
+        if not self.group:
+            self.group = self.get_or_create_group()
+        super().save(*args, **kwargs)
+        if self.lesson_count > 1:
+            self.create_lessons()
+
     def __str__(self):
         """Возвращает строковое представление занятия."""
         return f'{self.name} {self.subject.name}'
@@ -289,14 +297,6 @@ class Lesson(models.Model):
             raise ValidationError(
                 'Урок с таким названием уже существует в этот день.',
             )
-
-    def save(self, *args, **kwargs):
-        """Проверка на группу и на создание повторяющихся занятий."""
-        if not self.group:
-            self.group = self.get_or_create_group()
-        super().save(*args, **kwargs)
-        if self.lesson_count > 1:
-            self.create_lessons()
 
     @property
     def datetime_end(self):
