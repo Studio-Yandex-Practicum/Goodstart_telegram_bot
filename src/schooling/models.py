@@ -276,6 +276,10 @@ class Lesson(models.Model):
         verbose_name = 'занятие'
         verbose_name_plural = 'Занятия'
 
+    def __str__(self):
+        """Возвращает строковое представление занятия."""
+        return f'{self.name} {self.subject.name}'
+
     def save(self, *args, **kwargs):
         """Проверка на группу и на создание повторяющихся занятий."""
         if not self.group:
@@ -283,10 +287,6 @@ class Lesson(models.Model):
         super().save(*args, **kwargs)
         if self.lesson_count > 1:
             self.create_lessons()
-
-    def __str__(self):
-        """Возвращает строковое представление занятия."""
-        return f'{self.name} {self.subject.name}'
 
     def clean(self):
         """Проверка на совпадение занятия с уже существующими."""
