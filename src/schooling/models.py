@@ -232,7 +232,7 @@ class Lesson(models.Model):
     lesson_count = models.PositiveIntegerField(
         'Количество создаваемых занятий',
         default=1,
-        help_text='Сколько занятий создать на основе этого шаблона',
+        help_text='Сколько занятий создать',
     )
     is_passed = models.BooleanField('Занятие прошло', default=False)
     video_meeting_url = models.URLField(

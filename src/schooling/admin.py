@@ -119,6 +119,7 @@ class LessonGroupAdmin(admin.ModelAdmin):
 
     list_display = (
         'student', 'created_at', 'schedule',
+        'paid_lessons', 'unpaid_lessons', 'current_lessons'
     )
     inlines = [LessonInline]
     icon_name = 'lesson_group'
@@ -128,38 +129,71 @@ class LessonGroupAdmin(admin.ModelAdmin):
         """Запрещает добавление новых групп."""
         return False
     
+    @admin.display(description='Оплаченные занятия')
+    def paid_lessons(self, obj):
+        """Оплаченные занятия."""
+        return obj.student.paid_lessons
+    
+    @admin.display(description='Неоплаченные занятия')
+    def unpaid_lessons(self, obj):
+        """Неоплаченные занятия."""
+        unpaid_lessons = obj.lessons.all().count() - obj.student.paid_lessons
+        if unpaid_lessons <= 0:
+            return 0
+        return unpaid_lessons
+    
+    @admin.display(description='Запланированные занятия')
+    def current_lessons(self, obj):
+        """Запланированные занятия."""
+        return obj.lessons.all().count()
+    
     @admin.display(description='Расписание')
     def schedule(self, obj):
         """Группированное расписание занятий по месяцам и дням недели."""
-        pattern_date = '%d.%m.%Y %H:%M'
         
         # Получаем все занятия, отсортированные по дате
-        lessons = sorted(
-            obj.lessons.all(),
-            key=lambda l: (l.datetime_start.month,
-                           l.datetime_start.weekday(),
-                           l.datetime_start))
+        # lessons = sorted(
+        #     obj.lessons.all(),
+        #     key=lambda l: (l.datetime_start.month,
+        #                    l.datetime_start.weekday(),
+        #                    l.datetime_start))
+        lessons = sorted(obj.lessons.all(), key=lambda l: l.datetime_start)
         
         # Группировка по месяцам
         schedule_html = ''
-        for month, month_lessons in groupby(
-            lessons, key=lambda l: l.datetime_start.month
-        ):
-            schedule_html += (f'<strong>'
-                              f'{RU_MONTHS.get(calendar.month_name[month])}'
-                              f'</strong><br>')
+        last_month = None
+        # for month, month_lessons in groupby(
+        #     lessons, key=lambda l: l.datetime_start.month
+        # ):
+        #     schedule_html += (f'<h3>'
+        #                       f'{RU_MONTHS.get(calendar.month_name[month])}'
+        #                       f'</h3><br>')
             
-            # Группировка по дням недели
-            for day, day_lessons in groupby(
-                month_lessons,
-                key=lambda l: l.datetime_start.strftime('%A, %d')
-            ):
-                day = day.split(', ')
-                schedule_html += (f'&nbsp;&nbsp;<em>'
-                                  f'{RU_WEEKDAYS.get(day[0])}, '
-                                  f'{day[1]}</em><br>')
-                for lesson in day_lessons:
-                    time_str = lesson.datetime_start.strftime('%H:%M')
-                    schedule_html += (f'&nbsp;&nbsp;&nbsp;&nbsp;{time_str}'
-                                     f' - {lesson.subject}<br>')
+        #     # Группировка по дням недели
+        #     for day, day_lessons in groupby(
+        #         month_lessons,
+        #         key=lambda l: l.datetime_start.strftime('%A, %d')
+        #     ):
+        #         day = day.split(', ')
+        #         schedule_html += (f'&nbsp;&nbsp;<strong><em>'
+        #                           f'{RU_WEEKDAYS.get(day[0])}, '
+        #                           f'{day[1]}</em></strong><br>')
+        #         for lesson in day_lessons:
+        #             time_str = lesson.datetime_start.strftime('%H:%M')
+        #             schedule_html += (f'&nbsp;&nbsp;&nbsp;&nbsp;{time_str}'
+        #                              f' - {lesson.subject}<br>')
+        for lesson in lessons:
+            month = lesson.datetime_start.month
+            if month != last_month:
+                year = lesson.datetime_start.strftime('%Y')
+                month = lesson.datetime_start.month
+                month_name = (f'{RU_MONTHS.get(calendar.month_name[month])}, '
+                              f'{year}')
+                schedule_html += f'<h3>{month_name}</h3><br>'
+                last_month = month
+
+            date_str = (f'{RU_WEEKDAYS.get(
+                           lesson.datetime_start.strftime("%A"))}, '
+                        f'{lesson.datetime_start.strftime("%d")}')
+            schedule_html += f'&nbsp;&nbsp;{date_str} - {lesson.subject}<br>'
         return mark_safe(schedule_html)
