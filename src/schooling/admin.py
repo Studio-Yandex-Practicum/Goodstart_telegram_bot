@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from itertools import groupby
 import calendar
 
 from schooling.models import (Student, Teacher, Subject, StudyClass,
