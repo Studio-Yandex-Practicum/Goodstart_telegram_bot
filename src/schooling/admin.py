@@ -157,7 +157,7 @@ class LessonGroupAdmin(admin.ModelAdmin):
     def schedule(self, obj):
         """Группированное расписание занятий по месяцам и неделям."""
         lessons = sorted(
-            obj.lessons.all(), key=lambda lesson: lesson.datetime_start
+            obj.lessons.all(), key=lambda lesson: lesson.datetime_start,
         )
 
         # Группировка по месяцам

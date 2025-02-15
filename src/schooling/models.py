@@ -296,12 +296,7 @@ class Lesson(models.Model):
         return self.datetime_start + timedelta(minutes=self.duration)
 
     def save(self, *args, **kwargs):
-        """
-        Сохранение занятия.
-        
-        Проверка на группу и на создание повторяющихся занятий.
-        """
-
+        """Проверка на группу и на создание повторяющихся занятий."""
         if not self.group:
             self.group = self.get_or_create_group()
         super().save(*args, **kwargs)
@@ -345,5 +340,3 @@ class Lesson(models.Model):
             for i in range(self.lesson_count - 1)
         ]
         Lesson.objects.bulk_create(lessons)
-
-    
