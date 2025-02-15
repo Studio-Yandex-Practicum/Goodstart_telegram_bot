@@ -299,10 +299,8 @@ class Lesson(models.Model):
             student=self.student_id,
             lessons__subject=self.subject
         ).first()
-        
         if not group:
             group = LessonGroup.objects.create(student=self.student_id)
-
         return group
 
     def create_lessons(self):
