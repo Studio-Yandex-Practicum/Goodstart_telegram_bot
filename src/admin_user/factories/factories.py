@@ -8,6 +8,7 @@ from .constants import (
     ADMIN_CREATION_INSTANCES_COUNT,
     END_PHONE_NUMBER_VALUE,
     START_PHONE_NUMBER_VALUE,
+    LOCAL_PHONE_NUMBER_LENGTH,
 )
 
 
@@ -20,10 +21,10 @@ class AdminFactory(DjangoModelFactory):
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
     phone = factory.Sequence(
-        lambda some: f'+7495{FuzzyInteger(
+        lambda some: f'+7495{str(FuzzyInteger(
             START_PHONE_NUMBER_VALUE,
             END_PHONE_NUMBER_VALUE,
-        ).fuzz()}',
+        ).fuzz()).zfill(LOCAL_PHONE_NUMBER_LENGTH)}',
     )
     email = factory.LazyAttribute(
         lambda a: f'{a.first_name}.{a.last_name}@example.com'.lower(),
