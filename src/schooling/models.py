@@ -333,7 +333,6 @@ class Lesson(models.Model):
                 video_meeting_url=self.video_meeting_url,
                 homework_url=self.homework_url,
                 is_passed_teacher=False,
-                is_passed_student=False,
                 test_lesson=self.test_lesson,
                 regular_lesson=self.regular_lesson,
             )

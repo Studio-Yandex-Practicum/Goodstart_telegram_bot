@@ -1,6 +1,10 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from django.shortcuts import render
+from datetime import timedelta, datetime
 import calendar
+
+from django.urls import path
 
 from schooling.models import (Student, Teacher, Subject, StudyClass,
                               Lesson, LessonGroup)
@@ -143,9 +147,11 @@ class LessonInline(admin.StackedInline):
 class LessonGroupAdmin(admin.ModelAdmin):
     """Управление группами занятий для студента."""
 
+    # change_list_template = "admin/schedule_list.html"
+
     list_display = (
-        'student', 'created_at', 'schedule',
-        'paid_lessons', 'unpaid_lessons', 'current_lessons',
+        'student', 'parents_contacts',
+        'study_class_id', 'subjects', 'monday', 'tuesday'
     )
     inlines = [LessonInline]
     icon_name = 'lesson_group'
@@ -154,70 +160,32 @@ class LessonGroupAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
         """Запрещает добавление новых групп."""
         return False
+    
+    @admin.display(description='Представитель / Контакт')
+    def parents_contacts(self, obj):
+        """Представитель и контакт."""
+        return obj.student.parents_contacts
 
-    @admin.display(description='Оплаченные занятия')
-    def paid_lessons(self, obj):
-        """Оплаченные занятия."""
-        return obj.student.paid_lessons
+    @admin.display(description='Класс')
+    def study_class_id(self, obj):
+        """Класс."""
+        return obj.student.study_class_id
 
-    @admin.display(description='Неоплаченные занятия')
-    def unpaid_lessons(self, obj):
-        """Неоплаченные занятия."""
-        unpaid_lessons = obj.lessons.all().count() - obj.student.paid_lessons
-        if unpaid_lessons <= 0:
-            return 0
-        return unpaid_lessons
-
-    @admin.display(description='Запланированные занятия')
-    def current_lessons(self, obj):
-        """Запланированные занятия."""
-        return obj.lessons.all().count()
-
-    @admin.display(description='Расписание')
-    def schedule(self, obj):
-        """Группированное расписание занятий по месяцам и неделям."""
-        lessons = sorted(
-            obj.lessons.all(), key=lambda lesson: lesson.datetime_start,
-        )
-
-        # Группировка по месяцам
+    @admin.display(description='Предмет')
+    def subjects(self, obj):
+        """Предмет."""
         schedule_html = ''
-        last_month = None
-        last_week = None
-        last_day = None
-        for lesson in lessons:
-            month = lesson.datetime_start.month
-            week_number = (lesson.datetime_start.day - 1) // 7
-            day_of_week = lesson.datetime_start.strftime('%A')
-            day_label = f'{RU_WEEKDAYS[day_of_week]}'
+        subjects = [subject.name for subject in obj.student.subjects.all().order_by('name')]
+        for subject in subjects:
+            schedule_html += f'<strong>{subject}</strong><br>'
+        return mark_safe(schedule_html)
+        # return ', '.join(subject.name for subject in obj.student.subjects.all())
 
-            # Если месяц изменился, добавляем заголовок
-            if month != last_month:
-                year = lesson.datetime_start.strftime('%Y')
-                month_name = (f'{RU_MONTHS.get(calendar.month_name[month])}, '
-                              f'{year}')
-                schedule_html += f'<h3>{month_name}</h3><br>'
-                last_month = month
-                last_week = None  # Сбрасываем неделю при смене месяца
-
-            # Если неделя изменилась, добавляем заголовок недели
-            if week_number != last_week:
-                week_name = (
-                    RU_WEEK_NAMES[week_number]
-                    if week_number < len(RU_WEEK_NAMES)
-                    else f'{week_number + 1}-я неделя'
-                )
-                schedule_html += f'<strong>{week_name}</strong><br>'
-                last_week = week_number
-                last_day = None  # Сбрасываем день при смене недели
-
-            # Если день недели изменился, добавляем заголовок дня
-            if day_label != last_day:
-                schedule_html += (f'&nbsp;&nbsp;&nbsp;&nbsp;<strong>'
-                                  f'{day_label}</strong><br>')
-                last_day = day_label
-
-            # Добавляем запись занятия
+    def weekday(self, obj, day):
+        """Метод для отображения занятий по дням недели."""
+        schedule_html = ''
+        monday_lessons = obj.student.lessons.filter(datetime_start__week_day=day).order_by('datetime_start')
+        for lesson in monday_lessons:
             date = lesson.datetime_start.strftime('%d.%m.%Y')
             start_time = lesson.datetime_start.strftime('%H:%M')
             end_time = lesson.datetime_end.strftime('%H:%M')
@@ -225,3 +193,167 @@ class LessonGroupAdmin(admin.ModelAdmin):
                               f'{date} ({start_time} - {end_time}) '
                               f'- {lesson.subject}<br>')
         return mark_safe(schedule_html)
+
+    @admin.display(description='Понедельник')
+    def monday(self, obj):
+        """Возвращает список занятий, запланированных на понедельник."""
+        return self.weekday(obj, 2)
+    
+    @admin.display(description='Вторник')
+    def tuesday(self, obj):
+        """Возвращает список занятий, запланированных на вторник."""
+        return self.weekday(obj, 3)
+    
+        # if monday_lessons.exists():
+        #     return ', '.join(lesson.name for lesson in monday_lessons)
+        # return ''
+
+    # @admin.display(description='Преподаватель')
+    # def study_class_id(self, obj):
+    #     """Представитель и контакты."""
+    #     return obj.lessons.all().count()
+
+    # @admin.display(description='Оплаченные занятия')
+    # def paid_lessons(self, obj):
+    #     """Оплаченные занятия."""
+    #     return obj.student.paid_lessons
+
+    # @admin.display(description='Оплаченные занятия')
+    # def paid_lessons(self, obj):
+    #     """Оплаченные занятия."""
+    #     return obj.student.paid_lessons
+
+    # @admin.display(description='Неоплаченные занятия')
+    # def unpaid_lessons(self, obj):
+    #     """Неоплаченные занятия."""
+    #     unpaid_lessons = obj.lessons.all().count() - obj.student.paid_lessons
+    #     if unpaid_lessons <= 0:
+    #         return 0
+    #     return unpaid_lessons
+
+    # @admin.display(description='Запланированные занятия')
+    # def current_lessons(self, obj):
+    #     """Запланированные занятия."""
+    #     return obj.lessons.all().count()
+
+    # @admin.display(description='Расписание')
+    # def schedule(self, obj):
+    #     """Группированное расписание занятий по месяцам и неделям."""
+    #     lessons = sorted(
+    #         obj.lessons.all(), key=lambda lesson: lesson.datetime_start,
+    #     )
+
+    #     # Группировка по месяцам
+    #     schedule_html = ''
+    #     last_month = None
+    #     last_week = None
+    #     last_day = None
+    #     for lesson in lessons:
+    #         month = lesson.datetime_start.month
+    #         week_number = (lesson.datetime_start.day - 1) // 7
+    #         day_of_week = lesson.datetime_start.strftime('%A')
+    #         day_label = f'{RU_WEEKDAYS[day_of_week]}'
+
+    #         # Если месяц изменился, добавляем заголовок
+    #         if month != last_month:
+    #             year = lesson.datetime_start.strftime('%Y')
+    #             month_name = (f'{RU_MONTHS.get(calendar.month_name[month])}, '
+    #                           f'{year}')
+    #             schedule_html += f'<h3>{month_name}</h3><br>'
+    #             last_month = month
+    #             last_week = None  # Сбрасываем неделю при смене месяца
+
+    #         # Если неделя изменилась, добавляем заголовок недели
+    #         if week_number != last_week:
+    #             week_name = (
+    #                 RU_WEEK_NAMES[week_number]
+    #                 if week_number < len(RU_WEEK_NAMES)
+    #                 else f'{week_number + 1}-я неделя'
+    #             )
+    #             schedule_html += f'<strong>{week_name}</strong><br>'
+    #             last_week = week_number
+    #             last_day = None  # Сбрасываем день при смене недели
+
+    #         # Если день недели изменился, добавляем заголовок дня
+    #         if day_label != last_day:
+    #             schedule_html += (f'&nbsp;&nbsp;&nbsp;&nbsp;<strong>'
+    #                               f'{day_label}</strong><br>')
+    #             last_day = day_label
+
+    #         # Добавляем запись занятия
+    #         date = lesson.datetime_start.strftime('%d.%m.%Y')
+    #         start_time = lesson.datetime_start.strftime('%H:%M')
+    #         end_time = lesson.datetime_end.strftime('%H:%M')
+    #         schedule_html += (f'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+    #                           f'{date} ({start_time} - {end_time}) '
+    #                           f'- {lesson.subject}<br>')
+    #     return mark_safe(schedule_html)
+    
+    # def get_urls(self):
+    #     urls = super().get_urls()
+    #     custom_urls = [
+    #         path("", self.admin_site.admin_view(self.schedule_view), name="schedule"),
+    #     ]
+    #     return custom_urls + urls
+
+    # def schedule_view(self, request):
+    #     """Генерируем данные для таблицы"""
+        # students = Student.objects.all()
+        # parents_contacts = [student.parents_contacts for student in students]
+        # student_lessons = {
+        #     student.name: student.lessons.all() for student in students
+        # }
+        # today = datetime.today()
+        # week_days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
+        # time_slots = ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00"]
+
+        # # Заполняем таблицу занятиями
+        # schedule = {day: {slot: None for slot in time_slots} for day in week_days}
+        # # lessons = Lesson.objects.filter(date__gte=today, date__lt=today + timedelta(days=7))
+        # lessons = Lesson.objects.all()
+
+        # for lesson in lessons:
+        #     day_name = week_days[lesson.datetime_start.weekday()]
+        #     schedule[day_name][time_slots[0]] = lesson
+
+        # return render(request, "admin/schedule_list.html", {"schedule": schedule, "week_days": week_days, "time_slots": time_slots})
+        # return render(
+        #     request,
+        #     'admin/schedule_list.html',
+        #     {'week_days': week_days, 'students': students, 'parents_contacts': parents_contacts},
+
+        # )
+
+
+# class ScheduleAdmin(admin.ModelAdmin):
+#     change_list_template = "admin/schedule_list.html"
+
+#     def get_urls(self):
+#         urls = super().get_urls()
+#         custom_urls = [
+#             path("schedule/", self.admin_site.admin_view(self.schedule_view), name="schedule"),
+#         ]
+#         return custom_urls + urls
+
+#     def schedule_view(self, request):
+#         """Генерируем данные для таблицы расписания"""
+#         today = datetime.today()
+#         week_days = [day_name[i] for i in range(7)]  # ['Monday', 'Tuesday', ...]
+#         time_slots = ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00"]
+
+#         # Создаем пустой шаблон расписания
+#         schedule = {day: {slot: None for slot in time_slots} for day in week_days}
+
+#         lessons = Lesson.objects.filter(datetime_start__gte=today, datetime_start__lt=today + timedelta(days=7))
+
+#         for lesson in lessons:
+#             day_name = lesson.datetime_start.strftime("%A")  # Преобразуем в 'Monday', 'Tuesday'
+#             time_slot = lesson.datetime_start.strftime("%H:%M")
+
+#             if day_name in schedule and time_slot in schedule[day_name]:
+#                 schedule[day_name][time_slot] = lesson
+
+#         return render(request, "admin/schedule_table.html", {"schedule": schedule, "week_days": week_days, "time_slots": time_slots})
+
+
+# admin.site.register(Lesson, ScheduleAdmin)
