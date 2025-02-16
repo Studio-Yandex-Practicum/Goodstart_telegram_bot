@@ -168,9 +168,11 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
         student_telegram_id = await sync_to_async(
             lambda: instance.student_id.telegram_id,
         )()
-        teacher_old_telegram_id = await sync_to_async(
-            lambda: instance.teacher_old.telegram_id,
-        )()
+        teacher_old_telegram_id = None
+        if instance.teacher_old:
+            teacher_old_telegram_id = await sync_to_async(
+                lambda: instance.teacher_old.telegram_id,
+            )()
         chat_ids = (student_telegram_id, teacher_old_telegram_id)
         msg_text = (
             f'Ваше занятие на тему "{instance.name}" '
