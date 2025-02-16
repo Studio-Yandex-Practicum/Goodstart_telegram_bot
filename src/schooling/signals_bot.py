@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 from typing import Optional
 from datetime import timedelta
 
@@ -6,14 +7,20 @@ from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from telegram._utils.types import ReplyMarkup
 from telegram.error import BadRequest, Forbidden
-from django.utils import timezone
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.db.models.signals import post_save, post_init, pre_delete
 from django.dispatch import receiver
 from loguru import logger
+from pytz import timezone as pytz_timezone
+from telegram.ext import Application
 
 from bot.keyboards import get_root_markup
+from schooling.constants import (
+    LONG_TIME_REMINDER,
+    SHORT_TIME_REMINDER,
+    TIMEZONE_FOR_REMINDERS,
+)
 from schooling.models import Student, Teacher, Lesson
 from schooling.utils import format_datetime, format_lesson_duration
 
@@ -81,24 +88,29 @@ async def send_lesson_end_notification(context: CallbackContext):
 async def schedule_lesson_end_notification(sender, instance, **kwargs):
     """Создание задачи на отправку уведомления по окончании урока."""
     from bot.bot_interface import Bot
+
+    if instance.is_passed:
+        return
+
     bot = Bot()
     app = await bot.get_app()
-    lesson_end_time = instance.datetime_end
-    if lesson_end_time > timezone.now():
-        try:
-            app.job_queue.run_once(
-                send_lesson_end_notification,
-                when=lesson_end_time,
-                name=f'lesson_end_{instance.id}',
-                data={
-                    'teacher_chat_id': await sync_to_async(
-                        lambda: instance.teacher_id.telegram_id,
-                    )(),
-                    'lesson_id': instance.id,
-                },
-            )
-        except AttributeError as error:
-            print(f'Ошибка: {error}')
+    job_queue = app.job_queue
+
+    tz = pytz_timezone(TIMEZONE_FOR_REMINDERS)
+    lesson_end_time = instance.datetime_end.astimezone(tz)
+
+    if lesson_end_time > datetime.datetime.now(tz):
+        job_queue.run_once(
+            send_lesson_end_notification,
+            when=lesson_end_time,
+            name=f'lesson_end_{instance.id}',
+            data={
+                'teacher_chat_id': await sync_to_async(
+                    lambda: instance.teacher_id.telegram_id,
+                )(),
+                'lesson_id': instance.id,
+            },
+        )
 
 
 @receiver(post_save, sender=Teacher)
@@ -115,22 +127,63 @@ async def start_chat(sender, instance, created, **kwargs):
         )
 
 
-async def get_message_text(instance):
+async def get_message_text(instance, is_notification=False):
     """Получаем сообщение о назначении урока."""
     start_time_formatted = format_datetime(instance.datetime_start)
     duration = format_lesson_duration(
         instance.datetime_start, instance.datetime_end)
-
-    message_text = (
-        f'Вам назначено занятие на {start_time_formatted}, '
-        f'продолжительность занятия {duration} минут.\n'
-        f'Тема: {instance.name}.\n'
-        f'Преподаватель: {instance.teacher_id}\n'
-        f'Ученик: {instance.student_id}\n'
-        f'Ссылка на встречу: {instance.video_meeting_url}\n'
-        f'Домашнее задание: {instance.homework_url}\n'
-    )
+    if is_notification:
+        message_text = (
+            f"Напоминание о предстоящем занятии! Урок '{instance.name}' "
+            f"начнется в {instance.datetime_start.strftime('%H:%M')}."
+        )
+    else:
+        message_text = (
+            f'Вам назначено занятие на {start_time_formatted}, '
+            f'продолжительность занятия {duration} минут.\n'
+            f'Тема: {instance.name}.\n'
+            f'Преподаватель: {instance.teacher_id}\n'
+            f'Ученик: {instance.student_id}\n'
+            f'Ссылка на встречу: {instance.video_meeting_url}\n'
+            f'Домашнее задание: {instance.homework_url}\n'
+        )
     return message_text
+
+
+async def get_telegram_ids(instance):
+    """Получаем telegram_id ученика и преподавателя."""
+    teacher_telegram_id = await sync_to_async(
+        lambda: instance.teacher_id.telegram_id,
+    )()
+    student_telegram_id = await sync_to_async(
+        lambda: instance.student_id.telegram_id,
+    )()
+    return student_telegram_id, teacher_telegram_id
+
+
+async def get_reply_markup(
+    teacher_telegram_id: Optional[int], student_telegram_id: Optional[int],
+    ) -> ReplyMarkup:
+    """Создаем reply_markup для сообщения."""
+    if teacher_telegram_id:
+        return await get_root_markup(teacher_telegram_id)
+    return await get_root_markup(student_telegram_id)
+
+
+async def send_notification(lesson, is_notification=False):
+    """Отправляет уведомление или напоминание о занятии."""
+    message_text = await get_message_text(lesson, is_notification)
+    student_telegram_id, teacher_telegram_id = await get_telegram_ids(lesson)
+    reply_markup = await get_reply_markup(
+        teacher_telegram_id, student_telegram_id,
+    )
+
+    chat_ids = (student_telegram_id, teacher_telegram_id)
+    await gather_send_messages_to_users(
+        chat_ids=chat_ids,
+        message_text=message_text,
+        reply_markup=reply_markup,
+    )
 
 
 @receiver(post_init, sender=Lesson)
@@ -140,28 +193,42 @@ def init_lesson(sender, instance, **kwargs):
         instance.teacher_old = instance.teacher_id
 
 
+async def create_reminders(lesson, job_queue):
+    """Создает задачи на напоминания о начале урока."""
+    tz = pytz_timezone(TIMEZONE_FOR_REMINDERS)
+    lesson_time = lesson.datetime_start.astimezone(tz)
+
+    reminders = [
+        datetime.timedelta(minutes=LONG_TIME_REMINDER),
+        datetime.timedelta(minutes=SHORT_TIME_REMINDER),
+    ]
+
+    for delta in reminders:
+        reminder_time = lesson_time - delta
+        if reminder_time > datetime.datetime.now(tz):
+            job_queue.run_once(send_reminder, when=reminder_time, data=lesson)
+
+
+async def send_reminder(context):
+    """Функция отправки напоминания о занятии."""
+    job = context.job
+    lesson = job.data
+    await send_notification(lesson, is_notification=True)
+
+
 @receiver(post_save, sender=Lesson)
 async def notify_about_lesson(sender, instance, created, **kwargs):
-    """Отправляет уведомление о времени занятия."""
-    if created:
-        message_text = await get_message_text(instance)
-        teacher_telegram_id = await sync_to_async(
-            lambda: instance.teacher_id.telegram_id,
-        )()
-        student_telegram_id = await sync_to_async(
-            lambda: instance.student_id.telegram_id,
-        )()
-        if teacher_telegram_id:
-            reply_markup = await get_root_markup(teacher_telegram_id)
-        else:
-            reply_markup = await get_root_markup(student_telegram_id)
+    """Создает задачи на напоминания, если урок только что создан."""
+    from bot.bot_interface import Bot
 
-        chat_ids = (student_telegram_id, teacher_telegram_id)
-        await gather_send_messages_to_users(
-            chat_ids=chat_ids,
-            message_text=message_text,
-            reply_markup=reply_markup,
-        )
+    if created:
+        await send_notification(instance)
+
+        bot = Bot()
+        app: Application = await bot.get_app()
+        job_queue = app.job_queue
+
+        await create_reminders(instance, job_queue)
 
 
 @receiver(post_save, sender=Lesson)
