@@ -146,30 +146,6 @@ class LessonGroupAdmin(admin.ModelAdmin):
         """Класс."""
         return obj.student.study_class_id
 
-    # @admin.display(description='Предмет')
-    # def subjects(self, obj):
-    #     """Предмет."""
-    #     schedule_html = ''
-    #     subjects = [
-    #         subject.name for subject in
-    #         obj.student.subjects.all().order_by('name')
-    #     ]
-    #     for subject in subjects:
-    #         schedule_html += f'<strong>{subject}</strong><br>'
-    #     return mark_safe(schedule_html)
-
-    # @admin.display(description='Преподаватель')
-    # def teachers(self, obj):
-    #     """Предмет."""
-    #     schedule_html = ''
-    #     lessons = [
-    #         lesson for lesson in
-    #         obj.student.su.all().order_by('datetime_start')
-    #     ]
-    #     for lesson in lessons:
-    #         schedule_html += f'<strong>{lesson.teacher_id}</strong><br>'
-    #     return mark_safe(schedule_html)
-
     def weekday(self, obj, day):
         """Метод для отображения занятий по дням недели."""
         schedule_html = ''
@@ -177,12 +153,14 @@ class LessonGroupAdmin(admin.ModelAdmin):
             datetime_start__week_day=day,
         ).order_by('datetime_start')
         for lesson in monday_lessons:
+            teacher = lesson.teacher_id
             date = lesson.datetime_start.strftime('%d.%m.%Y')
             start_time = lesson.datetime_start.strftime('%H:%M')
             end_time = lesson.datetime_end.strftime('%H:%M')
             schedule_html += (f'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-                              f'{date} ({start_time} - {end_time}) '
-                              f'- {lesson.subject}<br>')
+                              f'{date} '
+                              f'(<strong>{start_time} - {end_time}) '
+                              f'- {lesson.subject}</strong> ({teacher})<br>')
         return mark_safe(schedule_html)
 
     @admin.display(description='Понедельник')
