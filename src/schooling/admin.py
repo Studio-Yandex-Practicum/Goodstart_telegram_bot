@@ -112,7 +112,7 @@ class LessonAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'subject', 'teacher_id', 'student_id',
         'start_time', 'duration', 'is_passed',
-        'regular_lesson','lesson_count',
+        'regular_lesson',
     )
     list_filter = (
         'subject', 'teacher_id', 'student_id',
@@ -151,11 +151,17 @@ class LessonGroupAdmin(admin.ModelAdmin):
 
     list_display = (
         'student', 'parents_contacts',
-        'study_class_id', 'subjects', 'monday', 'tuesday'
+        'study_class_id', 'subjects', 'monday', 'tuesday',
+        'wednesday', 'thursday', 'friday', 'saturday', 'sunday'
     )
     inlines = [LessonInline]
     icon_name = 'lesson_group'
     ordering = ('created_at',)
+
+    class Media:
+        css = {
+            'all': ('styles/custom_admin.css',)  # Подключаем кастомный CSS
+        }
 
     def has_add_permission(self, request, obj=None):
         """Запрещает добавление новых групп."""
@@ -179,7 +185,6 @@ class LessonGroupAdmin(admin.ModelAdmin):
         for subject in subjects:
             schedule_html += f'<strong>{subject}</strong><br>'
         return mark_safe(schedule_html)
-        # return ', '.join(subject.name for subject in obj.student.subjects.all())
 
     def weekday(self, obj, day):
         """Метод для отображения занятий по дням недели."""
@@ -198,15 +203,36 @@ class LessonGroupAdmin(admin.ModelAdmin):
     def monday(self, obj):
         """Возвращает список занятий, запланированных на понедельник."""
         return self.weekday(obj, 2)
-    
+
     @admin.display(description='Вторник')
     def tuesday(self, obj):
         """Возвращает список занятий, запланированных на вторник."""
         return self.weekday(obj, 3)
-    
-        # if monday_lessons.exists():
-        #     return ', '.join(lesson.name for lesson in monday_lessons)
-        # return ''
+
+    @admin.display(description='Среда')
+    def wednesday(self, obj):
+        """Возвращает список занятий, запланированных на среду."""
+        return self.weekday(obj, 4)
+
+    @admin.display(description='Четверг')
+    def thursday(self, obj):
+        """Возвращает список занятий, запланированных на четверг."""
+        return self.weekday(obj, 5)
+
+    @admin.display(description='Пятница')
+    def friday(self, obj):
+        """Возвращает список занятий, запланированных на пятницу."""
+        return self.weekday(obj, 6)
+
+    @admin.display(description='Суббота')
+    def saturday(self, obj):
+        """Возвращает список занятий, запланированных на субботу."""
+        return self.weekday(obj, 7)
+
+    @admin.display(description='Воскресенье')
+    def sunday(self, obj):
+        """Возвращает список занятий, запланированных на воскресенье."""
+        return self.weekday(obj, 1)
 
     # @admin.display(description='Преподаватель')
     # def study_class_id(self, obj):
@@ -323,37 +349,3 @@ class LessonGroupAdmin(admin.ModelAdmin):
         #     {'week_days': week_days, 'students': students, 'parents_contacts': parents_contacts},
 
         # )
-
-
-# class ScheduleAdmin(admin.ModelAdmin):
-#     change_list_template = "admin/schedule_list.html"
-
-#     def get_urls(self):
-#         urls = super().get_urls()
-#         custom_urls = [
-#             path("schedule/", self.admin_site.admin_view(self.schedule_view), name="schedule"),
-#         ]
-#         return custom_urls + urls
-
-#     def schedule_view(self, request):
-#         """Генерируем данные для таблицы расписания"""
-#         today = datetime.today()
-#         week_days = [day_name[i] for i in range(7)]  # ['Monday', 'Tuesday', ...]
-#         time_slots = ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00"]
-
-#         # Создаем пустой шаблон расписания
-#         schedule = {day: {slot: None for slot in time_slots} for day in week_days}
-
-#         lessons = Lesson.objects.filter(datetime_start__gte=today, datetime_start__lt=today + timedelta(days=7))
-
-#         for lesson in lessons:
-#             day_name = lesson.datetime_start.strftime("%A")  # Преобразуем в 'Monday', 'Tuesday'
-#             time_slot = lesson.datetime_start.strftime("%H:%M")
-
-#             if day_name in schedule and time_slot in schedule[day_name]:
-#                 schedule[day_name][time_slot] = lesson
-
-#         return render(request, "admin/schedule_table.html", {"schedule": schedule, "week_days": week_days, "time_slots": time_slots})
-
-
-# admin.site.register(Lesson, ScheduleAdmin)
