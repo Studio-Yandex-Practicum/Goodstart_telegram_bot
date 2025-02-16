@@ -104,7 +104,10 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'staticfiles']
+STATICFILES_DIRS = [
+    BASE_DIR / 'staticfiles',
+    BASE_DIR / 'static',
+]
 STATIC_ROOT = ROOT_DIR / 'static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -135,4 +138,21 @@ JAZZMIN_SETTINGS = {
     'site_header': 'GoodStart',
     'welcome_sign': 'Добро пожаловать в панель администратора!',
     'show_ui_builder': False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    'accent': 'accent-primary',
+    'navbar': 'navbar-white navbar-light',
+    'sidebar': 'sidebar-dark-primary',
+    'theme': 'minty',
+    'button_classes': {
+        'primary': 'btn-outline-primary',
+        'secondary': 'btn-outline-secondary',
+        'info': 'btn-info',
+        'warning': 'btn-warning',
+        'danger': 'btn-danger',
+        'success': 'btn-success',
+    },
+
+    'custom_css': 'jazzmin/css/main.css',
 }
