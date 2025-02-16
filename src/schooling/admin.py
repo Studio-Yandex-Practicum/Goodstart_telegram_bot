@@ -162,7 +162,7 @@ class LessonGroupAdmin(admin.ModelAdmin):
         """Метод для отображения занятий по дням недели."""
         schedule_html = ''
         monday_lessons = obj.student.lessons.filter(
-            datetime_start__week_day=day
+            datetime_start__week_day=day,
         ).order_by('datetime_start')
         for lesson in monday_lessons:
             date = lesson.datetime_start.strftime('%d.%m.%Y')
