@@ -37,7 +37,6 @@ class StudentAdmin(admin.ModelAdmin):
     )
     icon_name = 'school'
     exclude = ('state',)
-    
 
     def has_add_permission(self, request, obj=None):
         """Запрещает добавление новых студентов."""
@@ -47,7 +46,7 @@ class StudentAdmin(admin.ModelAdmin):
     def current_lessons(self, obj):
         """Запланированные занятия."""
         return obj.lessons.all().count()
-    
+
     @admin.display(description='Неоплаченные занятия')
     def unpaid_lessons(self, obj):
         """Неоплаченные занятия."""
@@ -122,7 +121,7 @@ class LessonGroupAdmin(admin.ModelAdmin):
     list_display = (
         'student', 'parents_contacts',
         'study_class_id', 'subjects', 'monday', 'tuesday',
-        'wednesday', 'thursday', 'friday', 'saturday', 'sunday'
+        'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
     )
     inlines = [LessonInline]
     icon_name = 'lesson_group'
@@ -130,13 +129,13 @@ class LessonGroupAdmin(admin.ModelAdmin):
 
     class Media:
         css = {
-            'all': ('styles/custom_admin.css',)
+            'all': ('styles/custom_admin.css',),
         }
 
     def has_add_permission(self, request, obj=None):
         """Запрещает добавление новых групп."""
         return False
-    
+
     @admin.display(description='Представитель / Контакт')
     def parents_contacts(self, obj):
         """Представитель и контакт."""
@@ -151,7 +150,10 @@ class LessonGroupAdmin(admin.ModelAdmin):
     def subjects(self, obj):
         """Предмет."""
         schedule_html = ''
-        subjects = [subject.name for subject in obj.student.subjects.all().order_by('name')]
+        subjects = [
+            subject.name for subject in
+            obj.student.subjects.all().order_by('name')
+        ]
         for subject in subjects:
             schedule_html += f'<strong>{subject}</strong><br>'
         return mark_safe(schedule_html)
