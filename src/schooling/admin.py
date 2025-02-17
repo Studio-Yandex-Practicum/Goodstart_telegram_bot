@@ -1,13 +1,14 @@
 from django.contrib import admin
 
 from schooling.models import Student, Teacher, Subject, StudyClass, Lesson
-from schooling.forms import LessonForm
+from schooling.forms import LessonForm, TeacherForm
 
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
     """Управление преподавателями."""
 
+    form = TeacherForm
     list_display = ('name', 'surname', 'get_competences')
     icon_name = 'edit'
     exclude = ('state',)
