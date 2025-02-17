@@ -14,7 +14,7 @@ from django.dispatch import receiver
 from loguru import logger
 
 from bot.keyboards import get_root_markup
-from schooling.models import Student, Teacher, Lesson, GeneralUserModel
+from schooling.models import Student, Teacher, Lesson
 from schooling.utils import format_datetime, format_lesson_duration
 
 
@@ -34,9 +34,8 @@ async def send_message_to_user(
         )
     except Forbidden:
         logger.warning(
-            f'Пользователь {user_id} заблокировал бота. '
-            f'Удаление пользователя из БД.')
-        GeneralUserModel.objects.filter(telegram_id=user_id).delete()
+            f'Пропуск пользователя '
+            f'Пользователь {user_id} заблокировал бота. ')
     except BadRequest as e:
         if 'Chat not found' in str(e):
             logger.warning(
