@@ -1,16 +1,13 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from schooling.models import Lesson, Teacher
+from schooling.models import (
+    Lesson, Teacher, MAX_COUNT_CLASSES, MAX_COUNT_SUBJECTS)
 from schooling.validators.form_validators import (
     validate_intersections_time_periods,
     validate_lesson_duration, validate_paid_lessons,
     validate_student_last_login, validate_teacher_last_login,
     validate_teacher_subjects)
-
-
-MAX_COUNT_CLASSES = 5
-MAX_COUNT_SUBJECTS = 3
 
 
 class TeacherForm(forms.ModelForm):
