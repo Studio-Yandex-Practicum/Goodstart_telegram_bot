@@ -40,6 +40,7 @@ class ApplicationForm(models.Model):
     )
     phone_number = PhoneNumberField(
         'Номер телефона',
+        region='RU',
         validators=[validate_phone_number],
         help_text='Формат +7XXXXXXXXXX',
     )

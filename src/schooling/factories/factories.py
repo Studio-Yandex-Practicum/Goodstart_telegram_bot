@@ -13,10 +13,15 @@ from .constants import (
     END_PHONE_VALUE,
     CREATION_COUNT,
     START_TELEGRAM_ID_VALUE,
+    LOCAL_PHONE_NUMBER_LENGTH,
     END_TELEGRAM_ID_VALUE,
     START_RANDOM_VALUE,
     STOP_RANDOM_VALUE,
     LOCALE,
+    MIN_COUNT_CLASSES,
+    MAX_COUNT_CLASSES,
+    MIN_COUNT_SUBJECTS,
+    MAX_COUNT_SUBJECTS,
 )
 
 
@@ -31,9 +36,9 @@ class PersonFactory(DjangoModelFactory):
     surname = factory.Faker('last_name', locale=LOCALE)
     city = factory.Faker('city', locale=LOCALE)
     phone_number = factory.Sequence(
-        lambda some: f'+7495{FuzzyInteger(
+        lambda some: f'+7495{str(FuzzyInteger(
             START_PHONE_VALUE, END_PHONE_VALUE,
-        ).fuzz()}',
+        ).fuzz()).zfill(LOCAL_PHONE_NUMBER_LENGTH)}',
     )
 
 
@@ -49,9 +54,9 @@ class StudentFactory(PersonFactory):
     parents_contacts = factory.List([
         factory.Faker('name', locale=LOCALE),
         factory.Sequence(
-            lambda some: f'+7495{FuzzyInteger(
+            lambda some: f'+7495{str(FuzzyInteger(
                 START_PHONE_VALUE, END_PHONE_VALUE,
-            ).fuzz()}',
+            ).fuzz()).zfill(LOCAL_PHONE_NUMBER_LENGTH)}',
         ),
     ])
 
@@ -78,10 +83,10 @@ class TeacherFactory(PersonFactory):
     def _create(cls, model_class, *args, **kwargs):
         """Override `_create` method to set competence and study classes."""
         competence = Subject.objects.order_by('?')[
-            :random.randint(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
+            :random.randint(MIN_COUNT_SUBJECTS, MAX_COUNT_SUBJECTS)
         ]
         study_classes = StudyClass.objects.order_by('?')[
-            :random.randint(START_RANDOM_VALUE, STOP_RANDOM_VALUE)
+            :random.randint(MIN_COUNT_CLASSES, MAX_COUNT_CLASSES)
         ]
         teacher = super()._create(model_class, *args, **kwargs)
         teacher.competence.set(competence)

@@ -26,6 +26,7 @@ class GeneralUserModel(models.Model):
     city = models.CharField('Город', max_length=MAX_LEN_CITY)
     phone_number = PhoneNumberField(
         'Номер телефона',
+        region='RU',
         validators=[validate_phone_number],
         help_text='Формат +7XXXXXXXXXX',
     )
@@ -67,24 +68,34 @@ class Teacher(GeneralUserModel):
         """Возвращает полное имя преподавателя."""
         return f'{self.name} {self.surname}'
 
-    def clean(self):
+    def save(self, *args, **kwargs):
         """
-        Проверка на максимальное количество классов и предметов.
+        Сохраняет объект.
 
-        Осуществляется на одного преподавателя.
+        Выполняет валидацию количества предметов и классов.
         """
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        """Проверяет максимальное количество классов и предметов."""
+        if not self.pk:
+            return
+
         current_classes_count = self.study_classes.count()
         current_subjects_count = self.competence.count()
 
         if current_classes_count > MAX_COUNT_CLASSES:
             raise ValidationError(
                 f'Преподаватель {self.name} {self.surname} уже '
-                f'ведет максимальное количество классов.')
+                f'ведет максимальное количество классов.',
+            )
 
         if current_subjects_count > MAX_COUNT_SUBJECTS:
             raise ValidationError(
                 f'Преподаватель {self.name} {self.surname} уже '
-                f'ведет максимальное количество предметов.')
+                f'ведет максимальное количество предметов.',
+            )
 
 
 class Student(GeneralUserModel):
