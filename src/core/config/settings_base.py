@@ -134,5 +134,6 @@ JAZZMIN_SETTINGS = {
     'site_title': 'GoodStart Admin',
     'site_header': 'GoodStart',
     'welcome_sign': 'Добро пожаловать в панель администратора!',
+    'site_brand': 'GoodStart Admin',
     'show_ui_builder': False,
 }

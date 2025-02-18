@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from schooling.constants import LessonCategories, LESSON_MARKED_AS_PAST_MESSAGE
 from schooling.models import Student, Teacher, Subject, StudyClass, Lesson
-from schooling.forms import LessonForm
+from schooling.forms import LessonForm, TeacherForm
 from schooling.utils import pluralize_ru
 
 
@@ -10,6 +10,7 @@ from schooling.utils import pluralize_ru
 class TeacherAdmin(admin.ModelAdmin):
     """Управление преподавателями."""
 
+    form = TeacherForm
     list_display = ('name', 'surname', 'get_competences')
     icon_name = 'edit'
     exclude = ('state',)

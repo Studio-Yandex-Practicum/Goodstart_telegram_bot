@@ -1,11 +1,47 @@
 from django import forms
+from django.core.exceptions import ValidationError
 
-from schooling.models import Lesson
+from schooling.models import (
+    Lesson, Teacher, MAX_COUNT_CLASSES, MAX_COUNT_SUBJECTS)
 from schooling.validators.form_validators import (
     validate_intersections_time_periods,
     validate_lesson_duration, validate_paid_lessons,
     validate_student_last_login, validate_teacher_last_login,
     validate_teacher_subjects)
+
+
+class TeacherForm(forms.ModelForm):
+    """Форма для валидации ManyToMany в админке."""
+
+    class Meta:
+        model = Teacher
+        fields = (
+            'telegram_id',
+            'name',
+            'surname',
+            'city',
+            'phone_number',
+            'state',
+            'competence',
+            'study_classes',
+        )
+    def clean_competence(self):
+        """Проверка количества предметов."""
+        competence = self.cleaned_data['competence']
+        if len(competence) > MAX_COUNT_SUBJECTS:
+            raise ValidationError(
+                f'Преподаватель не может вести более '
+                f'{MAX_COUNT_SUBJECTS} предметов!')
+        return competence
+
+    def clean_study_classes(self):
+        """Проверка количества классов."""
+        study_classes = self.cleaned_data['study_classes']
+        if len(study_classes) > MAX_COUNT_CLASSES:
+            raise ValidationError(
+                f'Преподаватель не может вести более '
+                f'{MAX_COUNT_CLASSES} классов!')
+        return study_classes
 
 
 class LessonForm(forms.ModelForm):
