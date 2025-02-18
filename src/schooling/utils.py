@@ -10,3 +10,19 @@ def format_lesson_duration(start_time, end_time):
     """Функция для вычисления продолжительности занятия."""
     duration = (end_time - start_time).seconds // 60
     return f'{duration}'
+
+
+def pluralize_ru(number, word_forms):
+    """
+    Возвращает правильную форму слова для русского языка.
+
+    :param number: Количество.
+    :param word_forms: Кортеж из трёх форм слова.
+    :return: Правильная форма слова.
+    """
+    if number % 10 == 1 and number % 100 != 11:
+        return word_forms[0]
+    elif 2 <= number % 10 <= 4 and (number % 100 < 10 or number % 100 >= 20):
+        return word_forms[1]
+    else:
+        return word_forms[2]
