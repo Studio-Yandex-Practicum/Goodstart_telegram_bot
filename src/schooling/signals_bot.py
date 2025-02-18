@@ -5,12 +5,13 @@ from datetime import timedelta
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from telegram._utils.types import ReplyMarkup
-from telegram.error import BadRequest
+from telegram.error import BadRequest, Forbidden
 from django.utils import timezone
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.db.models.signals import post_save, post_init, pre_delete
 from django.dispatch import receiver
+from loguru import logger
 
 from bot.keyboards import get_root_markup
 from schooling.models import Student, Teacher, Lesson
@@ -31,8 +32,15 @@ async def send_message_to_user(
             text=message_text,
             reply_markup=reply_markup,
         )
-    except BadRequest:
-        print(f'Чат с id {user_id} не найден!')
+    except Forbidden:
+        logger.warning(
+            f'Пропуск пользователя '
+            f'Пользователь {user_id} заблокировал бота. ')
+    except BadRequest as e:
+        if 'Chat not found' in str(e):
+            logger.warning(
+                f'Пропуск пользователя '
+                f'{user_id}: Чат не найден')
 
 
 async def gather_send_messages_to_users(
