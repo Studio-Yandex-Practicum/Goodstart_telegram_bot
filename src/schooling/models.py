@@ -187,6 +187,28 @@ class StudyClass(models.Model):
             )
 
 
+class LessonGroup(models.Model):
+    """Модель группы занятий, связывающая студента с его занятиями."""
+
+    student = models.ForeignKey(
+        'Student',
+        on_delete=models.CASCADE,
+        verbose_name='Студент',
+        related_name='lesson_groups',
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата создания',
+    )
+
+    class Meta:
+        verbose_name = 'группа занятий'
+        verbose_name_plural = 'Группы занятий'
+
+    def __str__(self):
+        """Возвращает строковое представление группы занятий."""
+        return f'Группа занятий {self.student.name} {self.student.surname}'
+
+
 class Lesson(models.Model):
     """Модель для хранения информации о занятиях."""
 
@@ -210,11 +232,23 @@ class Lesson(models.Model):
         verbose_name='Студент',
         related_name='lessons',
     )
+    group = models.ForeignKey(
+        'LessonGroup',
+        on_delete=models.CASCADE,
+        verbose_name='Группа занятий',
+        related_name='lessons',
+        null=True,
+    )
     datetime_start = models.DateTimeField('Время начала занятия')
     duration = models.PositiveIntegerField(
         'Продолжительность занятия',
         help_text='Продолжительность занятия в минутах.',
         default=DEFAULT_LESSON_DURATION,
+    )
+    lesson_count = models.PositiveIntegerField(
+        'Количество создаваемых занятий',
+        default=1,
+        help_text='Сколько занятий создать',
     )
     is_passed = models.BooleanField('Занятие прошло', default=False)
     video_meeting_url = models.URLField(
@@ -231,6 +265,9 @@ class Lesson(models.Model):
         'Занятие подтверждено учителем', default=False,
     )
     test_lesson = models.BooleanField('Пробное занятие', default=False)
+    regular_lesson = models.BooleanField(
+        'Регулярное занятие', default=False,
+    )
 
     class Meta:
         constraints = [
@@ -254,6 +291,14 @@ class Lesson(models.Model):
         """Возвращает строковое представление занятия."""
         return f'{self.name} {self.subject.name}'
 
+    def save(self, *args, **kwargs):
+        """Проверка на группу и на создание повторяющихся занятий."""
+        if not self.group:
+            self.group = self.get_or_create_group()
+        super().save(*args, **kwargs)
+        if self.lesson_count > 1:
+            self.create_lessons()
+
     def clean(self):
         """Проверка на совпадение занятия с уже существующими."""
         if Lesson.objects.filter(
@@ -268,3 +313,40 @@ class Lesson(models.Model):
     def datetime_end(self):
         """Возвращает дату и время окончания урока."""
         return self.datetime_start + timedelta(minutes=self.duration)
+
+    def get_or_create_group(self):
+        """Возвращает существующую группу студента или создаёт новую."""
+        group = LessonGroup.objects.filter(
+            student=self.student_id,
+            lessons__subject=self.subject,
+        ).first()
+        if not group:
+            group = LessonGroup.objects.create(student=self.student_id)
+        return group
+
+    def create_lessons(self):
+        """Создаёт несколько занятий на основе lesson_count."""
+        if self.lesson_count < 1:
+            raise ValidationError(
+                'Количество создаваемых занятий должно быть больше 0.',
+            )
+        lesson_group = self.get_or_create_group()
+        lessons = [
+            Lesson(
+                name=self.name,
+                subject=self.subject,
+                teacher_id=self.teacher_id,
+                student_id=self.student_id,
+                group=lesson_group,
+                datetime_start=self.datetime_start + timedelta(days=i + 1),
+                duration=self.duration,
+                is_passed=False,
+                video_meeting_url=self.video_meeting_url,
+                homework_url=self.homework_url,
+                is_passed_teacher=False,
+                test_lesson=self.test_lesson,
+                regular_lesson=self.regular_lesson,
+            )
+            for i in range(self.lesson_count - 1)
+        ]
+        Lesson.objects.bulk_create(lessons)
