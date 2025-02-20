@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 
 from schooling.constants import LessonCategories, LESSON_MARKED_AS_PAST_MESSAGE
 from schooling.models import (Student, Teacher, Subject, StudyClass,
@@ -78,6 +79,26 @@ class StudyClassAdmin(admin.ModelAdmin):
     list_filter = ('study_class_number',)
 
 
+class DateListFilter(admin.SimpleListFilter):
+    """Фильтр для выбора занятий по дате."""
+
+    title = _('Дата занятия')
+    parameter_name = 'lesson_date'
+
+    def lookups(self, request, model_admin):
+        """Возвращает список доступных дат для фильтрации."""
+        dates = set(model_admin.get_queryset(
+            request).values_list('datetime_start', flat=True))
+        return [(date.strftime('%d-%m-%Y'),
+                 date.strftime('%d-%m-%Y')) for date in dates if date]
+
+    def queryset(self, request, queryset):
+        """Фильтрует занятия по выбранной дате."""
+        if self.value():
+            return queryset.filter(datetime_start__date=self.value())
+        return queryset
+
+
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
     """Управление занятиями."""
@@ -90,7 +111,7 @@ class LessonAdmin(admin.ModelAdmin):
     )
     list_filter = (
         'subject', 'teacher_id', 'student_id',
-        'datetime_start', 'is_passed',
+        'is_passed', DateListFilter,
     )
     search_fields = (
         'name', 'subject__name',
