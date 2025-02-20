@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<main class="mx-auto p-2" align="center" style="max-width: 550px">
+  <div class="card">
+    <h2 class="card-header">
+      Выберите количество занятий для оплаты
+    </h2>
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn main-button" style="width: 50%; background-color: #4CAF50; color: white;"
+                onmouseover="this.style.background='#45a049';"
+                onmouseout="this.style.background='#4CAF50';">
+          Перейти к оплате
+        </button>
+      </form>
+    </div>
+  </div>
+</main>
+{% endblock content %}
