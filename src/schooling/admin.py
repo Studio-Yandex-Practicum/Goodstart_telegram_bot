@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -95,7 +97,11 @@ class DateListFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         """Фильтрует занятия по выбранной дате."""
         if self.value():
-            return queryset.filter(datetime_start__date=self.value())
+            try:
+                date_obj = datetime.strptime(self.value(), '%d-%m-%Y')
+                return queryset.filter(datetime_start__date=date_obj.date())
+            except ValueError:
+                return queryset.none()
         return queryset
 
 
