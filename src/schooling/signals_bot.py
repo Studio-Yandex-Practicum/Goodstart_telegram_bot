@@ -300,3 +300,22 @@ async def get_schedule_week_tasks(schedule, start_week):
         get_schedule_for_day(schedule, start_week, 6),
     )
     return await asyncio.gather(*tasks)
+
+
+@receiver(post_save, sender=Student)
+async def check_paid_lessons_and_notify(sender, instance, created, **kwargs):
+    """Проверяет, сколько занятий оплачено, и отправляет уведомление."""
+    if not created and instance.paid_lessons < 2:
+        message_text = 'Ваши занятия не оплачены. '
+        'Пожалуйста, оплатите занятия по следующей ссылке:'
+        keyboard = [
+            [
+                InlineKeyboardButton('Оплатить занятия',
+                                     url=f'{settings.BASE_URL}/payment/'),
+            ],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await send_message_to_user(settings.TELEGRAM_TOKEN,
+                                   instance.telegram_id,
+                                   message_text,
+                                   reply_markup=reply_markup)
