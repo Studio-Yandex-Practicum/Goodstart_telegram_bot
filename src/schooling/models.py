@@ -347,6 +347,6 @@ class Lesson(models.Model):
                 test_lesson=self.test_lesson,
                 regular_lesson=self.regular_lesson,
             )
-            for i in range(self.lesson_count - 1)
+            for i in range(1, self.lesson_count)
         ]
         Lesson.objects.bulk_create(lessons)
