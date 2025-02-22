@@ -338,7 +338,7 @@ class Lesson(models.Model):
                 teacher_id=self.teacher_id,
                 student_id=self.student_id,
                 group=lesson_group,
-                datetime_start=self.datetime_start + timedelta(days=i + 1),
+                datetime_start=self.datetime_start + timedelta(weeks=i),
                 duration=self.duration,
                 is_passed=False,
                 video_meeting_url=self.video_meeting_url,
