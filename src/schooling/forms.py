@@ -1,13 +1,72 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.forms import inlineformset_factory
 
 from schooling.models import (
-    Lesson, Teacher, MAX_COUNT_CLASSES, MAX_COUNT_SUBJECTS)
+    Lesson, Teacher, HomeworkImage,
+    MAX_COUNT_CLASSES, MAX_COUNT_SUBJECTS)
 from schooling.validators.form_validators import (
     validate_intersections_time_periods,
     validate_lesson_duration, validate_paid_lessons,
     validate_student_last_login, validate_teacher_last_login,
     validate_teacher_subjects)
+
+
+class MultipleFileInput(forms.ClearableFileInput):
+    """Виджет для выбора нескольких файлов."""
+
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    """Поле формы для загрузки нескольких файлов."""
+
+    widget = MultipleFileInput
+
+    def clean(self, data, initial=None):
+        """Очистка данных, поддерживающая списки файлов."""
+        if isinstance(data, (list, tuple)):
+            return [super().clean(d, initial) for d in data]
+        return super().clean(data, initial)
+
+
+class HomeworkForm(forms.ModelForm):
+    """Форма редактирования домашнего задания."""
+
+    homework_text = forms.CharField(
+        label='Текст домашнего задания',
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 8}),
+        required=False,
+    )
+    images = MultipleFileField(
+        label='Добавить изображения',
+        required=False,
+    )
+    files = MultipleFileField(
+        label='Прикрепить файлы (PDF, DOCX и др.)',
+        required=False,
+    )
+
+    class Meta:
+        model = Lesson
+        fields = ['homework_text']
+
+
+class HomeworkImageForm(forms.ModelForm):
+    """Форма для загрузки изображений домашнего задания."""
+
+    class Meta:
+        model = HomeworkImage
+        fields = ('image', )
+
+
+HomeworkImageFormSet = inlineformset_factory(
+    Lesson,
+    HomeworkImage,
+    form=HomeworkImageForm,
+    extra=2,
+    can_delete=True,
+)
 
 
 class TeacherForm(forms.ModelForm):
@@ -55,7 +114,7 @@ class LessonForm(forms.ModelForm):
             'teacher_id',
             'student_id',
             'video_meeting_url',
-            'homework_url',
+            'homework_text',
             'datetime_start',
             'duration',
             'regular_lesson',

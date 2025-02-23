@@ -30,6 +30,7 @@ async def send_message_to_user(
         await bot.send_message(
             chat_id=user_id,
             text=message_text,
+            parse_mode='HTML',
             reply_markup=reply_markup,
         )
     except Forbidden:
@@ -64,12 +65,12 @@ async def send_lesson_end_notification(context: CallbackContext):
     lesson_id = context.job.data.get('lesson_id')
 
     keyboard = [[
-        InlineKeyboardButton('Да', callback_data=f'yes {lesson_id}'),
-        InlineKeyboardButton('Нет', callback_data=f'no {lesson_id}'),
+        InlineKeyboardButton('✔ Да', callback_data=f'yes {lesson_id}'),
+        InlineKeyboardButton('❌ Нет', callback_data=f'no {lesson_id}'),
     ]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    message_text = 'Было ли занятие?'
+    message_text = '❓ Было ли занятие?'
 
     chat_ids = (teacher_chat_id,)
     await gather_send_messages_to_users(
@@ -115,22 +116,61 @@ async def start_chat(sender, instance, created, **kwargs):
         )
 
 
-async def get_message_text(instance):
-    """Получаем сообщение о назначении урока."""
+async def get_student_message_text(instance):
+    """Формируем сообщение для ученика с кликабельными ссылками."""
     start_time_formatted = format_datetime(instance.datetime_start)
     duration = format_lesson_duration(
         instance.datetime_start, instance.datetime_end)
 
-    message_text = (
-        f'Вам назначено занятие на {start_time_formatted}, '
-        f'продолжительность занятия {duration} минут.\n'
-        f'Тема: {instance.name}.\n'
-        f'Преподаватель: {instance.teacher_id}\n'
-        f'Ученик: {instance.student_id}\n'
-        f'Ссылка на встречу: {instance.video_meeting_url}\n'
-        f'Домашнее задание: {instance.homework_url}\n'
+    lesson_url = (f'{settings.BASE_URL}/schedule/'
+                  f'{instance.student_id.telegram_id}/{instance.id}/')
+
+    return (
+        f'📌 Вам назначено занятие!\n\n'
+        f'📅 Дата: {start_time_formatted}\n'
+        f'⏳ Длительность: {duration} минут\n'
+        f'📖 Тема: {instance.name}\n'
+        f'👨‍🏫 Преподаватель: {instance.teacher_id}\n'
+        f'🔗 <b><a href="{instance.video_meeting_url}">'
+        f'Ссылка на урок</a></b>\n\n'
+        f'📚 <b><a href="{lesson_url}">'
+        f'Домашнее задание можно будет найти тут</a></b>\n'
     )
-    return message_text
+
+
+async def get_homework_update_message(instance):
+    """Формируем сообщение о обновлении домашнего задания."""
+    lesson_url = (f'{settings.BASE_URL}/schedule/'
+                  f'{instance.student_id.telegram_id}/{instance.id}/')
+
+    return (
+        f'📌 Домашнее задание обновлено!\n\n'
+        f'👨‍🏫 Преподаватель: {instance.teacher_id}\n'
+        f'📚 <b><a href="{lesson_url}">'
+        f'Домашнее задание можно посмотреть тут</a></b>\n'
+    )
+
+
+async def get_teacher_message_text(instance):
+    """Формируем сообщение для учителя."""
+    start_time_formatted = format_datetime(instance.datetime_start)
+    duration = format_lesson_duration(
+        instance.datetime_start, instance.datetime_end)
+
+    lesson_url = (f'{settings.BASE_URL}/schedule/'
+                  f'{instance.teacher_id.telegram_id}/{instance.id}/')
+
+    return (
+        f'📌 Вам назначено занятие!\n\n'
+        f'📅 Дата: {start_time_formatted}\n'
+        f'⏳ Длительность: {duration} минут\n'
+        f'📖 Тема: {instance.name}\n'
+        f'🎓 Ученик: {instance.student_id}\n'
+        f'🔗 <b><a href="{instance.video_meeting_url}">'
+        f'Ссылка на урок</a></b>\n\n'
+        f'📚 <b><a href="{lesson_url}">'
+        f'Домашнее задание можно будет добавить тут</a></b>\n'
+    )
 
 
 @receiver(post_init, sender=Lesson)
@@ -141,27 +181,32 @@ def init_lesson(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Lesson)
-async def notify_about_lesson(sender, instance, created, **kwargs):
-    """Отправляет уведомление о времени занятия."""
+async def notify_about_homework_images(sender, instance, created, **kwargs):
+    """Отправляем сообщение только после загрузки изображения."""
     if created:
-        message_text = await get_message_text(instance)
+
+        message_student = await get_student_message_text(instance)
+        message_teacher = await get_teacher_message_text(instance)
+
         teacher_telegram_id = await sync_to_async(
-            lambda: instance.teacher_id.telegram_id,
-        )()
+            lambda: instance.teacher_id.telegram_id)()
         student_telegram_id = await sync_to_async(
-            lambda: instance.student_id.telegram_id,
-        )()
+            lambda: instance.student_id.telegram_id)()
+
         if teacher_telegram_id:
             reply_markup = await get_root_markup(teacher_telegram_id)
-        else:
+            await gather_send_messages_to_users(
+                chat_ids=[teacher_telegram_id],
+                message_text=message_teacher,
+                reply_markup=reply_markup,
+            )
+        if student_telegram_id:
             reply_markup = await get_root_markup(student_telegram_id)
-
-        chat_ids = (student_telegram_id, teacher_telegram_id)
-        await gather_send_messages_to_users(
-            chat_ids=chat_ids,
-            message_text=message_text,
-            reply_markup=reply_markup,
-        )
+            await gather_send_messages_to_users(
+                chat_ids=[student_telegram_id],
+                message_text=message_student,
+                reply_markup=reply_markup,
+            )
 
 
 @receiver(post_save, sender=Lesson)
