@@ -3,6 +3,8 @@ from datetime import timedelta
 from django.core.exceptions import ValidationError
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 from bot.states import UserStates
 from schooling.validators.phone_validators import validate_phone_number
@@ -338,7 +340,7 @@ class Lesson(models.Model):
                 teacher_id=self.teacher_id,
                 student_id=self.student_id,
                 group=lesson_group,
-                datetime_start=self.datetime_start + timedelta(days=i + 1),
+                datetime_start=self.datetime_start + timedelta(weeks=i),
                 duration=self.duration,
                 is_passed=False,
                 video_meeting_url=self.video_meeting_url,
@@ -347,6 +349,14 @@ class Lesson(models.Model):
                 test_lesson=self.test_lesson,
                 regular_lesson=self.regular_lesson,
             )
-            for i in range(self.lesson_count - 1)
+            for i in range(1, self.lesson_count)
         ]
         Lesson.objects.bulk_create(lessons)
+
+
+@receiver(post_delete, sender=Lesson)
+def delete_empty_lesson_group(sender, instance, **kwargs):
+    """Удаляет группу занятий, если в ней больше нет занятий."""
+    group = instance.group
+    if not group.lessons.exists():
+        group.delete()
