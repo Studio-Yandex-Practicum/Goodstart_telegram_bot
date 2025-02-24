@@ -256,6 +256,11 @@ class Lesson(models.Model):
         help_text='Там, где будет проходить встреча',
         null=True,
     )
+    homework_url = models.URLField(
+        'Ссылка на домашнее задание',
+        help_text='Там, где размещено домашнее задание',
+        null=True,
+    )  # Висит мертвым грузом пока не найдется применение.
     homework_text = models.TextField(
         'Текст домашнего задания',
         help_text='Описание домашнего задания',
