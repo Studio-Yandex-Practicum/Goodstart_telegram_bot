@@ -1,14 +1,45 @@
 from datetime import datetime
 
 from django.contrib import admin
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from django.core.files.storage import default_storage
 from django.utils.translation import gettext_lazy as _
 
 from schooling.constants import LessonCategories, LESSON_MARKED_AS_PAST_MESSAGE
 from schooling.models import (Student, Teacher, Subject, StudyClass,
-                              Lesson, LessonGroup)
-from schooling.forms import LessonForm, TeacherForm
+                              Lesson, LessonGroup, HomeworkImage, HomeworkFile)
+from schooling.forms import LessonForm, TeacherForm, HomeworkImageFormSet
 from schooling.utils import pluralize_ru
+
+
+class HomeworkImageInline(admin.TabularInline):
+    """Инлайн-форма для изображений в занятиях."""
+
+    model = HomeworkImage
+    formset = HomeworkImageFormSet
+    extra = 2
+    can_delete = True
+    fields = ('image', 'image_preview',)
+    readonly_fields = ('image_preview',)
+
+    def image_preview(self, obj):
+        """Отображает превью изображения."""
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-height: 150px;"/>',
+                obj.image.url,
+            )
+        return 'Нет изображения'
+
+    image_preview.short_description = 'Превью'
+
+
+class HomeworkFileInline(admin.TabularInline):
+    """Инлайн-форма для файлов (PDF, DOCX)."""
+
+    model = HomeworkFile
+    extra = 2
 
 
 @admin.register(Teacher)
@@ -110,6 +141,7 @@ class LessonAdmin(admin.ModelAdmin):
     """Управление занятиями."""
 
     form = LessonForm
+    inlines = [HomeworkImageInline, HomeworkFileInline]
     list_display = (
         'name', 'subject', 'teacher_id', 'student_id',
         'start_time', 'duration', 'is_passed',
@@ -125,6 +157,30 @@ class LessonAdmin(admin.ModelAdmin):
     )
     icon_name = 'access_time'
     actions = ['mark_as_passed']
+
+    def save_formset(self, request, form, formset, change):
+        """Сохранение формсета с поддержкой удаления изображений."""
+        if formset.model == HomeworkImage:
+            if not formset.is_valid():
+                print('Ошибки валидации:', formset.errors)
+                return
+
+            # Удаляем изображения, отмеченные на удаление
+            for deleted_form in formset.deleted_forms:
+                obj = deleted_form.instance
+                if obj.image and default_storage.exists(obj.image.name):
+                    default_storage.delete(obj.image.name)
+                obj.delete()
+
+            # Сохраняем новые изображения
+            instances = formset.save(commit=False)
+            for obj in instances:
+                obj.lesson = form.instance
+                obj.save()
+
+            formset.save()
+        else:
+            formset.save()
 
     @admin.display(description='Начало', ordering='datetime_start')
     def start_time(self, obj):
