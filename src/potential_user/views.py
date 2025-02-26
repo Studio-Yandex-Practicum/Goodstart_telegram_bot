@@ -1,6 +1,7 @@
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
 
 from potential_user.forms import RegistrationForm
 from potential_user.models import ApplicationForm
@@ -17,8 +18,16 @@ class RegistrationCreateView(CreateView):
 
     @log_errors
     def form_valid(self, form):
-        """Присваивает telegram_id."""
-        form.instance.telegram_id = self.kwargs.get('id')
+        """Присваивает telegram_id и проверяет дубликаты."""
+        telegram_id = self.kwargs.get('id')
+
+        # Проверка, существует ли уже заявка от этого telegram_id
+        if ApplicationForm.objects.filter(telegram_id=telegram_id).exists():
+            messages.warning(self.request,
+                             'Вы уже подали заявку на регистрацию.')
+            return redirect(self.get_success_url())
+
+        form.instance.telegram_id = telegram_id
         response = super().form_valid(form)
         send_registration_email(self.object)
         return response
