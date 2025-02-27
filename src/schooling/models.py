@@ -323,7 +323,6 @@ class Lesson(models.Model):
         """Возвращает существующую группу студента или создаёт новую."""
         group = LessonGroup.objects.filter(
             student=self.student_id,
-            lessons__subject=self.subject,
         ).first()
         if not group:
             group = LessonGroup.objects.create(student=self.student_id)
