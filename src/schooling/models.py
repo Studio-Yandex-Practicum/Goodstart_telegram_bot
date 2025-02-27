@@ -3,6 +3,8 @@ from datetime import timedelta
 from django.core.exceptions import ValidationError
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 from bot.states import UserStates
 from schooling.validators.phone_validators import validate_phone_number
@@ -399,3 +401,11 @@ class HomeworkFile(models.Model):
     def __str__(self):
         """Возвращает строковое представление файла."""
         return f'Файл для {self.lesson.name}'
+
+
+@receiver(post_delete, sender=Lesson)
+def delete_empty_lesson_group(sender, instance, **kwargs):
+    """Удаляет группу занятий, если в ней больше нет занятий."""
+    group = instance.group
+    if not group.lessons.exists():
+        group.delete()
