@@ -279,7 +279,6 @@ class Lesson(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=[
-                    'name',
                     'subject',
                     'teacher_id',
                     'student_id',
