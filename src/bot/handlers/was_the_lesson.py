@@ -1,4 +1,5 @@
 # TODO: Нам не нужен этот хендлер в виде команды. Он нам нужен как обработчик
+from asgiref.sync import sync_to_async
 from telegram import (
     Update, KeyboardButton, ReplyKeyboardMarkup,
 )
@@ -43,8 +44,10 @@ async def was_the_lesson_completed(update: Update, context: CallbackContext):
         id=int(lesson_id),
     )
 
-    teacher_tg_id = lesson.teacher_id.telegram_id
-    student_tg_id = lesson.student_id.telegram_id
+    teacher_tg_id = await sync_to_async(
+        lambda: lesson.teacher_id.telegram_id)()
+    student_tg_id = await sync_to_async(
+        lambda: lesson.student_id.telegram_id)()
 
     context.user_data.setdefault('lesson_responses', {})
 

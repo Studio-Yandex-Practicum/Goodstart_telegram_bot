@@ -49,6 +49,7 @@ class TeacherAdmin(admin.ModelAdmin):
     form = TeacherForm
     list_display = ('name', 'surname', 'get_competences')
     icon_name = 'edit'
+    search_fields = ('name', 'surname',)
     exclude = ('state',)
 
     def has_add_permission(self, request, obj=None):
@@ -72,6 +73,7 @@ class StudentAdmin(admin.ModelAdmin):
     list_filter = (
         'name', 'surname', 'paid_lessons',
     )
+    search_fields = ('name', 'surname',)
     icon_name = 'school'
     exclude = ('state',)
 
@@ -100,6 +102,7 @@ class SubjectAdmin(admin.ModelAdmin):
     list_display = ('name',)
     exclude = ('subject_key',)
     icon_name = 'subject'
+    search_fields = ('name', )
     ordering = ('name',)
 
 
@@ -151,6 +154,7 @@ class LessonAdmin(admin.ModelAdmin):
         'subject', 'teacher_id', 'student_id',
         'is_passed', DateListFilter,
     )
+    autocomplete_fields = ('subject', 'teacher_id', 'student_id',)
     search_fields = (
         'name', 'subject__name',
         'teacher_id__name', 'student_id__name',
