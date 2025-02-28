@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<main class="mx-auto p-3" align="center" style="max-width: 550px">
+  <div class="card">
+    <h2 class="card-header">Редактировать домашку</h2>
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if homework_images %}
+          <div class="mb-3">
+            <p><strong>Загруженные изображения:</strong></p>
+            <div class="d-flex flex-wrap justify-content-center">
+              {% for image in homework_images %}
+                <div class="m-2 text-center">
+                  <img src="{{ image.image.url }}" alt="Изображение"
+                       style="max-width: 100%; height: auto;">
+                  <div class="mt-2">
+                    <a href="{% url 'schedule:delete_homework_image' user_tg_id lesson.id image.id %}"
+                       class="btn btn-sm btn-danger">
+                      🗑 Удалить
+                    </a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+
+        {% if homework_files %}
+          <div class="mb-3">
+            <p><strong>Загруженные файлы:</strong></p>
+            <ul class="list-group">
+              {% for file in homework_files %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span>📄 {{ file.file.name|cut:"lesson_homework/files/" }}</span>
+                  <a href="{% url 'schedule:delete_homework_file' user_tg_id lesson.id file.id %}"
+                     class="btn btn-sm btn-danger">
+                    🗑 Удалить
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        {% bootstrap_form form %}
+
+        <button type="submit" class="btn btn-success mt-3">
+          💾 Сохранить
+        </button>
+
+        <a class="btn btn-secondary mt-3" href="{% url 'schedule:details_schedule' user_tg_id lesson.id %}">
+          ↩ Назад
+        </a>
+      </form>
+    </div>
+  </div>
+</main>
+{% endblock content %}
