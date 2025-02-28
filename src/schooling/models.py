@@ -260,6 +260,12 @@ class Lesson(models.Model):
         'Ссылка на домашнее задание',
         help_text='Там, где размещено домашнее задание',
         null=True,
+    )  # Висит мертвым грузом пока не найдется применение.
+    homework_text = models.TextField(
+        'Текст домашнего задания',
+        help_text='Описание домашнего задания',
+        blank=True,
+        null=True,
     )
     is_passed_teacher = models.BooleanField(
         'Занятие подтверждено учителем', default=False,
@@ -342,7 +348,6 @@ class Lesson(models.Model):
                 duration=self.duration,
                 is_passed=False,
                 video_meeting_url=self.video_meeting_url,
-                homework_url=self.homework_url,
                 is_passed_teacher=False,
                 test_lesson=self.test_lesson,
                 regular_lesson=self.regular_lesson,
@@ -350,3 +355,49 @@ class Lesson(models.Model):
             for i in range(self.lesson_count - 1)
         ]
         Lesson.objects.bulk_create(lessons)
+
+
+class HomeworkImage(models.Model):
+    """Изображения для домашнего задания."""
+
+    lesson = models.ForeignKey(
+        'Lesson',
+        on_delete=models.CASCADE,
+        related_name='homework_images',
+        verbose_name='Урок',
+    )
+    image = models.ImageField(
+        'Изображение',
+        upload_to='lesson_homework/images/',
+    )
+
+    class Meta:
+        verbose_name = 'изображение'
+        verbose_name_plural = 'изображения'
+
+    def __str__(self):
+        """Возвращает строковое представление изображения."""
+        return f'Изображение для {self.lesson.name}'
+
+
+class HomeworkFile(models.Model):
+    """Файлы (PDF, DOCX и т. д.) для домашнего задания."""
+
+    lesson = models.ForeignKey(
+        'Lesson',
+        on_delete=models.CASCADE,
+        related_name='homework_files',
+        verbose_name='Урок',
+    )
+    file = models.FileField(
+        'Файл',
+        upload_to='lesson_homework/files/',
+    )
+
+    class Meta:
+        verbose_name = 'файл'
+        verbose_name_plural = 'файлы'
+
+    def __str__(self):
+        """Возвращает строковое представление файла."""
+        return f'Файл для {self.lesson.name}'

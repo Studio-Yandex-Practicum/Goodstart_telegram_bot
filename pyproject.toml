@@ -21,6 +21,7 @@ psycopg2-binary = "^2.9.9"
 django-viewflow = "^2.0.2"
 babel = "^2.16.0"
 django-jazzmin = "^3.0.1"
+pillow = "^11.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
