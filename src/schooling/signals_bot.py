@@ -310,8 +310,10 @@ async def check_paid_lessons_and_notify(sender, instance, created, **kwargs):
         'Пожалуйста, оплатите занятия по следующей ссылке:'
         keyboard = [
             [
-                InlineKeyboardButton('Оплатить занятия',
-                                     url=f'{settings.BASE_URL}/payment/'),
+                InlineKeyboardButton(
+                    'Оплатить занятия',
+                    url=f'{settings.BASE_URL}/page43174319.html#price',
+                ),
             ],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
