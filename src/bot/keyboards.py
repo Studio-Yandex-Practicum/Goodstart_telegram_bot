@@ -34,11 +34,12 @@ async def get_root_markup(telegram_id):
                 ),
             ],
         ]
-    if paid_lessons >= 2:
+    if paid_lessons < 2:
         keyboard.append([
             InlineKeyboardButton(
                 text='Оплатить занятия',
-                web_app=WebAppInfo(url=f'{settings.BASE_URL}/payment/'),
+                web_app=WebAppInfo(
+                    url=f'{settings.BASE_URL}/page43174319.html#price'),
             ),
         ])
     return InlineKeyboardMarkup(keyboard)

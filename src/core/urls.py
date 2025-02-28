@@ -3,8 +3,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from schooling import views
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path(
@@ -17,12 +15,6 @@ urlpatterns = [
         include('schooling.urls'),
         name='schedule',
     ),
-    path('payment/',
-         views.payment_view,
-         name='payment_view'),
-    path('payment_summary/<int:lessons>/',
-         views.payment_summary_view,
-         name='payment_summary'),
 ]
 
 if settings.DEBUG:

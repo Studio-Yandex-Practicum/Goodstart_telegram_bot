@@ -1,18 +1,14 @@
 import datetime
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from asgiref.sync import sync_to_async
 from django.conf import settings
-from django.http import HttpResponseBadRequest
-from django.urls import reverse
 
 from schooling.models import Teacher, Student, Lesson
 from schooling.signals_bot import (
     get_schedule_for_role, get_schedule_week_tasks,
 )
 from bot.utils import check_user_from_db
-
-from .forms import PaymentForm
 
 EMAIL_HOST_USER = settings.EMAIL_HOST_USER
 
@@ -80,41 +76,3 @@ async def details_schedule_page(request, id, lesson_id):
     return await sync_to_async(render)(
         request, 'schedule_details_card.html', context,
     )
-
-
-def payment_view(request):
-    if request.method == 'POST':
-        form = PaymentForm(request.POST)
-        if form.is_valid():
-            try:
-                lessons = int(form.cleaned_data['number_of_lessons'])
-                return redirect(reverse('payment_summary',
-                                        kwargs={'lessons': lessons}))
-            except ValueError:
-                return HttpResponseBadRequest(
-                    'Некорректное значение количества занятий.')
-    else:
-        form = PaymentForm()
-
-    return render(request, 'payment_page.html', {'form': form})
-
-def payment_summary_view(request, lessons):
-    try:
-        lessons = int(lessons)
-        if lessons < 1 or lessons > 10:
-            return HttpResponseBadRequest('Некорректное количество занятий.')
-
-        total_price = lessons * 100
-        payment_url = (
-            f'https://example.com/pay?amount={total_price}'
-            f'&lessons={lessons}'
-        )
-
-        return render(request, 'payment_summary.html', {
-            'lessons': lessons,
-            'total_price': total_price,
-            'payment_url': payment_url,
-        })
-
-    except ValueError:
-        return HttpResponseBadRequest('Ошибка обработки запроса.')

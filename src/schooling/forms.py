@@ -138,20 +138,3 @@ class LessonForm(forms.ModelForm):
             raise forms.ValidationError(str(e)) from e
 
         return cleaned_data
-
-
-class PaymentForm(forms.Form):
-    """Форма для выбора количества занятий и оплаты."""
-
-    LESSON_CHOICES = [
-        (i, f'{i} занятие' if i == 1
-         else f'{i} занятия' if 2 <= i <= 4
-         else f'{i} занятий')
-        for i in range(1, 11)
-    ]
-
-    number_of_lessons = forms.ChoiceField(
-        choices=LESSON_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        label='Выберите количество занятий для оплаты',
-    )
