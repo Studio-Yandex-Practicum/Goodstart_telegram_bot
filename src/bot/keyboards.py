@@ -3,7 +3,6 @@ from django.urls import reverse
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from asgiref.sync import sync_to_async
-from bot.states import UserStates
 from schooling.models import Student
 
 async def get_root_markup(telegram_id):
@@ -14,26 +13,18 @@ async def get_root_markup(telegram_id):
     except Student.DoesNotExist:
         paid_lessons = 0
 
+    schedule_url = f"{settings.BASE_URL}{reverse(
+        'schedule:schedule',
+        kwargs={'id': telegram_id}
+    )}"
     keyboard = [
-            [
-                InlineKeyboardButton('Что умеет бот',
-                                     callback_data=UserStates.HELP.value),
-                InlineKeyboardButton(
-                    text='Посмотреть расписание',
-                    web_app=WebAppInfo(
-                        url=(
-                            f'{settings.BASE_URL}'
-                            f'{
-                                reverse(
-                                    'schedule:schedule',
-                                    kwargs={'id': telegram_id},
-                                )
-                            }'
-                        ),
-                    ),
-                ),
-            ],
-        ]
+        [
+            InlineKeyboardButton(
+                text='📜 Посмотреть расписание',
+                web_app=WebAppInfo(url=schedule_url),
+            ),
+        ],
+    ]
     if paid_lessons < 2:
         keyboard.append([
             InlineKeyboardButton(
