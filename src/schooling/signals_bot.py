@@ -375,40 +375,31 @@ async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
 
 
 async def get_schedule_for_role(user):
-    """Получение расписания пользователя в зависимости от роли."""
-    if user.__class__.__name__ == 'Teacher':
-        schedule = await sync_to_async(Lesson.objects.filter)(
-            teacher_id=user.id,
+    """Получает расписание пользователя в зависимости от его роли."""
+    if isinstance(user, Teacher):
+        schedule = await sync_to_async(list)(
+            Lesson.objects.filter(teacher_id=user.id)
+            .select_related('student_id', 'teacher_id', 'subject',),
         )
     else:
-        schedule = await sync_to_async(Lesson.objects.filter)(
-            student_id=user.id,
+        schedule = await sync_to_async(list)(
+            Lesson.objects.filter(student_id=user.id)
+            .select_related('student_id', 'teacher_id', 'subject',),
         )
-
     return schedule
 
 
 async def get_schedule_for_day(schedule, start_week, day_offset):
-    """Получение расписания пользователя в зависимости от дня."""
+    """Фильтрует расписание по конкретному дню недели."""
     target_date = start_week + timedelta(days=day_offset)
-
-    return await sync_to_async(schedule.filter)(
-        datetime_start__date=target_date,
-    )
+    return [lesson for lesson in schedule
+            if lesson.datetime_start.date() == target_date]
 
 
 async def get_schedule_week_tasks(schedule, start_week):
-    tasks = (
-        get_schedule_for_day(schedule, start_week, 0),
-        get_schedule_for_day(schedule, start_week, 1),
-        get_schedule_for_day(schedule, start_week, 2),
-        get_schedule_for_day(schedule, start_week, 3),
-        get_schedule_for_day(schedule, start_week, 4),
-        get_schedule_for_day(schedule, start_week, 5),
-        get_schedule_for_day(schedule, start_week, 6),
-    )
+    """Создает задачи для получения расписания на всю неделю."""
+    tasks = [get_schedule_for_day(schedule, start_week, i) for i in range(7)]
     return await asyncio.gather(*tasks)
-
 
 @receiver(post_save, sender=Student)
 async def check_paid_lessons_and_notify(sender, instance, created, **kwargs):
