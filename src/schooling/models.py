@@ -125,8 +125,8 @@ class Student(GeneralUserModel):
 
     class Meta:
 
-        verbose_name = 'Студент'
-        verbose_name_plural = 'Студенты'
+        verbose_name = 'Ученик'
+        verbose_name_plural = 'Ученики'
         ordering = ['name', 'surname']
 
     def __str__(self):
@@ -195,7 +195,7 @@ class LessonGroup(models.Model):
     student = models.ForeignKey(
         'Student',
         on_delete=models.CASCADE,
-        verbose_name='Студент',
+        verbose_name='Ученик',
         related_name='lesson_groups',
     )
     created_at = models.DateTimeField(
@@ -203,12 +203,12 @@ class LessonGroup(models.Model):
     )
 
     class Meta:
-        verbose_name = 'группа занятий'
-        verbose_name_plural = 'Группы занятий'
+        verbose_name = 'расписание'
+        verbose_name_plural = 'Расписание'
 
     def __str__(self):
         """Возвращает строковое представление группы занятий."""
-        return f'Группа занятий {self.student.name} {self.student.surname}'
+        return f'Расписание для {self.student.name} {self.student.surname}'
 
 
 class Lesson(models.Model):
@@ -231,13 +231,13 @@ class Lesson(models.Model):
     student_id = models.ForeignKey(
         'Student',
         on_delete=models.CASCADE,
-        verbose_name='Студент',
+        verbose_name='Ученик',
         related_name='lessons',
     )
     group = models.ForeignKey(
         'LessonGroup',
         on_delete=models.CASCADE,
-        verbose_name='Группа занятий',
+        verbose_name='Расписание',
         related_name='lessons',
         null=True,
     )
@@ -250,7 +250,8 @@ class Lesson(models.Model):
     lesson_count = models.PositiveIntegerField(
         'Количество создаваемых занятий',
         default=1,
-        help_text='Сколько занятий создать',
+        help_text='Указанное количество занятий будет '
+                  'создано с интервалом в 1 неделю.',
     )
     is_passed = models.BooleanField('Занятие прошло', default=False)
     video_meeting_url = models.URLField(

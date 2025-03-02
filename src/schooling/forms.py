@@ -106,6 +106,13 @@ class TeacherForm(forms.ModelForm):
 class LessonForm(forms.ModelForm):
     """Форма создания занятий."""
 
+    datetime_start = forms.DateTimeField(
+        widget=forms.DateTimeInput(
+            attrs={'type': 'datetime-local', 'class': 'vDateTimeField'},
+        ),
+        label='Дата и время начала',
+    )
+
     class Meta:
         model = Lesson
         fields = (

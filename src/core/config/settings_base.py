@@ -141,7 +141,15 @@ JAZZMIN_SETTINGS = {
     'site_header': 'GoodStart',
     'welcome_sign': 'Добро пожаловать в панель администратора!',
     'site_brand': 'GoodStart Admin',
-    'show_ui_builder': True,
+    'show_ui_builder': False,
+    'order_with_respect_to': [
+        'schooling.Lesson',
+        'schooling.LessonGroup',
+        'schooling.Teacher',
+        'schooling.Student',
+        'schooling.StudyClass',
+        'schooling.Subject',
+    ],
 }
 
 JAZZMIN_UI_TWEAKS = {

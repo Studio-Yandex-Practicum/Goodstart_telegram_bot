@@ -69,12 +69,15 @@ async def send_lesson_end_notification(context: CallbackContext):
     lesson_id = context.job.data.get('lesson_id')
 
     keyboard = [[
-        InlineKeyboardButton('✔ Да', callback_data=f'yes {lesson_id}'),
+        InlineKeyboardButton('✅ Да', callback_data=f'yes {lesson_id}'),
         InlineKeyboardButton('❌ Нет', callback_data=f'no {lesson_id}'),
     ]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    message_text = '❓ Было ли занятие?'
+    message_text = (
+        '📌 Подскажите, состоялось ли занятие?\n\n'
+        'Выберите ответ ниже.'
+    )
 
     chat_ids = (teacher_chat_id,)
     await gather_send_messages_to_users(
@@ -120,7 +123,7 @@ async def start_chat(sender, instance, created, **kwargs):
         await send_message_to_user(
             settings.TELEGRAM_TOKEN,
             instance.telegram_id,
-            message_text='Ваша заявка одобрена!',
+            message_text='📌 Ваша заявка одобрена!',
             reply_markup=reply_markup,
         )
 
@@ -290,13 +293,19 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
                 lambda: instance.teacher_old.telegram_id,
             )()
         chat_ids = (student_telegram_id, teacher_old_telegram_id)
+
         msg_text = (
-            f'Ваше занятие на тему "{instance.name}" '
-            f'проведёт преподаватель {instance.teacher_id}\n'
-            f'{start_time_formatted}'
-            f'продолжительность {duration} минут. '
+            f'📌 Внимание!\n\n'
+            f'Ваше занятие по теме "{instance.name}" '
+            f'теперь будет проводить преподаватель {instance.teacher_id}.\n'
+            f'📅 Дата: {start_time_formatted}\n'
+            f'⏳ Длительность: {duration} минут.\n'
         )
-        msg_student_old_teacher = 'Ваше занятие перенесено!\n' + msg_text
+
+        msg_student_old_teacher = (
+                'Ваше занятие перенесено!\n\n'
+                + msg_text
+        )
         message_text = None
 
         if (
@@ -307,9 +316,9 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
 
         elif instance.datetime_old != instance.datetime_start:
             message_text = (
-                f'Занятие на тему "{instance.name}" перенесено '
-                f'на {start_time_formatted}, '
-                f'продолжительность {duration} минут.'
+                f'📌 Занятие по теме "{instance.name}" перенесено!\n\n'
+                f'📅 Новая дата: {start_time_formatted}\n'
+                f'⏳ Длительность: {duration} минут.\n'
             )
             chat_ids = (
                 await sync_to_async(lambda: instance.student_id.telegram_id)(),
@@ -356,10 +365,10 @@ async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
     )()
     chat_ids = (student_telegram_id, teacher_telegram_id)
     message_text = (
-        f'Занятие на тему "{instance.name}" '
-        f'на {start_time_formatted}, '
-        f'продолжительностью {duration} минут. '
-        f'Отменено.'
+        f'📌 Занятие отменено!\n\n'
+        f'Тема: "{instance.name}"\n'
+        f'📅 Дата: {start_time_formatted}\n'
+        f'⏳ Длительность: {duration} минут.\n'
     )
 
     if instance.teacher_id.telegram_id:
@@ -379,12 +388,16 @@ async def get_schedule_for_role(user):
     if isinstance(user, Teacher):
         schedule = await sync_to_async(list)(
             Lesson.objects.filter(teacher_id=user.id)
-            .select_related('student_id', 'teacher_id', 'subject',),
+            .select_related('student_id', 'teacher_id', 'subject')
+            .only('id', 'name', 'datetime_start', 'duration',
+                  'subject_id', 'teacher_id', 'student_id',),
         )
     else:
         schedule = await sync_to_async(list)(
             Lesson.objects.filter(student_id=user.id)
-            .select_related('student_id', 'teacher_id', 'subject',),
+            .select_related('student_id', 'teacher_id', 'subject')
+            .only('id', 'name', 'datetime_start', 'duration',
+                  'subject_id', 'teacher_id', 'student_id',),
         )
     return schedule
 

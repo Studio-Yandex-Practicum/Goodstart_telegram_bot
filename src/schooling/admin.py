@@ -1,16 +1,21 @@
 from datetime import datetime
 
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.shortcuts import redirect
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.core.files.storage import default_storage
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import Group
 
 from schooling.constants import LessonCategories, LESSON_MARKED_AS_PAST_MESSAGE
 from schooling.models import (Student, Teacher, Subject, StudyClass,
                               Lesson, LessonGroup, HomeworkImage, HomeworkFile)
 from schooling.forms import LessonForm, TeacherForm, HomeworkImageFormSet
 from schooling.utils import pluralize_ru
+
+
+admin.site.unregister(Group)
 
 
 class HomeworkImageInline(admin.TabularInline):
@@ -76,6 +81,26 @@ class StudentAdmin(admin.ModelAdmin):
     search_fields = ('name', 'surname',)
     icon_name = 'school'
     exclude = ('state',)
+
+    def delete_view(self, request, object_id, extra_context=None):
+        """Блокирует удаление студента с оплаченными занятиями."""
+        obj = self.get_object(request, object_id)
+
+        if request.method == 'POST':
+            # Здесь проверяем оплаченные/активные занятия
+            if obj and obj.paid_lessons > 0:
+                self.message_user(
+                    request,
+                    'Нельзя удалить студента, '
+                    'у которого остались оплаченные занятия. '
+                    'Сначала используйте или удалите эти занятия!',
+                    level=messages.ERROR,
+                )
+                # Возвращаемся к списку студентов, отменяя удаление
+                return redirect('admin:schooling_student_changelist',)
+
+        # Если занятий нет, вызываем стандартное удаление
+        return super().delete_view(request, object_id, extra_context)
 
     def has_add_permission(self, request, obj=None):
         """Запрещает добавление новых студентов."""
@@ -156,11 +181,13 @@ class LessonAdmin(admin.ModelAdmin):
     )
     autocomplete_fields = ('subject', 'teacher_id', 'student_id',)
     search_fields = (
-        'name', 'subject__name',
-        'teacher_id__name', 'student_id__name',
+        'student_id__name', 'student_id__surname',
+        'teacher_id__name', 'teacher_id__surname',
+        'name',
     )
     icon_name = 'access_time'
     actions = ['mark_as_passed']
+
 
     def save_formset(self, request, form, formset, change):
         """Сохранение формсета с поддержкой удаления изображений."""
@@ -226,81 +253,95 @@ class LessonGroupAdmin(admin.ModelAdmin):
     """Управление группами занятий для студента."""
 
     list_display = (
-        'student', 'parents_contacts',
-        'study_class_id', 'monday', 'tuesday',
-        'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+        'student','display_schedule', 'study_class_id', 'remaining_lessons',
+        'parents_contacts',
+
     )
     inlines = [LessonInline]
-    icon_name = 'lesson_group'
+    icon_name = 'Расписание'
+    search_fields = ('student__name', 'student__surname',)
     ordering = ('created_at',)
-
-    class Media:
-        css = {
-            'all': ('styles/custom_admin.css',),
-        }
 
     def has_add_permission(self, request, obj=None):
         """Запрещает добавление новых групп."""
         return False
 
-    @admin.display(description='Представитель / Контакт')
-    def parents_contacts(self, obj):
-        """Представитель и контакт."""
-        return obj.student.parents_contacts
-
     @admin.display(description='Класс')
     def study_class_id(self, obj):
-        """Класс."""
+        """Возвращает учебный класс ученика."""
         return obj.student.study_class_id
 
-    def weekday(self, obj, day):
-        """Метод для отображения занятий по дням недели."""
-        schedule_html = ''
-        monday_lessons = obj.student.lessons.filter(
-            datetime_start__week_day=day,
-        ).order_by('datetime_start')
-        for lesson in monday_lessons:
-            teacher = lesson.teacher_id
-            date = lesson.datetime_start.strftime('%d.%m.%Y')
-            start_time = lesson.datetime_start.strftime('%H:%M')
-            end_time = lesson.datetime_end.strftime('%H:%M')
-            schedule_html += (f'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-                              f'{date} '
-                              f'(<strong>{start_time} - {end_time}) '
-                              f'- {lesson.subject}</strong> ({teacher})<br>')
+    @admin.display(description=mark_safe('Оплачено<br>занятий'))
+    def remaining_lessons(self, obj):
+        """Возвращает количество оставшихся оплаченных уроков."""
+        return obj.student.paid_lessons
+
+    @admin.display(description='Контакты родителей')
+    def parents_contacts(self, obj):
+        """Возвращает контакты родителей (более широкая колонка)."""
+        return obj.student.parents_contacts
+
+    @admin.display(description='Расписание')
+    def display_schedule(self, obj):
+        """Формирует расписание в виде таблицы."""
+        days_of_week = {
+            2: 'Понедельник',
+            3: 'Вторник',
+            4: 'Среда',
+            5: 'Четверг',
+            6: 'Пятница',
+            7: 'Суббота',
+            1: 'Воскресенье',
+        }
+
+        # Начало карточки с отступами
+        schedule_html = ('<div style="margin: 5px 0; padding: 5px; border: '
+                         '1px solid #ddd; border-radius: 8px;">')
+
+        schedule_html += ('<table style="border: 1px solid #ddd; '
+                          'border-collapse: collapse; width: 100%;">')
+        schedule_html += '<thead style="background-color: #f8f9fa;">'
+        schedule_html += '<tr>'
+        schedule_html += ('<th style="border: 1px solid #ddd; padding: 8px; '
+                          'text-align: center;">День</th>')
+        schedule_html += ('<th style="border: 1px solid #ddd; padding: 8px; '
+                          'text-align: center;">Дата</th>')
+        schedule_html += ('<th style="border: 1px solid #ddd; padding: 8px; '
+                          'text-align: center;">Время</th>')
+        schedule_html += ('<th style="border: 1px solid #ddd; padding: 8px; '
+                          'text-align: center;">Предмет</th>')
+        schedule_html += ('<th style="border: 1px solid #ddd; padding: 8px; '
+                          'text-align: center;">Преподаватель</th>')
+        schedule_html += '</tr>'
+        schedule_html += '</thead><tbody>'
+
+        for day, day_name in days_of_week.items():
+            lessons = obj.student.lessons.filter(
+                datetime_start__week_day=day).order_by('datetime_start')
+
+            if lessons.exists():
+                for lesson in lessons:
+                    date = lesson.datetime_start.strftime('%d.%m.%Y')
+                    start_time = lesson.datetime_start.strftime('%H:%M')
+                    end_time = lesson.datetime_end.strftime('%H:%M')
+                    teacher = lesson.teacher_id
+                    subject = lesson.subject
+
+                    schedule_html += '<tr>'
+                    schedule_html += (f'<td style="border: 1px solid #ddd; '
+                                      f'padding: 8px;">{day_name}</td>')
+                    schedule_html += (f'<td style="border: 1px solid #ddd; '
+                                      f'padding: 8px; text-align: '
+                                      f'center;">{date}</td>')
+                    schedule_html += (f'<td style="border: 1px solid #ddd; '
+                                      f'padding: 8px; text-align: center;'
+                                      f'">{start_time} - {end_time}</td>')
+                    schedule_html += (f'<td style="border: 1px solid #ddd; '
+                                      f'padding: 8px;">{subject}</td>')
+                    schedule_html += (f'<td style="border: 1px solid #ddd; '
+                                      f'padding: 8px;">{teacher}</td>')
+                    schedule_html += '</tr>'
+
+        schedule_html += '</tbody></table>'
+        schedule_html += '</div>'  # Закрываем div-контейнер
         return mark_safe(schedule_html)
-
-    @admin.display(description='Понедельник')
-    def monday(self, obj):
-        """Возвращает список занятий, запланированных на понедельник."""
-        return self.weekday(obj, 2)
-
-    @admin.display(description='Вторник')
-    def tuesday(self, obj):
-        """Возвращает список занятий, запланированных на вторник."""
-        return self.weekday(obj, 3)
-
-    @admin.display(description='Среда')
-    def wednesday(self, obj):
-        """Возвращает список занятий, запланированных на среду."""
-        return self.weekday(obj, 4)
-
-    @admin.display(description='Четверг')
-    def thursday(self, obj):
-        """Возвращает список занятий, запланированных на четверг."""
-        return self.weekday(obj, 5)
-
-    @admin.display(description='Пятница')
-    def friday(self, obj):
-        """Возвращает список занятий, запланированных на пятницу."""
-        return self.weekday(obj, 6)
-
-    @admin.display(description='Суббота')
-    def saturday(self, obj):
-        """Возвращает список занятий, запланированных на субботу."""
-        return self.weekday(obj, 7)
-
-    @admin.display(description='Воскресенье')
-    def sunday(self, obj):
-        """Возвращает список занятий, запланированных на воскресенье."""
-        return self.weekday(obj, 1)
