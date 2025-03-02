@@ -27,7 +27,10 @@ async def left_lessons(
     if not user or user.__class__.__name__ != 'Student':
         await context.bot.send_message(
             chat_id=telegram_id,
-            text='Эта функция доступна только для учеников.',
+            text=(
+                '📌 Внимание!\n\n'
+                'Эта функция доступна только для учеников.'
+            ),
         )
     else:
         left = user.paid_lessons
@@ -36,8 +39,8 @@ async def left_lessons(
         else:
             lesson = 'занятия'
         await update.message.reply_text(
-            f'{user.name}, у вас осталось {user.paid_lessons}'
-            f' оплаченных {lesson}.',
+            f'📌 {user.name}!\n\n'
+            f'У вас осталось {user.paid_lessons} оплаченных {lesson}.',
         )
     return UserStates.START
 

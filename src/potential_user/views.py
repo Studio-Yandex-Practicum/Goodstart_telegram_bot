@@ -24,7 +24,7 @@ class RegistrationCreateView(CreateView):
         # Проверка, существует ли уже заявка от этого telegram_id
         if ApplicationForm.objects.filter(telegram_id=telegram_id).exists():
             messages.warning(self.request,
-                             'Вы уже подали заявку на регистрацию.')
+                             '📌 Вы уже подали заявку на регистрацию.')
             return redirect(self.get_success_url())
 
         form.instance.telegram_id = telegram_id

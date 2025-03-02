@@ -10,7 +10,10 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Echo messages handler."""
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text='Неизвестная команда, выберите что-то из того, что я умею!',
+        text=(
+            '📌 Неизвестная команда!\n\n'
+            'Пожалуйста, выберите что-то из того, что я умею.'
+        ),
     )
     await help(update, context)
 
