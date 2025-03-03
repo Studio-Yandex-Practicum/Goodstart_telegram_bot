@@ -291,7 +291,6 @@ class Lesson(models.Model):
                 name='unique_lesson',
             ),
         ]
-        unique_together = ('name', 'datetime_start')
         verbose_name = 'занятие'
         verbose_name_plural = 'Занятия'
 
