@@ -385,7 +385,7 @@ async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
 
 async def get_schedule_for_role(user):
     """Получает расписание пользователя в зависимости от его роли."""
-    if isinstance(user, Teacher):
+    if await Teacher.objects.filter(id=user.id).aexists():
         schedule = await sync_to_async(list)(
             Lesson.objects.filter(teacher_id=user.id)
             .select_related('student_id', 'teacher_id', 'subject')
