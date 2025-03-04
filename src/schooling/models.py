@@ -300,7 +300,7 @@ class Lesson(models.Model):
 
     def save(self, *args, **kwargs):
         """Проверка на группу и на создание повторяющихся занятий."""
-        if not self.group:
+        if not self.group and self.student_id:
             self.group = self.get_or_create_group()
         super().save(*args, **kwargs)
         if self.lesson_count > 1:
@@ -308,6 +308,10 @@ class Lesson(models.Model):
 
     def clean(self):
         """Проверка на совпадение занятия с уже существующими."""
+        if not self.datetime_start:
+            raise ValidationError(
+                'Дата начала занятия не может быть пустой.'
+            )
         if Lesson.objects.filter(
             name=self.name,
             datetime_start__date=self.datetime_start.date(),
@@ -323,11 +327,7 @@ class Lesson(models.Model):
 
     def get_or_create_group(self):
         """Возвращает существующую группу студента или создаёт новую."""
-        group = LessonGroup.objects.filter(
-            student=self.student_id,
-        ).first()
-        if not group:
-            group = LessonGroup.objects.create(student=self.student_id)
+        group, _ = LessonGroup.objects.get_or_create(student=self.student_id)
         return group
 
     def create_lessons(self):
@@ -337,24 +337,40 @@ class Lesson(models.Model):
                 'Количество создаваемых занятий должно быть больше 0.',
             )
         lesson_group = self.get_or_create_group()
-        lessons = [
-            Lesson(
-                name=self.name,
+        lessons = []
+
+        for i in range(1, self.lesson_count):
+            new_datetime = self.datetime_start + timedelta(weeks=i)
+
+            # Проверяем, существует ли уже такое занятие
+            if Lesson.objects.filter(
                 subject=self.subject,
                 teacher_id=self.teacher_id,
                 student_id=self.student_id,
-                group=lesson_group,
-                datetime_start=self.datetime_start + timedelta(weeks=i),
+                datetime_start=new_datetime,
                 duration=self.duration,
-                is_passed=False,
-                video_meeting_url=self.video_meeting_url,
-                is_passed_teacher=False,
-                test_lesson=self.test_lesson,
-                regular_lesson=self.regular_lesson,
+            ).exists():
+                continue  # Пропускаем создание дубликата
+
+            lessons.append(
+                Lesson(
+                    name=self.name,
+                    subject=self.subject,
+                    teacher_id=self.teacher_id,
+                    student_id=self.student_id,
+                    group=lesson_group,
+                    datetime_start=new_datetime,
+                    duration=self.duration,
+                    is_passed=False,
+                    video_meeting_url=self.video_meeting_url,
+                    is_passed_teacher=False,
+                    test_lesson=self.test_lesson,
+                    regular_lesson=self.regular_lesson,
+                )
             )
-            for i in range(1, self.lesson_count)
-        ]
-        Lesson.objects.bulk_create(lessons)
+
+        if lessons:
+            Lesson.objects.bulk_create(lessons)
 
 
 class HomeworkImage(models.Model):
@@ -406,6 +422,10 @@ class HomeworkFile(models.Model):
 @receiver(post_delete, sender=Lesson)
 def delete_empty_lesson_group(sender, instance, **kwargs):
     """Удаляет группу занятий, если в ней больше нет занятий."""
-    group = instance.group
-    if not group.lessons.exists():
-        group.delete()
+    if instance.group_id:
+        try:
+            group = instance.group
+            if not group.lessons.exists():
+                group.delete()
+        except LessonGroup.DoesNotExist:
+            pass
