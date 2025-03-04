@@ -238,18 +238,21 @@ def init_lesson(sender, instance, **kwargs):
 
 
 async def create_reminders(lesson, job_queue):
-    """Создает задачи на напоминания о начале урока."""
-    tz = pytz_timezone(TIMEZONE_FOR_REMINDERS)
-    lesson_time = lesson.datetime_start.astimezone(tz)
-
-    reminders = [
-        datetime.timedelta(minutes=LONG_TIME_REMINDER),
-        datetime.timedelta(minutes=SHORT_TIME_REMINDER),
+    """Создает задачи на напоминания о начале урока, не дублируя их.""" 
+    tz = pytz_timezone(TIMEZONE_FOR_REMINDERS) 
+    lesson_time = lesson.datetime_start.astimezone(tz) 
+    # Удаляем старые напоминания для этого урока 
+    for job in job_queue.jobs(): 
+        if job.data == lesson:
+            job.schedule_removal() 
+    reminders = [ 
+        datetime.timedelta(minutes=LONG_TIME_REMINDER), 
+        datetime.timedelta(minutes=SHORT_TIME_REMINDER), 
     ]
 
-    for delta in reminders:
-        reminder_time = lesson_time - delta
-        if reminder_time > datetime.datetime.now(tz):
+    for delta in reminders: 
+        reminder_time = lesson_time - delta 
+        if reminder_time > datetime.datetime.now(tz): 
             job_queue.run_once(send_reminder, when=reminder_time, data=lesson)
 
 
