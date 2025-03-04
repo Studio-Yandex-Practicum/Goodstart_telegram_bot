@@ -109,6 +109,7 @@ class LessonForm(forms.ModelForm):
     datetime_start = forms.DateTimeField(
         widget=forms.DateTimeInput(
             attrs={'type': 'datetime-local', 'class': 'vDateTimeField'},
+            format='%Y-%m-%dT%H:%M',
         ),
         label='Дата и время начала',
     )
