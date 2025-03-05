@@ -69,8 +69,9 @@ async def was_the_lesson_completed(update: Update, context: CallbackContext):
         lesson.is_passed = True
         await lesson.asave()
         student = await Student.objects.aget(telegram_id=student_tg_id)
-        student.paid_lessons -= 1
-        await student.asave()
+        if student.paid_lessons > 0:
+            student.paid_lessons -= 1
+            await student.asave()
         context.user_data['lesson_responses'].clear()
 
     if teacher_answ == 'no':

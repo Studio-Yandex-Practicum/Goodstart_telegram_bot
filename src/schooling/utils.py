@@ -1,7 +1,12 @@
+import pytz
+
 from babel.dates import format_datetime as form_date
+from .constants import TIMEZONE_FOR_REMINDERS
 
 def format_datetime(dt):
     """Функция для форматирования даты и времени в удобный формат."""
+    tz = pytz.timezone(TIMEZONE_FOR_REMINDERS)  # Указываем нужный часовой пояс
+    dt = dt.astimezone(tz)  # Преобразуем dt в UTC+3
     date = form_date(dt, locale='ru')
     return date
 

@@ -9,7 +9,7 @@ from telegram._utils.types import ReplyMarkup
 from telegram.error import BadRequest, Forbidden
 from asgiref.sync import sync_to_async
 from django.conf import settings
-from django.db.models.signals import post_save, post_init, pre_delete
+from django.db.models.signals import post_save, post_init, pre_delete, post_delete
 from django.dispatch import receiver
 from loguru import logger
 from pytz import timezone as pytz_timezone
@@ -89,7 +89,6 @@ async def send_lesson_end_notification(context: CallbackContext):
 async def schedule_lesson_end_notification(sender, instance, **kwargs):
     """Создание задачи на отправку уведомления по окончании урока."""
     from bot.bot_interface import Bot
-
     if instance.is_passed:
         return
 
@@ -99,7 +98,6 @@ async def schedule_lesson_end_notification(sender, instance, **kwargs):
 
     tz = pytz_timezone(TIMEZONE_FOR_REMINDERS)
     lesson_end_time = instance.datetime_end.astimezone(tz)
-
     if lesson_end_time > datetime.datetime.now(tz):
         job_queue.run_once(
             send_lesson_end_notification,
@@ -241,10 +239,6 @@ async def create_reminders(lesson, job_queue):
     """Создает задачи на напоминания о начале урока, не дублируя их.""" 
     tz = pytz_timezone(TIMEZONE_FOR_REMINDERS) 
     lesson_time = lesson.datetime_start.astimezone(tz) 
-    # Удаляем старые напоминания для этого урока 
-    for job in job_queue.jobs(): 
-        if job.data == lesson:
-            job.schedule_removal() 
     reminders = [ 
         datetime.timedelta(minutes=LONG_TIME_REMINDER), 
         datetime.timedelta(minutes=SHORT_TIME_REMINDER), 
@@ -352,9 +346,19 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
             )
 
 
-@receiver(pre_delete, sender=Lesson)
+@receiver(post_delete, sender=Lesson)
 async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
     """Отправляет уведомление об отмене занятия."""
+    from bot.bot_interface import Bot
+    bot = Bot()
+    app = await bot.get_app()
+    job_queue = app.job_queue
+    # Удаляем все задачи, связанные с этим занятием
+    for job in job_queue.jobs():
+        # print(f"Job ID: {job.id}, Job Data: {job.data}, Lesson ID: {instance.id}")
+        if job.data and job.data.get('lesson_id') == instance.id:
+            job.schedule_removal()
+            # print(f"Удалена задача {instance.id}")
     if instance.teacher_id is None:
         return
     start_time_formatted = format_datetime(instance.datetime_start)
