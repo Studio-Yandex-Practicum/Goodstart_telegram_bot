@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden
 from asgiref.sync import sync_to_async
 from django.conf import settings
+from django.http import HttpResponseNotFound
 
 from schooling.models import (Teacher, Student, Lesson, HomeworkImage,
                               HomeworkFile)
@@ -61,9 +62,12 @@ async def details_schedule_page(request, id, lesson_id):
     context = {}
     user = await check_user_from_db(id, (Teacher, Student))
     user_role = user.__class__.__name__
-    lesson = await Lesson.objects.select_related(
-        'subject', 'teacher_id', 'student_id',
-    ).aget(id=lesson_id)
+    try:
+        lesson = await Lesson.objects.select_related(
+            'subject', 'teacher_id', 'student_id',
+        ).aget(id=lesson_id)
+    except Lesson.DoesNotExist:
+        return HttpResponseNotFound("⚠️ Это занятие было удалено и больше не доступно.")
 
     if user_role == 'Teacher':
         context['user_full_name'] = (
