@@ -73,9 +73,11 @@ async def send_lesson_end_notification(context: CallbackContext):
         InlineKeyboardButton('❌ Нет', callback_data=f'no {lesson_id}'),
     ]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-
+    lesson = await Lesson.objects.select_related(
+        'student_id'
+    ).filter(id=int(lesson_id)).afirst()
     message_text = (
-        '📌 Подскажите, состоялось ли занятие?\n\n'
+        f'📌 Подскажите, состоялось ли занятие по теме "{lesson.name}"?\n\n'
         'Выберите ответ ниже.'
     )
 
