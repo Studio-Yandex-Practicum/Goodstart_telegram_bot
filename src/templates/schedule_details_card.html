@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load django_bootstrap5 %}
-{% load tz %}
 
 {% block content %}
 <main class="mx-auto p-2" align="center" style="max-width: 550px">
@@ -20,8 +19,8 @@
 
       <p class="card-text">
         <strong>Время и дата:</strong><br>
-        {{ lesson.datetime_start|localtime|timezone:"Europe/Moscow"|date:"d.m.Y H:i" }}
-        – {{ lesson.datetime_end|localtime|timezone:"Europe/Moscow"|date:"d.m.Y H:i" }}
+        {{ lesson.datetime_start|localtime|date:"d.m.Y H:i" }}
+        – {{ lesson.datetime_end|localtime|date:"d.m.Y H:i" }}
       </p>
 
       <p class="card-text">
