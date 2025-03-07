@@ -20,7 +20,7 @@
       {% for lesson in schedule_day %}
       <tbody>
         <tr>
-          <td class="text-nowrap">{{ lesson.datetime_start|localtime|date:"H:i" }} - {{ lesson.datetime_end|localtime|date:"H:i" }}</td>
+          <td class="text-nowrap">{{ lesson.datetime_start|timezone:"Europe/Moscow"|date:"H:i" }} - {{ lesson.datetime_end|timezone:"Europe/Moscow"|date:"H:i" }}</td>
           <td>
             <a href="{% url 'schedule:details_schedule' user_tg_id lesson.id %}" class="text-decoration-none position-relative">
               <div class="p-2 button-style">
