@@ -20,8 +20,8 @@
 
       <p class="card-text">
         <strong>Время и дата:</strong><br>
-        {{ lesson.datetime_start|timezone:"Europe/Moscow"|date:"d.m.Y H:i" }}
-        – {{ lesson.datetime_end|timezone:"Europe/Moscow"|date:"d.m.Y H:i" }}
+        {{ lesson.datetime_start|localtime|timezone:"Europe/Moscow"|date:"d.m.Y H:i" }}
+        – {{ lesson.datetime_end|localtime|timezone:"Europe/Moscow"|date:"d.m.Y H:i" }}
       </p>
 
       <p class="card-text">
