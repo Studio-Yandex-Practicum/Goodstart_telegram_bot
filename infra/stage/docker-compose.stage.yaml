@@ -28,8 +28,8 @@ services:
       - NET_ADMIN
     environment:
       - PUID=1001
-      - PGID=1004
-      - TZ=Etc/UTC
+      - PGID=1001
+      - TZ=Europe/Moscow
       - URL=goodstart-test.zapto.org
     volumes:
       - /home/aptalca/appdata/swag:/config
