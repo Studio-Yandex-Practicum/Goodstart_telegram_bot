@@ -9,7 +9,7 @@ from telegram._utils.types import ReplyMarkup
 from telegram.error import BadRequest, Forbidden
 from asgiref.sync import sync_to_async
 from django.conf import settings
-from django.db.models.signals import post_save, post_init, pre_delete
+from django.db.models.signals import post_save, post_init, post_delete
 from django.dispatch import receiver
 from loguru import logger
 from pytz import timezone as pytz_timezone
@@ -348,7 +348,7 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
             )
 
 
-@receiver(pre_delete, sender=Lesson)
+@receiver(post_delete, sender=Lesson)
 async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
     """Отправляет уведомление об отмене занятия."""
     from bot.bot_interface import Bot
