@@ -97,7 +97,7 @@ async def schedule_lesson_end_notification(sender, instance, **kwargs):
     bot = Bot()
     app = await bot.get_app()
     job_queue = app.job_queue
-
+    
     tz = pytz_timezone(TIMEZONE_FOR_REMINDERS)
     lesson_end_time = instance.datetime_end.astimezone(tz)
     if lesson_end_time > datetime.datetime.now(tz):
@@ -238,8 +238,8 @@ def init_lesson(sender, instance, **kwargs):
 
 
 async def create_reminders(lesson, job_queue):
-    """Создает задачи на напоминания о начале урока, не дублируя их.""" 
-    tz = pytz_timezone(TIMEZONE_FOR_REMINDERS) 
+    """Создает задачи на напоминания о начале урока, не дублируя их."""
+    tz = pytz_timezone(TIMEZONE_FOR_REMINDERS)
     lesson_time = lesson.datetime_start.astimezone(tz) 
     reminders = [ 
         datetime.timedelta(minutes=LONG_TIME_REMINDER), 
@@ -278,7 +278,8 @@ async def notify_about_lesson(sender, instance, created, **kwargs):
 async def msg_change_lesson(sender, instance, created, **kwargs):
     """Отправляет уведомление о изменении занятия."""
     message_text = ''  # Инициализация переменной
-
+    if instance.is_passed:
+        return
     if not created:
         start_time_formatted = format_datetime(instance.datetime_start)
         duration = format_lesson_duration(
@@ -361,6 +362,8 @@ async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
         if job.data and job.data.get('lesson_id') == instance.id:
             job.schedule_removal()
             # print(f"Удалена задача {instance.id}")
+    if instance.is_passed:
+        return
     if instance.teacher_id is None:
         return
     start_time_formatted = format_datetime(instance.datetime_start)
