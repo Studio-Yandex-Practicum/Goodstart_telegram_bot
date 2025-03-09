@@ -9,7 +9,7 @@ from telegram._utils.types import ReplyMarkup
 from telegram.error import BadRequest, Forbidden
 from asgiref.sync import sync_to_async
 from django.conf import settings
-from django.db.models.signals import post_save, post_init, pre_delete
+from django.db.models.signals import post_save, post_init, post_delete
 from django.dispatch import receiver
 from loguru import logger
 from pytz import timezone as pytz_timezone
@@ -349,7 +349,7 @@ async def msg_change_lesson(sender, instance, created, **kwargs):
             )
 
 
-@receiver(pre_delete, sender=Lesson)
+@receiver(post_delete, sender=Lesson)
 async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
     """Отправляет уведомление об отмене занятия."""
     from bot.bot_interface import Bot
@@ -359,7 +359,7 @@ async def delete_lesson_and_send_msg(sender, instance, *args, **kwargs):
     # Удаляем все задачи, связанные с этим занятием
     for job in job_queue.jobs():
         # print(f"Job ID: {job.id}, Job Data: {job.data}, Lesson ID: {instance.id}")
-        if job.data and job.data.get('lesson_id') == instance.id:
+        if job.data and isinstance(job.data, dict) and job.data.get('lesson_id') == instance.id:
             job.schedule_removal()
             # print(f"Удалена задача {instance.id}")
     if instance.is_passed:
