@@ -2,6 +2,8 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from loguru import logger
+from django.contrib.auth import get_user_model
 
 from potential_user.forms import RegistrationForm
 from potential_user.models import ApplicationForm
@@ -29,7 +31,20 @@ class RegistrationCreateView(CreateView):
 
         form.instance.telegram_id = telegram_id
         response = super().form_valid(form)
-        send_registration_email(self.object)
+        try:
+            send_registration_email(self.object)
+        except OSError as e:
+            logger.error(f'Ошибка отправки письма: {e}')
+             # Получаем email администратора
+            admin_email = get_user_model().objects.filter(
+                is_superuser=True
+            ).values_list('email', flat=True).first()
+            
+            if admin_email:
+                messages.error(
+                    self.request, 
+                    f'⚠ Не удалось отправить письмо. Пожалуйста, свяжитесь с администратором: {admin_email}'
+                )
         return response
 
     def get_success_url(self):
