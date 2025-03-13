@@ -24,5 +24,5 @@ class Command(BaseCommand):
             count += 1
 
         self.stdout.write(
-            self.style.SUCCESS(f'Успешно обновлено {count} занятий.')
+            self.style.SUCCESS(f'Успешно обновлено {count} занятий.'),
         )
