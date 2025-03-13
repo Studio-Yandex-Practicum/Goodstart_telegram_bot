@@ -29,12 +29,12 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=Europe/Moscow
       - URL=goodstart-education-bot.ru
     volumes:
       - /home/aptalca/appdata/swag:/config
       - ./nginx.prod.conf.template:/config/nginx/site-confs/default.conf:ro
-      - static_volume:/var/html/static/
+      - static_volume:/static/
       - ../../logs/nginx/:/var/log/nginx/
     ports:
       - 443:443

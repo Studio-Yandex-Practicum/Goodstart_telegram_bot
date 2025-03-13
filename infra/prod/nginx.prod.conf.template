@@ -15,25 +15,15 @@ server {
 
     client_max_body_size 10M;
 
-
-    location / {
-      alias /static/;
-      autoindex on;
+    location /admin {
       proxy_set_header Host $http_host;
       proxy_set_header        X-Real-IP $remote_addr;
       proxy_set_header        X-Forwarded-Proto $scheme;
       proxy_pass http://bot:8000/admin;
     }
 
-    location /admin {
-      proxy_set_header Host $http_host;
-      proxy_set_header        X-Real-IP $remote_addr;
-      proxy_set_header        X-Forwarded-Proto $scheme;
-      proxy_pass http://bot:8000;
-    }
-
     location /static {
-      root /var/html/;
+      alias /static/;
     }
 
     location /registration {
@@ -42,19 +32,17 @@ server {
       proxy_set_header        X-Forwarded-Proto $scheme;
       proxy_pass http://bot:8000/registration;
     }
-
-    location /schedule {
-      proxy_set_header Host $http_host;
-      proxy_set_header        X-Real-IP $remote_addr;
-      proxy_set_header        X-Forwarded-Proto $scheme;
-      proxy_pass http://bot:8000/schedule;
+    location / {
+      proxy_pass http://bot:8000/;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-Proto $scheme;
     }
-
 }
 
 
 server {
-    if ($host = goodstart-education-bot.ru) {
+    if ($host = goodstart-test.zapto.org) {
         return 301 https://$host$request_uri;
     }
 

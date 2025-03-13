@@ -28,14 +28,15 @@ services:
       - NET_ADMIN
     environment:
       - PUID=1001
-      - PGID=1004
-      - TZ=Etc/UTC
-      - URL=jetrai.ru
+      - PGID=1001
+      - TZ=Europe/Moscow
+      - URL=goodstart-test.zapto.org
     volumes:
       - /home/aptalca/appdata/swag:/config
       - ./nginx.stage.conf.template:/config/nginx/site-confs/default.conf:ro
-      - static_volume:/var/html/static/
+      - static_volume:/static/
       - ../../logs/nginx/:/var/log/nginx/
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     ports:
       - 443:443
       - 80:80

@@ -76,6 +76,10 @@ create_test_teachers:
 create_test_lessons:
 	cd $(PROJECT_DIR) && $(DJANGO_RUN) create_test_lessons
 
+# Группировка занятий по ученику
+assign_groups:
+	cd $(PROJECT_DIR) && $(DJANGO_RUN) assign_groups
+
 # Запуск локального контейнера Postgres
 start-db:
 	docker-compose -f $(DEV_DOCK_FILE) up -d; \

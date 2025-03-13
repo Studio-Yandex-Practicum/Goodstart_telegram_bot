@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 import environ
-from django.utils.translation import gettext_lazy as _
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ROOT_DIR = BASE_DIR.parent
@@ -39,8 +39,8 @@ LOCAL_APPS = [
 ]
 
 EXTERNAL_APPS = [
-    'material',
-    'core.apps.CustomAdminConfig',
+    'jazzmin',
+    'django.contrib.admin',
     'phonenumber_field',
     'django_bootstrap5',
 ]
@@ -97,15 +97,21 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ru-RU'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
 USE_TZ = True
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'staticfiles']
+STATICFILES_DIRS = [
+    BASE_DIR / 'staticfiles',
+    BASE_DIR / 'static',
+]
 STATIC_ROOT = ROOT_DIR / 'static'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -130,10 +136,51 @@ DEFAULT_RECEIVER = env.str('DEFAULT_EMAIL_ADDRESS', default='NOT_SET')
 
 BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:8000')
 
-MATERIAL_ADMIN_SITE = {
-    'HEADER':  _('GoodStart школа'),  # Admin site header
-    'TITLE':  _('Администрирование'),  # Admin site title
-    'SHOW_THEMES':  True,  # Show default admin themes button
-    'NAVBAR_REVERSE': True,  # Hide side navbar by default
-    'SHOW_COUNTS': True,  # Show instances counts for each model
+JAZZMIN_SETTINGS = {
+    'site_title': 'GoodStart Admin',
+    'site_header': 'GoodStart',
+    'welcome_sign': 'Добро пожаловать в панель администратора!',
+    'site_brand': 'GoodStart Admin',
+    'show_ui_builder': False,
+    'order_with_respect_to': [
+        'schooling.Lesson',
+        'schooling.LessonGroup',
+        'schooling.Teacher',
+        'schooling.Student',
+        'schooling.StudyClass',
+        'schooling.Subject',
+    ],
+}
+
+JAZZMIN_UI_TWEAKS = {
+    'navbar_small_text': False,
+    'footer_small_text': False,
+    'body_small_text': False,
+    'brand_small_text': False,
+    'brand_colour': False,
+    'accent': 'accent-primary',
+    'navbar': 'navbar-white navbar-light',
+    'no_navbar_border': False,
+    'navbar_fixed': False,
+    'layout_boxed': False,
+    'footer_fixed': False,
+    'sidebar_fixed': False,
+    'sidebar': 'sidebar-dark-primary',
+    'sidebar_nav_small_text': False,
+    'sidebar_disable_expand': False,
+    'sidebar_nav_child_indent': False,
+    'sidebar_nav_compact_style': False,
+    'sidebar_nav_legacy_style': False,
+    'sidebar_nav_flat_style': False,
+    'theme': 'united',
+    'dark_mode_theme': None,
+    'button_classes': {
+        'primary': 'btn-outline-primary',
+        'secondary': 'btn-outline-secondary',
+        'info': 'btn-info',
+        'warning': 'btn-warning',
+        'danger': 'btn-danger',
+        'success': 'btn-success',
+    },
+    'custom_css': 'jazzmin/css/main.css',
 }

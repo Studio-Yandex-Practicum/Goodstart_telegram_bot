@@ -38,6 +38,7 @@ jobs:
 
       - name: Create folder for deploy
         run: ssh ${{ secrets.HOST_USERNAME }}@${{ secrets.HOST_IP }} mkdir -p ${{ env.DEPLOY_PATH }}/infra
+        # run: ssh -i ~/.ssh/authorized_keys -o StrictHostKeyChecking=no ${{ secrets.HOST_USERNAME }}@${{ secrets.HOST_IP }} mkdir -p ${{ env.DEPLOY_PATH }}/infra
 
       - name: Copy dev folder to VPS
         run: scp -r $GITHUB_WORKSPACE/infra/stage/ ${{ secrets.HOST_USERNAME }}@${{ secrets.HOST_IP }}:${{ env.DEPLOY_PATH }}/infra/

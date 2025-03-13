@@ -1,18 +1,19 @@
-import pytz
+import asyncio
 import datetime
 
-from django.urls import reverse, reverse_lazy
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseForbidden
 from asgiref.sync import sync_to_async
 from django.conf import settings
+from django.http import HttpResponseNotFound
 
-from schooling.forms import ChangeDateTimeLesson
-from schooling.models import Teacher, Student, Lesson
+from schooling.models import (Teacher, Student, Lesson, HomeworkImage,
+                              HomeworkFile)
+from schooling.forms import HomeworkForm
 from schooling.signals_bot import (
-    get_schedule_for_role, get_schedule_week_tasks,
-)
+    get_schedule_for_role, get_schedule_week_tasks, send_message_to_user,
+    get_homework_update_message)
 from bot.utils import check_user_from_db
-from core.utils import send_change_lesson_email, send_cancel_lesson_email
 
 
 EMAIL_HOST_USER = settings.EMAIL_HOST_USER
@@ -61,9 +62,14 @@ async def details_schedule_page(request, id, lesson_id):
     context = {}
     user = await check_user_from_db(id, (Teacher, Student))
     user_role = user.__class__.__name__
-    lesson = await Lesson.objects.select_related(
-        'subject', 'teacher_id', 'student_id',
-    ).aget(id=lesson_id)
+    try:
+        lesson = await Lesson.objects.select_related(
+            'subject', 'teacher_id', 'student_id',
+        ).aget(id=lesson_id)
+    except Lesson.DoesNotExist:
+        return HttpResponseNotFound(
+            '⚠️ Это занятие было удалено и больше не доступно.',
+        )
 
     if user_role == 'Teacher':
         context['user_full_name'] = (
@@ -83,53 +89,68 @@ async def details_schedule_page(request, id, lesson_id):
     )
 
 
-async def change_datetime_lesson(request, id, lesson_id):
-    form = ChangeDateTimeLesson()
+def edit_homework(request, id, lesson_id):
+    """Редактирование домашнего задания преподавателем."""
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+
+    if lesson.teacher_id.telegram_id != id:
+        return HttpResponseForbidden('Вы не можете редактировать это занятие!')
+
     if request.method == 'POST':
-        form = ChangeDateTimeLesson(request.POST)
+        form = HomeworkForm(request.POST, request.FILES, instance=lesson)
         if form.is_valid():
-            lesson = await Lesson.objects.aget(id=lesson_id)
-            new_datetime = form.cleaned_data['dt_field']
-            user = await check_user_from_db(id, (Student, Teacher))
-            moscow_tz = pytz.timezone('Europe/Moscow')
-            new_datetime_moscow = new_datetime.astimezone(moscow_tz)
-            formatted_datetime = new_datetime_moscow.strftime(
-                '%Y-%m-%d %H:%M:%S',
+            form.save()
+
+            for image in request.FILES.getlist('images'):
+                HomeworkImage.objects.create(lesson=lesson, image=image)
+
+            for file in request.FILES.getlist('files'):
+                HomeworkFile.objects.create(lesson=lesson, file=file)
+
+            if lesson.student_id:
+                student_tg_id = lesson.student_id.telegram_id
+                message = asyncio.run(get_homework_update_message(lesson))
+                asyncio.run(send_message_to_user(
+                    settings.TELEGRAM_TOKEN, student_tg_id, message))
+
+            return redirect(
+                'schedule:details_schedule',
+                id=id,
+                lesson_id=lesson.id,
             )
-            await send_change_lesson_email(lesson, user, formatted_datetime)
-            redirect_url = (
-                reverse('schedule:lesson_change_success') +
-                f'?new_datetime={formatted_datetime}'
-            )
-            return HttpResponseRedirect(redirect_url)
-    return await sync_to_async(render)(
-        request,
-        'schedule_change_dt_lesson.html',
-        context={'form': form},
-    )
+
+    else:
+        form = HomeworkForm(instance=lesson)
+
+    context = {
+        'form': form,
+        'lesson': lesson,
+        'user_tg_id': id,
+        'homework_images': lesson.homework_images.all(),
+        'homework_files': lesson.homework_files.all(),
+    }
+
+    return render(request, 'edit_homework.html', context)
 
 
-async def cancel_lesson(request, id, lesson_id):
-    if request.method == 'POST':
-        lesson = await Lesson.objects.aget(id=lesson_id)
-        user = await check_user_from_db(id, (Student, Teacher))
-        await send_cancel_lesson_email(lesson, user)
-        return await sync_to_async(HttpResponseRedirect)(
-            reverse_lazy('schedule:lesson_cancel_success'),
-        )
-    return await sync_to_async(render)(
-        request,
-        'schedule_cancel_lesson.html',
-    )
+def delete_homework_image(request, id, lesson_id, image_id):
+    """Удаление изображения домашнего задания только преподавателем."""
+    image = get_object_or_404(HomeworkImage, id=image_id, lesson_id=lesson_id)
+
+    if image.lesson.teacher_id.telegram_id != id:
+        return HttpResponseForbidden(
+            'Вы не можете удалять файлы в этом занятии.')
+    image.delete()
+    return redirect('schedule:edit_homework', id=id, lesson_id=lesson_id)
 
 
-def lesson_change_success(request):
-    new_datetime = request.GET.get('new_datetime')
-    return render(
-        request, 'lesson_change_success.html',
-        context={'new_datetime': new_datetime},
-    )
+def delete_homework_file(request, id, lesson_id, file_id):
+    """Удаление файла домашнего задания только преподавателем."""
+    file = get_object_or_404(HomeworkFile, id=file_id, lesson_id=lesson_id)
 
+    if file.lesson.teacher_id.telegram_id != id:
+        return HttpResponseForbidden(
+            'Вы не можете удалять файлы в этом занятии.')
 
-def lesson_cancel_success(request):
-    return render(request, 'lesson_cancel_success.html')
+    file.delete()
+    return redirect('schedule:edit_homework', id=id, lesson_id=lesson_id)

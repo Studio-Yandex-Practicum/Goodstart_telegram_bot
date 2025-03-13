@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load django_bootstrap5 %}
+{% load tz %}
 
 {% block content %}
 <main class="mx-auto p-2" align="center" style="max-width: 550px">
@@ -8,27 +9,85 @@
       {{ lesson.name }}
     </h2>
     <div class="card-body">
+
       <p class="card-text"><strong>Предмет:</strong> {{ lesson.subject }}</p>
+
       {% if user_role == 'Teacher' %}
         <p class="card-text"><strong>Ученик:</strong> {{ user_full_name }}</p>
       {% elif user_role == 'Student' %}
         <p class="card-text"><strong>Преподаватель:</strong> {{ user_full_name }}</p>
       {% endif %}
-      <p class="card-text"><strong>Время и дата:</strong><br>{{ lesson.datetime_start|date:"d.m.Y H:i" }} - {{ lesson.datetime_end|date:"d.m.Y H:i" }}</p>
-      <p class="card-text"><strong>Ссылка на встречу:</strong> <a href="{{ lesson.video_meeting_url }}">тут</a></p>
-      <p class="card-text"><strong>Ссылка на домашнее задание:</strong> <a href="{{ lesson.homework_url }}">тут</a></p>
-      <a class="btn main-button" style="width: 40%;" href="{% url 'schedule:change_datetime_lesson' user_tg_id lesson.id %}" role="button">
-        Перенести
-      </a>
-      <a class="btn main-button danger-button" style="width: 40%;" href="{% url 'schedule:cancel_lesson' user_tg_id lesson.id %}" role="button">
-        Отменить
-      </a>
-      <a class="btn main-button" style="width: 30%; margin-top: 10px; background-color: #d0d0d0; color: #000;"
-        onmouseover="this.style.background='#879099';"
-        onmouseout="this.style.background='#d0d0d0';"
-        href="{% url 'schedule:schedule' user_tg_id %}" role="button">
+
+      <p class="card-text">
+        <strong>Время и дата:</strong><br>
+        {{ lesson.datetime_start|timezone:"Europe/Moscow"|date:"d.m.Y H:i" }}
+        – {{ lesson.datetime_end|timezone:"Europe/Moscow"|date:"d.m.Y H:i" }}
+      </p>
+
+      <p class="card-text">
+        {% if lesson.video_meeting_url %}
+          <a href="{{ lesson.video_meeting_url }}">Ссылка на встречу</a>
+        {% else %}
+          <span class="text-muted">(не указана)</span>
+        {% endif %}
+      </p>
+
+      <hr>
+
+      <!-- Домашнее задание -->
+      <div class="text-start">
+        <p class="card-text"><strong>Домашнее задание:</strong></p>
+        {% if lesson.homework_text %}
+          <p class="card-text">
+            {{ lesson.homework_text|linebreaks }}
+          </p>
+        {% else %}
+          <p class="text-muted">Домашнее задание не указано.</p>
+        {% endif %}
+      </div>
+
+      <!-- Изображения -->
+      {% for image in lesson.homework_images.all %}
+        <div class="mb-3">
+          <img src="{{ image.image.url }}" alt="Изображение" style="max-width: 100%; height: auto;">
+          <p>
+            <a href="{{ image.image.url }}" download="{{ image.image.name }}">Скачать</a>
+          </p>
+        </div>
+      {% endfor %}
+
+      <!-- Файлы -->
+      {% if lesson.homework_files.all %}
+        <div class="text-start">
+          <p><strong>Прикрепленные файлы:</strong></p>
+          <ul>
+            {% for file in lesson.homework_files.all %}
+              <li>
+                <a href="{{ file.file.url }}" download="{{ file.file.name }}">
+                  {{ file.file.name|cut:"lesson_homework/files/" }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <!-- Кнопка "Добавить/Изменить домашку" для преподавателя -->
+      {% if user_role == 'Teacher' %}
+        <a class="btn btn-primary mt-3" href="{% url 'schedule:edit_homework' user_tg_id lesson.id %}" role="button">
+          ✏️ Добавить/Изменить домашнее задание
+        </a>
+      {% endif %}
+
+      <a class="btn main-button mt-3"
+         style="width: 30%; background-color: #d0d0d0; color: #000;"
+         onmouseover="this.style.background='#879099';"
+         onmouseout="this.style.background='#d0d0d0';"
+         href="{% url 'schedule:schedule' user_tg_id %}"
+         role="button">
         Назад
       </a>
+
     </div>
   </div>
 </main>

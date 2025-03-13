@@ -3,6 +3,8 @@ from datetime import timedelta
 from django.core.exceptions import ValidationError
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 from bot.states import UserStates
 from schooling.validators.phone_validators import validate_phone_number
@@ -14,6 +16,7 @@ MAX_LEN_STATE = 50
 MAX_COUNT_STUDENTS = 30
 MAX_COUNT_CLASSES = 5
 MAX_COUNT_SUBJECTS = 3
+DEFAULT_LESSON_DURATION = 60
 
 
 class GeneralUserModel(models.Model):
@@ -25,6 +28,7 @@ class GeneralUserModel(models.Model):
     city = models.CharField('Город', max_length=MAX_LEN_CITY)
     phone_number = PhoneNumberField(
         'Номер телефона',
+        region='RU',
         validators=[validate_phone_number],
         help_text='Формат +7XXXXXXXXXX',
     )
@@ -60,29 +64,40 @@ class Teacher(GeneralUserModel):
     class Meta:
         verbose_name = 'Преподаватель'
         verbose_name_plural = 'Преподаватели'
+        ordering = ['name', 'surname']
 
     def __str__(self):
         """Возвращает полное имя преподавателя."""
         return f'{self.name} {self.surname}'
 
-    def clean(self):
+    def save(self, *args, **kwargs):
         """
-        Проверка на максимальное количество классов и предметов.
+        Сохраняет объект.
 
-        Осуществляется на одного преподавателя.
+        Выполняет валидацию количества предметов и классов.
         """
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        """Проверяет максимальное количество классов и предметов."""
+        if not self.pk:
+            return
+
         current_classes_count = self.study_classes.count()
         current_subjects_count = self.competence.count()
 
         if current_classes_count > MAX_COUNT_CLASSES:
             raise ValidationError(
                 f'Преподаватель {self.name} {self.surname} уже '
-                f'ведет максимальное количество классов.')
+                f'ведет максимальное количество классов.',
+            )
 
         if current_subjects_count > MAX_COUNT_SUBJECTS:
             raise ValidationError(
                 f'Преподаватель {self.name} {self.surname} уже '
-                f'ведет максимальное количество предметов.')
+                f'ведет максимальное количество предметов.',
+            )
 
 
 class Student(GeneralUserModel):
@@ -110,8 +125,9 @@ class Student(GeneralUserModel):
 
     class Meta:
 
-        verbose_name = 'Студент'
-        verbose_name_plural = 'Студенты'
+        verbose_name = 'Ученик'
+        verbose_name_plural = 'Ученики'
+        ordering = ['name', 'surname']
 
     def __str__(self):
         """Возвращает строковое представление студента."""
@@ -173,6 +189,28 @@ class StudyClass(models.Model):
             )
 
 
+class LessonGroup(models.Model):
+    """Модель группы занятий, связывающая студента с его занятиями."""
+
+    student = models.ForeignKey(
+        'Student',
+        on_delete=models.CASCADE,
+        verbose_name='Ученик',
+        related_name='lesson_groups',
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата создания',
+    )
+
+    class Meta:
+        verbose_name = 'расписание'
+        verbose_name_plural = 'Расписание'
+
+    def __str__(self):
+        """Возвращает строковое представление группы занятий."""
+        return f'Расписание для {self.student.name} {self.student.surname}'
+
+
 class Lesson(models.Model):
     """Модель для хранения информации о занятиях."""
 
@@ -185,21 +223,35 @@ class Lesson(models.Model):
     )
     teacher_id = models.ForeignKey(
         'Teacher',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         verbose_name='Преподаватель',
         related_name='lessons',
+        null=True,
     )
     student_id = models.ForeignKey(
         'Student',
         on_delete=models.CASCADE,
-        verbose_name='Студент',
+        verbose_name='Ученик',
         related_name='lessons',
+    )
+    group = models.ForeignKey(
+        'LessonGroup',
+        on_delete=models.CASCADE,
+        verbose_name='Расписание',
+        related_name='lessons',
+        null=True,
     )
     datetime_start = models.DateTimeField('Время начала занятия')
     duration = models.PositiveIntegerField(
         'Продолжительность занятия',
         help_text='Продолжительность занятия в минутах.',
-        default=45,
+        default=DEFAULT_LESSON_DURATION,
+    )
+    lesson_count = models.PositiveIntegerField(
+        'Количество создаваемых занятий',
+        default=1,
+        help_text='Указанное количество занятий будет '
+                  'создано с интервалом в 1 неделю.',
     )
     is_passed = models.BooleanField('Занятие прошло', default=False)
     video_meeting_url = models.URLField(
@@ -211,20 +263,25 @@ class Lesson(models.Model):
         'Ссылка на домашнее задание',
         help_text='Там, где размещено домашнее задание',
         null=True,
+    )  # Висит мертвым грузом пока не найдется применение.
+    homework_text = models.TextField(
+        'Текст домашнего задания',
+        help_text='Описание домашнего задания',
+        blank=True,
+        null=True,
     )
     is_passed_teacher = models.BooleanField(
         'Занятие подтверждено учителем', default=False,
     )
-    is_passed_student = models.BooleanField(
-        'Занятие подтверждено учеником', default=False,
-    )
     test_lesson = models.BooleanField('Пробное занятие', default=False)
+    regular_lesson = models.BooleanField(
+        'Регулярное занятие', default=False,
+    )
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
                 fields=[
-                    'name',
                     'subject',
                     'teacher_id',
                     'student_id',
@@ -234,7 +291,6 @@ class Lesson(models.Model):
                 name='unique_lesson',
             ),
         ]
-        unique_together = ('name', 'datetime_start')
         verbose_name = 'занятие'
         verbose_name_plural = 'Занятия'
 
@@ -242,8 +298,20 @@ class Lesson(models.Model):
         """Возвращает строковое представление занятия."""
         return f'{self.name} {self.subject.name}'
 
+    def save(self, *args, **kwargs):
+        """Проверка на группу и на создание повторяющихся занятий."""
+        if not self.group and self.student_id:
+            self.group = self.get_or_create_group()
+        super().save(*args, **kwargs)
+        if self.lesson_count > 1:
+            self.create_lessons()
+
     def clean(self):
         """Проверка на совпадение занятия с уже существующими."""
+        if not self.datetime_start:
+            raise ValidationError(
+                'Дата начала занятия не может быть пустой.',
+            )
         if Lesson.objects.filter(
             name=self.name,
             datetime_start__date=self.datetime_start.date(),
@@ -256,3 +324,108 @@ class Lesson(models.Model):
     def datetime_end(self):
         """Возвращает дату и время окончания урока."""
         return self.datetime_start + timedelta(minutes=self.duration)
+
+    def get_or_create_group(self):
+        """Возвращает существующую группу студента или создаёт новую."""
+        group, _ = LessonGroup.objects.get_or_create(student=self.student_id)
+        return group
+
+    def create_lessons(self):
+        """Создаёт несколько занятий на основе lesson_count."""
+        if self.lesson_count < 1:
+            raise ValidationError(
+                'Количество создаваемых занятий должно быть больше 0.',
+            )
+        lesson_group = self.get_or_create_group()
+        lessons = []
+
+        for i in range(1, self.lesson_count):
+            new_datetime = self.datetime_start + timedelta(weeks=i)
+
+            # Проверяем, существует ли уже такое занятие
+            if Lesson.objects.filter(
+                subject=self.subject,
+                teacher_id=self.teacher_id,
+                student_id=self.student_id,
+                datetime_start=new_datetime,
+                duration=self.duration,
+            ).exists():
+                continue  # Пропускаем создание дубликата
+
+            lessons.append(
+                Lesson(
+                    name=self.name,
+                    subject=self.subject,
+                    teacher_id=self.teacher_id,
+                    student_id=self.student_id,
+                    group=lesson_group,
+                    datetime_start=new_datetime,
+                    duration=self.duration,
+                    is_passed=False,
+                    video_meeting_url=self.video_meeting_url,
+                    is_passed_teacher=False,
+                    test_lesson=self.test_lesson,
+                    regular_lesson=self.regular_lesson,
+                ),
+            )
+
+        if lessons:
+            Lesson.objects.bulk_create(lessons)
+
+
+class HomeworkImage(models.Model):
+    """Изображения для домашнего задания."""
+
+    lesson = models.ForeignKey(
+        'Lesson',
+        on_delete=models.CASCADE,
+        related_name='homework_images',
+        verbose_name='Урок',
+    )
+    image = models.ImageField(
+        'Изображение',
+        upload_to='lesson_homework/images/',
+    )
+
+    class Meta:
+        verbose_name = 'изображение'
+        verbose_name_plural = 'изображения'
+
+    def __str__(self):
+        """Возвращает строковое представление изображения."""
+        return f'Изображение для {self.lesson.name}'
+
+
+class HomeworkFile(models.Model):
+    """Файлы (PDF, DOCX и т. д.) для домашнего задания."""
+
+    lesson = models.ForeignKey(
+        'Lesson',
+        on_delete=models.CASCADE,
+        related_name='homework_files',
+        verbose_name='Урок',
+    )
+    file = models.FileField(
+        'Файл',
+        upload_to='lesson_homework/files/',
+    )
+
+    class Meta:
+        verbose_name = 'файл'
+        verbose_name_plural = 'файлы'
+
+    def __str__(self):
+        """Возвращает строковое представление файла."""
+        return f'Файл для {self.lesson.name}'
+
+
+@receiver(post_delete, sender=Lesson)
+def delete_empty_lesson_group(sender, instance, **kwargs):
+    """Удаляет группу занятий, если в ней больше нет занятий."""
+    if instance.group_id:
+        try:
+            group = instance.group
+            if not group.lessons.exists():
+                group.delete()
+        except LessonGroup.DoesNotExist:
+            pass

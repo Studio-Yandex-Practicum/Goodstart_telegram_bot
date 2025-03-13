@@ -67,17 +67,15 @@ def validate_intersections_time_periods(
             )
 
 
-def validate_paid_lessons(student: Student, test_lesson: bool) -> None:
+def validate_paid_lessons(student: Student) -> None:
     lessons_count = Lesson.objects.filter(
         student_id=student,
-        test_lesson=False,
         is_passed=False,
     ).count()
-    if not test_lesson:
-        if lessons_count >= student.paid_lessons:
-            raise forms.ValidationError(
-                {'student_id': _('Исчерпан лимит оплаченных занятий!')},
-            )
+    if lessons_count >= student.paid_lessons:
+        raise forms.ValidationError(
+            {'student_id': _('Исчерпан лимит оплаченных занятий!')},
+        )
 
 
 def validate_teacher_subjects(subject: str, teacher: Teacher) -> None:
@@ -111,9 +109,3 @@ def validate_teacher_last_login(teacher):
     if not hasattr(teacher, 'last_login_date'):
         raise ValidationError(
             'У преподавателя отсутствует информация о последнем посещении.')
-    if teacher.last_login_date + timedelta(days=60) < timezone.now().date():
-        raise ValidationError(
-            f'Преподаватель не проводил занятия '
-            f'в течение последних двух месяцев.\n'
-            f'Последнее посещение: {teacher.last_login_date}.',
-        )

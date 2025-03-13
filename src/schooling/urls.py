@@ -1,9 +1,11 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path
 
-from schooling.views import (
-    schedule_page, details_schedule_page, cancel_lesson,
-    change_datetime_lesson, lesson_change_success, lesson_cancel_success,
-)
+from schooling.views import (schedule_page, details_schedule_page,
+                             edit_homework, delete_homework_image,
+                             delete_homework_file)
+
 
 app_name = 'schedule'
 
@@ -15,23 +17,28 @@ urlpatterns = [
         name='details_schedule',
     ),
     path(
-        '<int:id>/<int:lesson_id>/change-datetime-lesson/',
-        change_datetime_lesson,
-        name='change_datetime_lesson',
+        '<int:id>/<int:lesson_id>/edit/',
+        edit_homework,
+        name='edit_homework',
     ),
     path(
-        '<int:id>/<int:lesson_id>/cancel-lesson/',
-        cancel_lesson,
-        name='cancel_lesson',
+        '<int:id>/<int:lesson_id>/delete_image/<int:image_id>/',
+        delete_homework_image,
+        name='delete_homework_image',
     ),
     path(
-        'lesson_change_success/',
-        lesson_change_success,
-        name='lesson_change_success',
-    ),
-    path(
-        'lesson_cancel_success/',
-        lesson_cancel_success,
-        name='lesson_cancel_success',
+        '<int:id>/<int:lesson_id>/delete_file/<int:file_id>/',
+        delete_homework_file,
+        name='delete_homework_file',
     ),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.STATIC_URL,
+        document_root=settings.STATIC_ROOT,
+    )
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT,
+    )

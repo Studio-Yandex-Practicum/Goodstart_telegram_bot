@@ -1,6 +1,10 @@
 from django import forms
+from django.core.exceptions import ValidationError
+from django.forms import inlineformset_factory
 
-from schooling.models import Lesson
+from schooling.models import (
+    Lesson, Teacher, HomeworkImage,
+    MAX_COUNT_CLASSES, MAX_COUNT_SUBJECTS)
 from schooling.validators.form_validators import (
     validate_intersections_time_periods,
     validate_lesson_duration, validate_paid_lessons,
@@ -8,8 +12,107 @@ from schooling.validators.form_validators import (
     validate_teacher_subjects)
 
 
+class MultipleFileInput(forms.ClearableFileInput):
+    """Виджет для выбора нескольких файлов."""
+
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    """Поле формы для загрузки нескольких файлов."""
+
+    widget = MultipleFileInput
+
+    def clean(self, data, initial=None):
+        """Очистка данных, поддерживающая списки файлов."""
+        if isinstance(data, (list, tuple)):
+            return [super().clean(d, initial) for d in data]
+        return super().clean(data, initial)
+
+
+class HomeworkForm(forms.ModelForm):
+    """Форма редактирования домашнего задания."""
+
+    homework_text = forms.CharField(
+        label='Текст домашнего задания',
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 8}),
+        required=False,
+    )
+    images = MultipleFileField(
+        label='Добавить изображения',
+        required=False,
+    )
+    files = MultipleFileField(
+        label='Прикрепить файлы (PDF, DOCX и др.)',
+        required=False,
+    )
+
+    class Meta:
+        model = Lesson
+        fields = ['homework_text']
+
+
+class HomeworkImageForm(forms.ModelForm):
+    """Форма для загрузки изображений домашнего задания."""
+
+    class Meta:
+        model = HomeworkImage
+        fields = ('image', )
+
+
+HomeworkImageFormSet = inlineformset_factory(
+    Lesson,
+    HomeworkImage,
+    form=HomeworkImageForm,
+    extra=2,
+    can_delete=True,
+)
+
+
+class TeacherForm(forms.ModelForm):
+    """Форма для валидации ManyToMany в админке."""
+
+    class Meta:
+        model = Teacher
+        fields = (
+            'telegram_id',
+            'name',
+            'surname',
+            'city',
+            'phone_number',
+            'state',
+            'competence',
+            'study_classes',
+        )
+    def clean_competence(self):
+        """Проверка количества предметов."""
+        competence = self.cleaned_data['competence']
+        if len(competence) > MAX_COUNT_SUBJECTS:
+            raise ValidationError(
+                f'Преподаватель не может вести более '
+                f'{MAX_COUNT_SUBJECTS} предметов!')
+        return competence
+
+    def clean_study_classes(self):
+        """Проверка количества классов."""
+        study_classes = self.cleaned_data['study_classes']
+        if len(study_classes) > MAX_COUNT_CLASSES:
+            raise ValidationError(
+                f'Преподаватель не может вести более '
+                f'{MAX_COUNT_CLASSES} классов!')
+        return study_classes
+
+
 class LessonForm(forms.ModelForm):
     """Форма создания занятий."""
+
+    datetime_start = forms.DateTimeField(
+        widget=forms.DateTimeInput(
+            attrs={'type': 'datetime-local', 'class': 'vDateTimeField'},
+            format='%Y-%m-%dT%H:%M',
+        ),
+        label='Дата и время начала',
+    )
 
     class Meta:
         model = Lesson
@@ -19,11 +122,12 @@ class LessonForm(forms.ModelForm):
             'teacher_id',
             'student_id',
             'video_meeting_url',
-            'homework_url',
+            'homework_text',
             'datetime_start',
             'duration',
+            'regular_lesson',
             'is_passed',
-            'test_lesson',
+            'lesson_count',
         )
 
     def clean(self):
@@ -42,7 +146,7 @@ class LessonForm(forms.ModelForm):
         # Проверка наличия необходимых данных
         required_fields = ['datetime_start', 'duration',
                            'student_id', 'teacher_id',
-                           'subject', 'test_lesson']
+                           'subject',]
         for field in required_fields:
             if field not in cleaned_data:
                 raise forms.ValidationError(
@@ -53,7 +157,7 @@ class LessonForm(forms.ModelForm):
         student = cleaned_data.get('student_id')
         teacher = cleaned_data.get('teacher_id')
         subject = cleaned_data.get('subject')
-        test_lesson = cleaned_data.get('test_lesson')
+        regular_lesson = cleaned_data.get('regular_lesson')
 
         # Валидация даты и времени начала урока
         if not datetime_start:
@@ -82,7 +186,8 @@ class LessonForm(forms.ModelForm):
 
         # Проведение остальных проверок
         try:
-            validate_paid_lessons(student=student, test_lesson=test_lesson)
+            if not regular_lesson:
+                validate_paid_lessons(student=student)
             validate_teacher_subjects(subject=subject, teacher=teacher)
             validate_intersections_time_periods(
                 user=student,
@@ -100,14 +205,3 @@ class LessonForm(forms.ModelForm):
             raise forms.ValidationError(str(e)) from e
 
         return cleaned_data
-
-
-class ChangeDateTimeLesson(forms.Form):
-    """Форма для запроса нового времени для урока."""
-
-    dt_field = forms.DateTimeField(
-        label='Новая дата и время занятия',
-        widget=forms.DateTimeInput(
-            attrs={'type': 'datetime-local'},
-        ),
-    )
