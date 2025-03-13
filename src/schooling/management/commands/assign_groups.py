@@ -2,9 +2,12 @@ from django.core.management.base import BaseCommand
 from schooling.models import Lesson, LessonGroup
 
 class Command(BaseCommand):
+    """Назначает занятиям группу на основе ученика."""
+
     help = 'Назначает занятиям группу на основе ученика'
 
     def handle(self, *args, **kwargs):
+        """Назначает занятиям группу на основе ученика."""
         lessons_without_group = Lesson.objects.filter(group__isnull=True)
 
         if not lessons_without_group.exists():
@@ -13,9 +16,13 @@ class Command(BaseCommand):
 
         count = 0
         for lesson in lessons_without_group:
-            group, created = LessonGroup.objects.get_or_create(student=lesson.student_id)
+            group, created = LessonGroup.objects.get_or_create(
+                student=lesson.student_id,
+            )
             lesson.group = group
             lesson.save(update_fields=['group'])
             count += 1
 
-        self.stdout.write(self.style.SUCCESS(f'Успешно обновлено {count} занятий.'))
+        self.stdout.write(
+            self.style.SUCCESS(f'Успешно обновлено {count} занятий.')
+        )

@@ -67,7 +67,9 @@ async def details_schedule_page(request, id, lesson_id):
             'subject', 'teacher_id', 'student_id',
         ).aget(id=lesson_id)
     except Lesson.DoesNotExist:
-        return HttpResponseNotFound("⚠️ Это занятие было удалено и больше не доступно.")
+        return HttpResponseNotFound(
+            '⚠️ Это занятие было удалено и больше не доступно.',
+        )
 
     if user_role == 'Teacher':
         context['user_full_name'] = (

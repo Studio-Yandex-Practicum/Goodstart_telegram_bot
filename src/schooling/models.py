@@ -310,7 +310,7 @@ class Lesson(models.Model):
         """Проверка на совпадение занятия с уже существующими."""
         if not self.datetime_start:
             raise ValidationError(
-                'Дата начала занятия не может быть пустой.'
+                'Дата начала занятия не может быть пустой.',
             )
         if Lesson.objects.filter(
             name=self.name,
@@ -366,7 +366,7 @@ class Lesson(models.Model):
                     is_passed_teacher=False,
                     test_lesson=self.test_lesson,
                     regular_lesson=self.regular_lesson,
-                )
+                ),
             )
 
         if lessons:

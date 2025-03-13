@@ -37,13 +37,14 @@ class RegistrationCreateView(CreateView):
             logger.error(f'Ошибка отправки письма: {e}')
              # Получаем email администратора
             admin_email = get_user_model().objects.filter(
-                is_superuser=True
+                is_superuser=True,
             ).values_list('email', flat=True).first()
-            
+
             if admin_email:
                 messages.error(
-                    self.request, 
-                    f'⚠ Не удалось отправить письмо. Пожалуйста, свяжитесь с администратором: {admin_email}'
+                    self.request,
+                    (f'⚠ Не удалось отправить письмо. Пожалуйста, свяжитесь'
+                     f'с администратором: {admin_email}'),
                 )
         return response
 
