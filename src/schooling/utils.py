@@ -11,7 +11,7 @@ def format_datetime(dt):
     return date
 
 def format_time(dt):
-    """Функция для форматирования даты и времени в удобный формат без секунд."""
+    """Функция для форматирования времени в удобный формат без секунд."""
     tz = pytz.timezone(TIMEZONE_FOR_REMINDERS)  # Указываем нужный часовой пояс
     dt = dt.astimezone(tz)  # Преобразуем dt в UTC+3
     time = dt.strftime('%H:%M')  # Форматируем время без секунд
