@@ -13,6 +13,8 @@ from schooling.models import (Student, Teacher, Subject, StudyClass,
                               Lesson, LessonGroup, HomeworkImage, HomeworkFile)
 from schooling.forms import LessonForm, TeacherForm, HomeworkImageFormSet
 from schooling.utils import pluralize_ru
+from schooling.utils import format_time
+
 
 
 admin.site.unregister(Group)
@@ -322,8 +324,8 @@ class LessonGroupAdmin(admin.ModelAdmin):
             if lessons.exists():
                 for lesson in lessons:
                     date = lesson.datetime_start.strftime('%d.%m.%Y')
-                    start_time = lesson.datetime_start.strftime('%H:%M')
-                    end_time = lesson.datetime_end.strftime('%H:%M')
+                    start_time = format_time(lesson.datetime_start)
+                    end_time = format_time(lesson.datetime_end)
                     teacher = lesson.teacher_id
                     subject = lesson.subject
 
