@@ -8,6 +8,7 @@ from django.dispatch import receiver
 
 from bot.states import UserStates
 from schooling.validators.phone_validators import validate_phone_number
+from schooling.validators.file_size_validator import validate_file_size
 
 
 MAX_LEN_NAME_SURNAME = 150
@@ -78,26 +79,6 @@ class Teacher(GeneralUserModel):
         """
         self.full_clean()
         super().save(*args, **kwargs)
-
-    def clean(self):
-        """Проверяет максимальное количество классов и предметов."""
-        if not self.pk:
-            return
-
-        current_classes_count = self.study_classes.count()
-        current_subjects_count = self.competence.count()
-
-        if current_classes_count > MAX_COUNT_CLASSES:
-            raise ValidationError(
-                f'Преподаватель {self.name} {self.surname} уже '
-                f'ведет максимальное количество классов.',
-            )
-
-        if current_subjects_count > MAX_COUNT_SUBJECTS:
-            raise ValidationError(
-                f'Преподаватель {self.name} {self.surname} уже '
-                f'ведет максимальное количество предметов.',
-            )
 
 
 class Student(GeneralUserModel):
@@ -313,8 +294,7 @@ class Lesson(models.Model):
                 'Дата начала занятия не может быть пустой.',
             )
         if Lesson.objects.filter(
-            name=self.name,
-            datetime_start__date=self.datetime_start.date(),
+            datetime_start=self.datetime_start,
         ).exclude(pk=self.pk).exists():
             raise ValidationError(
                 'Урок с таким названием уже существует в этот день.',
@@ -385,6 +365,7 @@ class HomeworkImage(models.Model):
     image = models.ImageField(
         'Изображение',
         upload_to='lesson_homework/images/',
+        validators=[validate_file_size],
     )
 
     class Meta:
@@ -408,6 +389,7 @@ class HomeworkFile(models.Model):
     file = models.FileField(
         'Файл',
         upload_to='lesson_homework/files/',
+        validators=[validate_file_size],
     )
 
     class Meta:
