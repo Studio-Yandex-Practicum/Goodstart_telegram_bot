@@ -1,10 +1,8 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.forms import inlineformset_factory
 
 from schooling.models import (
-    Lesson, Teacher, HomeworkImage,
-    MAX_COUNT_CLASSES, MAX_COUNT_SUBJECTS)
+    Lesson, Teacher, HomeworkImage)
 from schooling.validators.form_validators import (
     validate_intersections_time_periods,
     validate_lesson_duration, validate_paid_lessons,
