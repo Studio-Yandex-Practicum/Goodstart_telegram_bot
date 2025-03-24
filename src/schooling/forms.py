@@ -1,10 +1,8 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.forms import inlineformset_factory
 
 from schooling.models import (
-    Lesson, Teacher, HomeworkImage,
-    MAX_COUNT_CLASSES, MAX_COUNT_SUBJECTS)
+    Lesson, Teacher, HomeworkImage)
 from schooling.validators.form_validators import (
     validate_intersections_time_periods,
     validate_lesson_duration, validate_paid_lessons,
@@ -84,23 +82,6 @@ class TeacherForm(forms.ModelForm):
             'competence',
             'study_classes',
         )
-    def clean_competence(self):
-        """Проверка количества предметов."""
-        competence = self.cleaned_data['competence']
-        if len(competence) > MAX_COUNT_SUBJECTS:
-            raise ValidationError(
-                f'Преподаватель не может вести более '
-                f'{MAX_COUNT_SUBJECTS} предметов!')
-        return competence
-
-    def clean_study_classes(self):
-        """Проверка количества классов."""
-        study_classes = self.cleaned_data['study_classes']
-        if len(study_classes) > MAX_COUNT_CLASSES:
-            raise ValidationError(
-                f'Преподаватель не может вести более '
-                f'{MAX_COUNT_CLASSES} классов!')
-        return study_classes
 
 
 class LessonForm(forms.ModelForm):
