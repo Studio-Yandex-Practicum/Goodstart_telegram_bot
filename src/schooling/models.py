@@ -293,12 +293,6 @@ class Lesson(models.Model):
             raise ValidationError(
                 'Дата начала занятия не может быть пустой.',
             )
-        if Lesson.objects.filter(
-            datetime_start=self.datetime_start,
-        ).exclude(pk=self.pk).exists():
-            raise ValidationError(
-                'Урок с таким названием уже существует в этот день.',
-            )
 
     @property
     def datetime_end(self):
