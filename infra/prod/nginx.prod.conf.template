@@ -25,12 +25,17 @@ server {
     location /static {
       alias /static/;
     }
-
     location /registration {
       proxy_set_header Host $http_host;
       proxy_set_header        X-Real-IP $remote_addr;
       proxy_set_header        X-Forwarded-Proto $scheme;
       proxy_pass http://bot:8000/registration;
+    }
+    location /adminschedule {
+      proxy_pass http://bot:8000/schedule;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-Proto $scheme;
     }
     location / {
       proxy_pass http://bot:8000/admin;
@@ -42,7 +47,7 @@ server {
 
 
 server {
-    if ($host = goodstart-test.zapto.org) {
+    if ($host = goodstart-education-bot.ru) {
         return 301 https://$host$request_uri;
     }
 
