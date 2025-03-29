@@ -25,6 +25,12 @@ server {
     location /static {
       alias /static/;
     }
+    location /schedule {
+      proxy_set_header Host $http_host;
+      proxy_set_header        X-Real-IP $remote_addr;
+      proxy_set_header        X-Forwarded-Proto $scheme;
+      proxy_pass http://bot:8000/schedule;
+    }
     location /registration {
       proxy_set_header Host $http_host;
       proxy_set_header        X-Real-IP $remote_addr;
@@ -32,7 +38,7 @@ server {
       proxy_pass http://bot:8000/registration;
     }
     location / {
-      proxy_pass http://bot:8000;
+      proxy_pass http://bot:8000/admin;
       proxy_set_header Host $host;
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Forwarded-Proto $scheme;
