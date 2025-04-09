@@ -22,10 +22,10 @@ server {
       proxy_pass http://bot:8000/admin;
     }
     location /media {
-      alias /app/media/;
-    }
-    location /media/ {
       alias /media/;
+    }
+    location /static {
+      alias /static/;
     }
     location /schedule {
       proxy_set_header Host $http_host;
