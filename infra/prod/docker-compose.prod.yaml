@@ -20,7 +20,7 @@ services:
       - db
     volumes:
       - static_volume:/app/static/
-      - static_volume:/app/src/static/
+      - media_volume:/app/src/media/
 
   swag:
     image: lscr.io/linuxserver/swag
