@@ -21,9 +21,11 @@ server {
       proxy_set_header        X-Forwarded-Proto $scheme;
       proxy_pass http://bot:8000/admin;
     }
-
-    location /static {
-      alias /static/;
+    location /media {
+      alias /app/media/;
+    }
+    location /media/ {
+      alias /media/;
     }
     location /schedule {
       proxy_set_header Host $http_host;

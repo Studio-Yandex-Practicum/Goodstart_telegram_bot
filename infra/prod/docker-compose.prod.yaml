@@ -20,6 +20,7 @@ services:
       - db
     volumes:
       - static_volume:/app/static/
+      - static_volume:/app/src/static/
 
   swag:
     image: lscr.io/linuxserver/swag
@@ -36,6 +37,7 @@ services:
       - ./nginx.prod.conf.template:/config/nginx/site-confs/default.conf:ro
       - static_volume:/static/
       - ../../logs/nginx/:/var/log/nginx/
+      - media_volume:/media/
     ports:
       - 443:443
       - 80:80
@@ -46,3 +48,4 @@ services:
 volumes:
   pg_data:
   static_volume:
+  media_volume:
