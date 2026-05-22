@@ -18,7 +18,7 @@ server {
     # ДОБАВЬТЕ ЭТОТ БЛОК ДЛЯ ТЕЛЕГРАМА
     location /telegram-proxy/ {
         # Перенаправляем запросы на ваш пустой сервер
-        proxy_pass http://195.133.8; 
+        proxy_pass http://195.133.8.27/; 
         
         proxy_set_header Host api.telegram.org;
         proxy_ssl_server_name on;
