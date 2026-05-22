@@ -16,6 +16,7 @@ from pytz import timezone as pytz_timezone
 from telegram.ext import Application
 
 from bot.keyboards import get_root_markup
+from bot.bot_interface import Bot as BotSingleton
 from schooling.constants import (LONG_TIME_REMINDER, SHORT_TIME_REMINDER,
                                  TIMEZONE_FOR_REMINDERS,)
 from schooling.models import Student, Teacher, Lesson
@@ -29,7 +30,10 @@ async def send_message_to_user(
     reply_markup: Optional[ReplyMarkup] = None,
 ):
     """Инициативно отправляет сообщение."""
-    bot = Bot(token=bot_token)
+    # bot = Bot(token=bot_token)
+    bot_instance = BotSingleton()
+    app = await bot_instance.get_app()
+    bot = app.bot
     try:
         await bot.send_message(
             chat_id=user_id,
