@@ -72,14 +72,15 @@ class Bot:
             ),
             update_interval=PERSISTENCE_UPDATE_DELAY,
         )
-        custom_request = HTTPXRequest(base_url=settings.TELEGRAM_BASE_URL)
+        # custom_request = HTTPXRequest(base_url=settings.TELEGRAM_BASE_URL)
 
         # Передаем custom_request в билдер через метод .request()
         app = (
             ApplicationBuilder()
             .token(settings.TELEGRAM_TOKEN)
+            .base_url(settings.TELEGRAM_BASE_URL)          # <-- Для обычных запросов
+            .base_webhook_url(settings.TELEGRAM_BASE_URL)  # <-- Для вебхуков (на будущее)
             .persistence(persistence)
-            .request(custom_request)  # Подменяем api.telegram.org
             .build()
         )
         # app = ApplicationBuilder().token(
