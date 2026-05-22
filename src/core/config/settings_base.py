@@ -184,3 +184,4 @@ JAZZMIN_UI_TWEAKS = {
     },
     'custom_css': 'jazzmin/css/main.css',
 }
+TELEGRAM_BASE_URL=env.str('TELEGRAM_BASE_URL', default='localhost')
