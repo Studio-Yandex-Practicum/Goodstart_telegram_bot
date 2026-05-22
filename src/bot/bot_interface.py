@@ -79,7 +79,7 @@ class Bot:
             ApplicationBuilder()
             .token(settings.TELEGRAM_TOKEN)
             .base_url(settings.TELEGRAM_BASE_URL)          # <-- Для обычных запросов
-            .base_webhook_url(settings.TELEGRAM_BASE_URL)  # <-- Для вебхуков (на будущее)
+            # .base_webhook_url(settings.TELEGRAM_BASE_URL)  # <-- Для вебхуков (на будущее)
             .persistence(persistence)
             .build()
         )
