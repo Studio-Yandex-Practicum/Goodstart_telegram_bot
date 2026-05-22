@@ -13,6 +13,7 @@ from telegram.ext import (Application, ApplicationBuilder,
                           CallbackQueryHandler, ConversationHandler,
                           MessageHandler, PersistenceInput, filters)
 from telegram.request import HTTPXRequest
+from telegram.request import BaseRequest
 
 from bot.handlers import (feedback_handler, help_handler, left_lessons_handler,
                           lesson_end_handler, schedule_handler, start_handler,
@@ -76,17 +77,19 @@ class Bot:
 
         # Передаем custom_request в билдер через метод .request()
 
-        proxy_base_url = f"{settings.TELEGRAM_BASE_URL}bot" 
-        app = (
-            ApplicationBuilder()
-            .token(settings.TELEGRAM_TOKEN)
-            .base_url(proxy_base_url)          # <-- Для обычных запросов
-            # .base_webhook_url(settings.TELEGRAM_BASE_URL)  # <-- Для вебхуков (на будущее)
-            .persistence(persistence)
-            .build()
-        )
-        # app = ApplicationBuilder().token(
-        #     settings.TELEGRAM_TOKEN).persistence(persistence).build()
+        # proxy_base_url = f"{settings.TELEGRAM_BASE_URL}bot" 
+        # app = (
+        #     ApplicationBuilder()
+        #     .token(settings.TELEGRAM_TOKEN)
+        #     .base_url(proxy_base_url)          # <-- Для обычных запросов
+        #     # .base_webhook_url(settings.TELEGRAM_BASE_URL)  # <-- Для вебхуков (на будущее)
+        #     .persistence(persistence)
+        #     .build()
+        # )
+        base_url_stripped = settings.TELEGRAM_BASE_URL.rstrip('/')
+        BaseRequest.BASE_URL = f"{base_url_stripped}/bot{{0}}/{{1}}"
+        app = ApplicationBuilder().token(
+            settings.TELEGRAM_TOKEN).persistence(persistence).build()
         main_handler = await build_main_handler()
         app.add_handlers([
             main_handler,
