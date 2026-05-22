@@ -86,16 +86,23 @@ class Bot:
         #     .persistence(persistence)
         #     .build()
         # )
-        base_url_stripped = settings.TELEGRAM_BASE_URL.rstrip('/')
-        BaseRequest.BASE_URL = f"{base_url_stripped}/bot{{0}}/{{1}}"
+        # base_url_stripped = settings.TELEGRAM_BASE_URL.rstrip('/')
+        # BaseRequest.BASE_URL = f"{base_url_stripped}/bot{{0}}/{{1}}"
 
-        custom_request = HTTPXRequest(proxy_url=None)
+        # custom_request = HTTPXRequest(proxy_url=None)
         # Отключаем верификацию SSL для httpx клиента библиотеки
-        custom_request._client.verify = False 
+        # custom_request._client.verify = False 
+        # app = (
+        #     ApplicationBuilder()
+        #     .token(settings.TELEGRAM_TOKEN)
+        #     .request(custom_request) # Передаем кастомный клиент запросов
+        #     .persistence(persistence)
+        #     .build()
+        # )
         app = (
             ApplicationBuilder()
             .token(settings.TELEGRAM_TOKEN)
-            .request(custom_request) # Передаем кастомный клиент запросов
+            .base_url("http://195.133.8.27/bot")
             .persistence(persistence)
             .build()
         )
