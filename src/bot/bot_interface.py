@@ -75,10 +75,12 @@ class Bot:
         # custom_request = HTTPXRequest(base_url=settings.TELEGRAM_BASE_URL)
 
         # Передаем custom_request в билдер через метод .request()
+
+        proxy_base_url = f"{settings.TELEGRAM_BASE_URL}bot" 
         app = (
             ApplicationBuilder()
             .token(settings.TELEGRAM_TOKEN)
-            .base_url(settings.TELEGRAM_BASE_URL)          # <-- Для обычных запросов
+            .base_url(proxy_base_url)          # <-- Для обычных запросов
             # .base_webhook_url(settings.TELEGRAM_BASE_URL)  # <-- Для вебхуков (на будущее)
             .persistence(persistence)
             .build()
