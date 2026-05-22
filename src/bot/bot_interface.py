@@ -12,6 +12,7 @@ from telegram import (BotCommand, BotCommandScopeChat, MenuButtonCommands,
 from telegram.ext import (Application, ApplicationBuilder,
                           CallbackQueryHandler, ConversationHandler,
                           MessageHandler, PersistenceInput, filters)
+from telegram.request import HTTPXRequest
 
 from bot.handlers import (feedback_handler, help_handler, left_lessons_handler,
                           lesson_end_handler, schedule_handler, start_handler,
@@ -71,8 +72,18 @@ class Bot:
             ),
             update_interval=PERSISTENCE_UPDATE_DELAY,
         )
-        app = ApplicationBuilder().token(
-            settings.TELEGRAM_TOKEN).persistence(persistence).build()
+        custom_request = HTTPXRequest(base_url=settings.TELEGRAM_BASE_URL)
+
+        # Передаем custom_request в билдер через метод .request()
+        app = (
+            ApplicationBuilder()
+            .token(settings.TELEGRAM_TOKEN)
+            .persistence(persistence)
+            .request(custom_request)  # Подменяем api.telegram.org
+            .build()
+        )
+        # app = ApplicationBuilder().token(
+        #     settings.TELEGRAM_TOKEN).persistence(persistence).build()
         main_handler = await build_main_handler()
         app.add_handlers([
             main_handler,
