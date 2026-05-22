@@ -88,8 +88,19 @@ class Bot:
         # )
         base_url_stripped = settings.TELEGRAM_BASE_URL.rstrip('/')
         BaseRequest.BASE_URL = f"{base_url_stripped}/bot{{0}}/{{1}}"
-        app = ApplicationBuilder().token(
-            settings.TELEGRAM_TOKEN).persistence(persistence).build()
+
+        custom_request = HTTPXRequest(proxy_url=None)
+        # Отключаем верификацию SSL для httpx клиента библиотеки
+        custom_request._client.verify = False 
+        app = (
+            ApplicationBuilder()
+            .token(settings.TELEGRAM_TOKEN)
+            .request(custom_request) # Передаем кастомный клиент запросов
+            .persistence(persistence)
+            .build()
+        )
+        # app = ApplicationBuilder().token(
+        #     settings.TELEGRAM_TOKEN).persistence(persistence).build()
         main_handler = await build_main_handler()
         app.add_handlers([
             main_handler,
