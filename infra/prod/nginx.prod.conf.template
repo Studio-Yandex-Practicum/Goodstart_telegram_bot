@@ -62,11 +62,25 @@ server {
 
 
 server {
-    if ($host = goodstart-education-bot.ru) {
-        return 301 https://$host$request_uri;
-    }
+
+  # if ($host = goodstart-education-bot.ru) {
+  #     return 301 https://$host$request_uri;
+  # }
+    
 
   listen 80;
+  server_name goodstart-education-bot.ru swag;
+
+  # Перехватываем запрос бота ДО того, как сработает редирект на HTTPS
+  location /telegram-proxy/ {
+      proxy_pass http://195.133.8.27/; # <-- ИСПРАВЛЕН IP И СЛЭШ НА КОНЦЕ
+      proxy_set_header Host api.telegram.org;
+      proxy_ssl_server_name on;
+      proxy_connect_timeout 15s;
+      proxy_read_timeout 15s;
+      proxy_send_timeout 15s;
+  }
+
   server_name goodstart-education-bot.ru;
     return 301 https://$host$request_uri;
 
