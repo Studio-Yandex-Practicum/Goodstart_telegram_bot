@@ -99,13 +99,31 @@ class Bot:
         #     .persistence(persistence)
         #     .build()
         # )
+
+        request = HTTPXRequest(
+            connection_pool_size=100,
+            connect_timeout=60,
+            read_timeout=60,
+            write_timeout=60,
+            pool_timeout=30,
+            http_version="1.1",
+        )
+
         app = (
             ApplicationBuilder()
             .token(settings.TELEGRAM_TOKEN)
             .base_url("http://195.133.8.27/bot")
+            .request(request)
             .persistence(persistence)
             .build()
         )
+        # app = (
+        #     ApplicationBuilder()
+        #     .token(settings.TELEGRAM_TOKEN)
+        #     .base_url("http://195.133.8.27/bot")
+        #     .persistence(persistence)
+        #     .build()
+        # )
         # app = ApplicationBuilder().token(
         #     settings.TELEGRAM_TOKEN).persistence(persistence).build()
         main_handler = await build_main_handler()
