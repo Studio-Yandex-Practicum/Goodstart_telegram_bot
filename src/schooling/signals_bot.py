@@ -87,31 +87,31 @@ async def send_lesson_end_notification(context: CallbackContext):
     )
 
 
-@receiver(post_save, sender=Lesson)
-async def schedule_lesson_end_notification(sender, instance, **kwargs):
-    """Создание задачи на отправку уведомления по окончании урока."""
-    from bot.bot_interface import Bot
-    if instance.is_passed:
-        return
+# @receiver(post_save, sender=Lesson)
+# async def schedule_lesson_end_notification(sender, instance, **kwargs):
+#     """Создание задачи на отправку уведомления по окончании урока."""
+#     from bot.bot_interface import Bot
+#     if instance.is_passed:
+#         return
 
-    bot = Bot()
-    app = await bot.get_app()
-    job_queue = app.job_queue
+#     bot = Bot()
+#     app = await bot.get_app()
+#     job_queue = app.job_queue
 
-    tz = pytz_timezone(TIMEZONE_FOR_REMINDERS)
-    lesson_end_time = instance.datetime_end.astimezone(tz)
-    if lesson_end_time > datetime.datetime.now(tz):
-        job_queue.run_once(
-            send_lesson_end_notification,
-            when=lesson_end_time,
-            name=f'lesson_end_{instance.id}',
-            data={
-                'teacher_chat_id': await sync_to_async(
-                    lambda: instance.teacher_id.telegram_id,
-                )(),
-                'lesson_id': instance.id,
-            },
-        )
+#     tz = pytz_timezone(TIMEZONE_FOR_REMINDERS)
+#     lesson_end_time = instance.datetime_end.astimezone(tz)
+#     if lesson_end_time > datetime.datetime.now(tz):
+#         job_queue.run_once(
+#             send_lesson_end_notification,
+#             when=lesson_end_time,
+#             name=f'lesson_end_{instance.id}',
+#             data={
+#                 'teacher_chat_id': await sync_to_async(
+#                     lambda: instance.teacher_id.telegram_id,
+#                 )(),
+#                 'lesson_id': instance.id,
+#             },
+#         )
 
 
 @receiver(post_save, sender=Teacher)

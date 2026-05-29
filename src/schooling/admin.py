@@ -75,8 +75,9 @@ class StudentAdmin(admin.ModelAdmin):
 
     list_display = (
         'name', 'surname', 'paid_lessons', 'unpaid_lessons',
-        'current_lessons',
+        'current_lessons', 'past_lessons'
     )
+    list_editable = ('past_lessons',)
     list_filter = (
         'name', 'surname', 'paid_lessons',
     )

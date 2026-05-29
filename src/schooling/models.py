@@ -103,6 +103,10 @@ class Student(GeneralUserModel):
         'Subject',
         verbose_name='Предмет',
     )
+    past_lessons = models.PositiveIntegerField(
+        'Прошедшие занятия',
+        default=0,
+    )
 
     class Meta:
 

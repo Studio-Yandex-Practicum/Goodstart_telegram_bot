@@ -13,6 +13,6 @@ services:
       POSTGRES_PASSWORD: postgres
     container_name: GoodStart-DB
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql
     ports:
       - "5432:5432"
