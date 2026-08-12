@@ -7,6 +7,8 @@ from django.utils.safestring import mark_safe
 from django.core.files.storage import default_storage
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import Group
+from django.urls import path
+from django.utils import timezone
 
 from schooling.constants import LessonCategories, LESSON_MARKED_AS_PAST_MESSAGE
 from schooling.models import (Student, Teacher, Subject, StudyClass,
@@ -14,7 +16,8 @@ from schooling.models import (Student, Teacher, Subject, StudyClass,
 from schooling.forms import LessonForm, TeacherForm, HomeworkImageFormSet
 from schooling.utils import pluralize_ru
 from schooling.utils import format_time
-
+from schooling.models import TrialLessonRequest
+from schooling.services.trial_lesson_broadcast import send_trial_lesson_broadcast
 
 
 admin.site.unregister(Group)
@@ -348,3 +351,63 @@ class LessonGroupAdmin(admin.ModelAdmin):
         schedule_html += '</tbody></table>'
         schedule_html += '</div>'  # Закрываем div-контейнер
         return mark_safe(schedule_html)
+
+
+@admin.register(TrialLessonRequest)
+class TrialLessonRequestAdmin(admin.ModelAdmin):
+    """Админка для заявок на пробный урок."""
+
+    # Кастомный шаблон списка — добавляет кнопку рассылки над таблицей.
+    change_list_template = 'admin/schooling/triallessonrequest/change_list.html'
+
+    list_display = (
+        'id', 'full_name', 'username', 'telegram_id',
+        'status', 'created_at', 'processed_at',
+    )
+    list_filter = ('status', 'created_at')
+    search_fields = ('full_name', 'username', 'telegram_id')
+    readonly_fields = ('telegram_id', 'username', 'full_name', 'created_at')
+    actions = ['mark_as_processed']
+
+    @admin.action(description='Отметить выбранные заявки как обработанные')
+    def mark_as_processed(self, request, queryset):
+        """Массово помечает заявки как обработанные."""
+        updated = queryset.update(
+            status=TrialLessonRequest.PROCESSED,
+            processed_at=timezone.now(),
+        )
+        self.message_user(request, f'{updated} заявок отмечено как обработанные.')
+
+    def get_urls(self):
+        """Добавляет свой url для кнопки рассылки в change_list."""
+        custom_urls = [
+            path(
+                'send-broadcast/',
+                self.admin_site.admin_view(self.send_broadcast_view),
+                name='schooling_triallessonrequest_send_broadcast',
+            ),
+        ]
+        return custom_urls + super().get_urls()
+
+    def send_broadcast_view(self, request):
+        """
+        Запускает рассылку приглашения на пробный урок всем студентам
+        (Student) и возвращает обратно на список заявок.
+        """
+        if request.method != 'POST':
+            return redirect('..')
+
+        try:
+            sent, failed = send_trial_lesson_broadcast()
+        except Exception as e:
+            self.message_user(
+                request, f'Ошибка при рассылке: {e}', level=messages.ERROR,
+            )
+            return redirect('..')
+
+        self.message_user(
+            request,
+            f'Рассылка завершена. Отправлено: {sent}, ошибок: {failed}.',
+            level=messages.SUCCESS,
+        )
+        return redirect('..')

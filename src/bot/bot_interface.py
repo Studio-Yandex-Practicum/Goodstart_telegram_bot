@@ -21,6 +21,7 @@ from bot.handlers import (feedback_handler, help_handler, left_lessons_handler,
                           unknown_command_handler)
 from bot.handlers.conversation import help
 from bot.handlers.feedback import body, subject
+from bot.handlers.trial_lesson import trial_lesson_handler
 from bot.persistence import DjangoPersistence
 from bot.states import UserStates
 from bot.utils import add_daily_task
@@ -128,6 +129,7 @@ class Bot:
         #     settings.TELEGRAM_TOKEN).persistence(persistence).build()
         main_handler = await build_main_handler()
         app.add_handlers([
+            trial_lesson_handler,
             main_handler,
             start_handler,
             help_handler,

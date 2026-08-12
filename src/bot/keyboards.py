@@ -19,3 +19,19 @@ async def get_root_markup(telegram_id):
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
+
+
+TRIAL_LESSON_CALLBACK_DATA = 'sign_up_trial_lesson'
+
+
+def get_trial_lesson_markup():
+    """Возвращает клавиатуру с кнопкой записи на пробный урок."""
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                text='📝 Записаться на пробный урок',
+                callback_data=TRIAL_LESSON_CALLBACK_DATA,
+            ),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)

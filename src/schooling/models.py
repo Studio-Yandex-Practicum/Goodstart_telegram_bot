@@ -409,3 +409,45 @@ def delete_empty_lesson_group(sender, instance, **kwargs):
                 group.delete()
         except LessonGroup.DoesNotExist:
             pass
+
+
+class TrialLessonRequest(models.Model):
+    """Заявка на пробный урок, оставленная через Telegram-бота."""
+
+    NEW = 'new'
+    PROCESSED = 'processed'
+    STATUS_CHOICES = [
+        (NEW, 'Новая'),
+        (PROCESSED, 'Обработана'),
+    ]
+
+    telegram_id = models.BigIntegerField('Telegram ID')
+    username = models.CharField(
+        'Username в Telegram', max_length=150, blank=True, null=True,
+    )
+    full_name = models.CharField(
+        'Имя пользователя', max_length=300, blank=True, null=True,
+    )
+    status = models.CharField(
+        'Статус',
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=NEW,
+    )
+    comment = models.TextField(
+        'Комментарий менеджера', blank=True, null=True,
+    )
+    created_at = models.DateTimeField('Дата заявки', auto_now_add=True)
+    processed_at = models.DateTimeField(
+        'Дата обработки', null=True, blank=True,
+    )
+
+    class Meta:
+        verbose_name = 'заявка на пробный урок'
+        verbose_name_plural = 'Заявки на пробный урок'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        """Возвращает строковое представление заявки."""
+        name = self.full_name or self.username or self.telegram_id
+        return f'Заявка от {name} ({self.get_status_display()})'
