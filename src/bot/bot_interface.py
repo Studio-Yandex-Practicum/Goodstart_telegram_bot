@@ -18,7 +18,9 @@ from telegram.request import BaseRequest
 from bot.handlers import (feedback_handler, help_handler, left_lessons_handler,
                           lesson_end_handler, schedule_handler, start_handler,
                           success_registration_webapp_handler,
-                          unknown_command_handler)
+                          unknown_command_handler, write_teacher_handler,
+                          write_teacher_select_handler, write_teacher_start,
+                          write_teacher_select, write_teacher_message)
 from bot.handlers.conversation import help
 from bot.handlers.feedback import body, subject
 from bot.handlers.trial_lesson import trial_lesson_handler
@@ -74,32 +76,6 @@ class Bot:
             ),
             update_interval=PERSISTENCE_UPDATE_DELAY,
         )
-        # custom_request = HTTPXRequest(base_url=settings.TELEGRAM_BASE_URL)
-
-        # Передаем custom_request в билдер через метод .request()
-
-        # proxy_base_url = f"{settings.TELEGRAM_BASE_URL}bot" 
-        # app = (
-        #     ApplicationBuilder()
-        #     .token(settings.TELEGRAM_TOKEN)
-        #     .base_url(proxy_base_url)          # <-- Для обычных запросов
-        #     # .base_webhook_url(settings.TELEGRAM_BASE_URL)  # <-- Для вебхуков (на будущее)
-        #     .persistence(persistence)
-        #     .build()
-        # )
-        # base_url_stripped = settings.TELEGRAM_BASE_URL.rstrip('/')
-        # BaseRequest.BASE_URL = f"{base_url_stripped}/bot{{0}}/{{1}}"
-
-        # custom_request = HTTPXRequest(proxy_url=None)
-        # Отключаем верификацию SSL для httpx клиента библиотеки
-        # custom_request._client.verify = False 
-        # app = (
-        #     ApplicationBuilder()
-        #     .token(settings.TELEGRAM_TOKEN)
-        #     .request(custom_request) # Передаем кастомный клиент запросов
-        #     .persistence(persistence)
-        #     .build()
-        # )
 
         request = HTTPXRequest(
             connection_pool_size=100,
@@ -118,15 +94,6 @@ class Bot:
             .persistence(persistence)
             .build()
         )
-        # app = (
-        #     ApplicationBuilder()
-        #     .token(settings.TELEGRAM_TOKEN)
-        #     .base_url("http://195.133.8.27/bot")
-        #     .persistence(persistence)
-        #     .build()
-        # )
-        # app = ApplicationBuilder().token(
-        #     settings.TELEGRAM_TOKEN).persistence(persistence).build()
         main_handler = await build_main_handler()
         app.add_handlers([
             trial_lesson_handler,
@@ -139,6 +106,7 @@ class Bot:
             schedule_handler,
             lesson_end_handler,
             left_lessons_handler,
+            write_teacher_handler,
         ])
         await app.bot.delete_my_commands()
         await self._update_bot_commands(app)
@@ -161,6 +129,7 @@ class Bot:
 
         student_commands = teacher_commands + [
             BotCommand('left_lessons', 'Оставшиеся уроки'),
+            BotCommand('write_teacher', 'Написать преподавателю'),
         ]
 
         async def set_commands_for_users(users, commands):
@@ -245,7 +214,9 @@ class Bot:
 async def build_main_handler():
     """Функция создания главного обработчика."""
     return ConversationHandler(
-        entry_points=[start_handler, feedback_handler],
+        entry_points=[
+            start_handler, feedback_handler, write_teacher_handler,
+        ],
         name='main_handler',
         persistent=True,
         states={
@@ -255,6 +226,10 @@ async def build_main_handler():
                                      pattern=f'^{UserStates.HELP.value}$'),
                 CallbackQueryHandler(schedule_handler,
                                      pattern=f'^{UserStates.SCHEDULE.value}$'),
+                CallbackQueryHandler(
+                    write_teacher_start,
+                    pattern=f'^{UserStates.WRITE_TEACHER.value}$',
+                ),
             ],
             UserStates.HELP: [
                 CallbackQueryHandler(
@@ -284,6 +259,15 @@ async def build_main_handler():
                 MessageHandler(
                     filters.TEXT & ~filters.COMMAND,
                     body,
+                ),
+            ],
+            UserStates.WRITE_TEACHER: [
+                write_teacher_select_handler,
+            ],
+            UserStates.WRITE_TEACHER_MESSAGE: [
+                MessageHandler(
+                    filters.TEXT & ~filters.COMMAND,
+                    write_teacher_message,
                 ),
             ],
         },

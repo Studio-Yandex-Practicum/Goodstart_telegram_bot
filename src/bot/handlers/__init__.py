@@ -8,9 +8,15 @@ from bot.handlers.feedback import feedback_handler
 from bot.handlers.schedule import schedule_handler
 from bot.handlers.was_the_lesson import lesson_end_handler
 from bot.handlers.left_lessons import left_lessons_handler
+from bot.handlers.write_teacher import (
+    write_teacher_handler, write_teacher_select_handler,
+    write_teacher_start, write_teacher_select, write_teacher_message,
+)
 
 __all__ = [
     'unknown_command_handler', 'start_handler', 'help_handler',
     'success_registration_webapp_handler', 'feedback_handler',
     'schedule_handler', 'lesson_end_handler', 'left_lessons_handler',
+    'write_teacher_handler', 'write_teacher_select_handler',
+    'write_teacher_start', 'write_teacher_select', 'write_teacher_message',
 ]
