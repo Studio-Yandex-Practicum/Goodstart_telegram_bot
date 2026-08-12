@@ -1,5 +1,7 @@
 from asgiref.sync import sync_to_async
+from loguru import logger
 from telegram import Update
+from telegram.error import BadRequest, Forbidden
 from telegram.ext import CallbackQueryHandler, CommandHandler, ContextTypes
 
 from core.logging import log_errors
@@ -20,6 +22,11 @@ ENTER_MESSAGE_MSG = (
 MESSAGE_SENT_MSG = 'Сообщение отправлено преподавателю ✅'
 TEACHER_NOT_FOUND_MSG = (
     'Не удалось найти преподавателя. Попробуйте ещё раз.'
+)
+TEACHER_CHAT_UNAVAILABLE_MSG = (
+    'Не удалось доставить сообщение: похоже, преподаватель заблокировал '
+    'чат с ботом или ещё не запускал его. Свяжитесь с преподавателем '
+    'другим способом или обратитесь в поддержку.'
 )
 
 USER_DATA_TEACHER_ID_KEY = 'write_teacher_id'
@@ -163,13 +170,28 @@ async def write_teacher_message(
         context.user_data.pop(USER_DATA_TEACHER_ID_KEY, None)
         return UserStates.START
 
-    await context.bot.send_message(
-        chat_id=teacher.telegram_id,
-        text=(
-            f'✉️ Сообщение от ученика {student.name} {student.surname}:\n\n'
-            f'{update.message.text}'
-        ),
-    )
+    try:
+        await context.bot.send_message(
+            chat_id=teacher.telegram_id,
+            text=(
+                f'✉️ Сообщение от ученика '
+                f'{student.name} {student.surname}:\n\n'
+                f'{update.message.text}'
+            ),
+        )
+    except (BadRequest, Forbidden) as e:
+        # BadRequest('Chat not found') — преподаватель никогда не
+        # запускал бота (нет чата с ним). Forbidden — преподаватель
+        # заблокировал бота. Обе ситуации не даём студенту улетать
+        # в никуда, а сообщаем о недоставке.
+        logger.warning(
+            f'Не удалось отправить сообщение преподавателю '
+            f'{teacher.id} ({teacher.telegram_id}): {e}',
+        )
+        await update.message.reply_text(TEACHER_CHAT_UNAVAILABLE_MSG)
+        context.user_data.pop(USER_DATA_TEACHER_ID_KEY, None)
+        return UserStates.START
+
     await update.message.reply_text(MESSAGE_SENT_MSG)
     context.user_data.pop(USER_DATA_TEACHER_ID_KEY, None)
     return UserStates.START
