@@ -3,13 +3,22 @@
 #
 # Здесь — общая логика рассылки. Её использует и management-команда
 # (для запуска из консоли), и кнопка в админке (для запуска руками).
+#
+# Защита от блокировки бота Telegram при массовой рассылке:
+#   - сообщения отправляются не параллельно, а последовательно с паузой
+#     (MESSAGES_PER_SECOND), т.к. у Telegram Bot API есть общий лимит
+#     ~30 сообщений в секунду на бота, и близкая к лимиту скорость
+#     повышает риск временной блокировки (429 Too Many Requests);
+#   - если Telegram всё же ответил 429 (RetryAfter), ждём именно
+#     столько, сколько он просит, и повторяем попытку для этого же
+#     получателя (с ограничением по числу попыток).
 
 import asyncio
 import logging
 
 from django.conf import settings
 from telegram import Bot
-from telegram.error import BadRequest, Forbidden
+from telegram.error import BadRequest, Forbidden, RetryAfter, TimedOut
 from telegram.request import HTTPXRequest
 
 from bot.keyboards import get_trial_lesson_markup
@@ -22,6 +31,16 @@ DEFAULT_TEXT = (
     'Нажмите на кнопку ниже, чтобы записаться — '
     'наш менеджер свяжется с вами для подтверждения времени.'
 )
+
+# Сколько сообщений в секунду отправляем. У Telegram лимит около 30/сек
+# на бота суммарно по всем чатам — берём с запасом, чтобы не приближаться
+# к границе и не подставлять бота под блокировку/ограничение.
+MESSAGES_PER_SECOND = 20
+DELAY_BETWEEN_MESSAGES = 1 / MESSAGES_PER_SECOND
+
+# Сколько раз повторяем отправку одному получателю, если Telegram
+# ответил "подожди" (RetryAfter) или временной ошибкой сети.
+MAX_RETRIES = 3
 
 
 def send_trial_lesson_broadcast(telegram_ids=None, text=None):
@@ -65,7 +84,7 @@ def send_trial_lesson_broadcast(telegram_ids=None, text=None):
 
 
 async def _send_messages(telegram_ids, text):
-    """Асинхронно рассылает сообщения по списку telegram_id."""
+    """Асинхронно и с ограничением скорости рассылает сообщения."""
     request = HTTPXRequest(
         connection_pool_size=20,
         connect_timeout=30,
@@ -80,25 +99,75 @@ async def _send_messages(telegram_ids, text):
     markup = get_trial_lesson_markup()
 
     sent, failed = 0, 0
+    total = len(telegram_ids)
+
     async with bot:
-        for telegram_id in telegram_ids:
-            try:
-                await bot.send_message(
-                    chat_id=telegram_id,
-                    text=text,
-                    reply_markup=markup,
-                )
+        for i, telegram_id in enumerate(telegram_ids, start=1):
+            if await _send_one(bot, telegram_id, text, markup):
                 sent += 1
-            except Forbidden:
-                logger.warning(
-                    f'{telegram_id}: пользователь заблокировал бота',
-                )
-                failed += 1
-            except BadRequest as e:
-                logger.warning(f'{telegram_id}: чат не найден ({e})')
-                failed += 1
-            except Exception as e:
-                logger.error(f'{telegram_id}: ошибка отправки — {e}')
+            else:
                 failed += 1
 
+            # Пауза после каждого сообщения, кроме последнего —
+            # держим темп ниже общего лимита Telegram.
+            if i < total:
+                await asyncio.sleep(DELAY_BETWEEN_MESSAGES)
+
+            if i % 100 == 0:
+                logger.info(f'Рассылка: отправлено {i}/{total}')
+
     return sent, failed
+
+
+async def _send_one(bot, telegram_id, text, markup):
+    """
+    Отправляет одно сообщение с повторными попытками при 429/таймаутах.
+    Возвращает True при успехе, False — если получатель недостижим
+    (заблокировал бота, чат не найден) или попытки исчерпаны.
+    """
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            await bot.send_message(
+                chat_id=telegram_id,
+                text=text,
+                reply_markup=markup,
+            )
+            return True
+
+        except Forbidden:
+            # Пользователь заблокировал бота — повторять бессмысленно.
+            logger.warning(
+                f'{telegram_id}: пользователь заблокировал бота',
+            )
+            return False
+
+        except BadRequest as e:
+            # Некорректный chat_id / чат не найден — повторять бессмысленно.
+            logger.warning(f'{telegram_id}: чат не найден ({e})')
+            return False
+
+        except RetryAfter as e:
+            # Telegram сам просит подождать — ждём ровно столько,
+            # сколько он указал, и пробуем этого же получателя ещё раз.
+            wait_seconds = e.retry_after + 1
+            logger.warning(
+                f'{telegram_id}: Telegram просит подождать '
+                f'{wait_seconds} сек. (попытка {attempt}/{MAX_RETRIES})',
+            )
+            await asyncio.sleep(wait_seconds)
+
+        except TimedOut:
+            logger.warning(
+                f'{telegram_id}: таймаут сети, повтор '
+                f'(попытка {attempt}/{MAX_RETRIES})',
+            )
+            await asyncio.sleep(2)
+
+        except Exception as e:
+            logger.error(f'{telegram_id}: ошибка отправки — {e}')
+            return False
+
+    logger.error(
+        f'{telegram_id}: не удалось отправить после {MAX_RETRIES} попыток',
+    )
+    return False

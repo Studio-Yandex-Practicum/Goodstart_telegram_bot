@@ -1,4 +1,6 @@
 from datetime import datetime
+import threading
+import logging
 
 from django.contrib import admin, messages
 from django.shortcuts import redirect
@@ -19,6 +21,8 @@ from schooling.utils import format_time
 from schooling.models import TrialLessonRequest
 from schooling.services.trial_lesson_broadcast import send_trial_lesson_broadcast
 
+
+logger = logging.getLogger(__name__)
 
 admin.site.unregister(Group)
 
@@ -353,6 +357,10 @@ class LessonGroupAdmin(admin.ModelAdmin):
         return mark_safe(schedule_html)
 
 
+# (например, если менеджер случайно нажмёт кнопку дважды подряд).
+_broadcast_lock = threading.Lock()
+
+
 @admin.register(TrialLessonRequest)
 class TrialLessonRequestAdmin(admin.ModelAdmin):
     """Админка для заявок на пробный урок."""
@@ -392,23 +400,44 @@ class TrialLessonRequestAdmin(admin.ModelAdmin):
     def send_broadcast_view(self, request):
         """
         Запускает рассылку приглашения на пробный урок всем студентам
-        (Student) и возвращает обратно на список заявок.
+        (Student). Рассылка идёт с ограничением скорости (см.
+        schooling/services/trial_lesson_broadcast.py) и на большом
+        количестве получателей может занять больше минуты — поэтому
+        запускаем её в фоновом потоке и сразу возвращаемся в список,
+        не заставляя менеджера ждать загрузку страницы.
         """
         if request.method != 'POST':
             return redirect('..')
 
-        try:
-            sent, failed, skipped = send_trial_lesson_broadcast()
-        except Exception as e:
+        if not _broadcast_lock.acquire(blocking=False):
             self.message_user(
-                request, f'Ошибка при рассылке: {e}', level=messages.ERROR,
+                request,
+                'Рассылка уже выполняется — дождитесь её завершения, '
+                'прежде чем запускать снова.',
+                level=messages.WARNING,
             )
             return redirect('..')
 
+        def run_broadcast():
+            try:
+                sent, failed, skipped = send_trial_lesson_broadcast()
+                logger.info(
+                    f'Рассылка пробного урока завершена. '
+                    f'Отправлено: {sent}, ошибок: {failed}, '
+                    f'пропущено (уже есть заявка): {skipped}.',
+                )
+            except Exception as e:
+                logger.error(f'Ошибка при рассылке пробного урока: {e}')
+            finally:
+                _broadcast_lock.release()
+
+        threading.Thread(target=run_broadcast, daemon=True).start()
+
         self.message_user(
             request,
-            f'Рассылка завершена. Отправлено: {sent}, ошибок: {failed}, '
-            f'пропущено (уже есть заявка): {skipped}.',
+            'Рассылка запущена в фоне. Она отправляется постепенно '
+            '(чтобы не заблокировали бота), для 1000+ адресатов это '
+            'может занять несколько минут — результат появится в заявках и в логах.',
             level=messages.SUCCESS,
         )
         return redirect('..')
