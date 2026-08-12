@@ -398,7 +398,7 @@ class TrialLessonRequestAdmin(admin.ModelAdmin):
             return redirect('..')
 
         try:
-            sent, failed = send_trial_lesson_broadcast()
+            sent, failed, skipped = send_trial_lesson_broadcast()
         except Exception as e:
             self.message_user(
                 request, f'Ошибка при рассылке: {e}', level=messages.ERROR,
@@ -407,7 +407,8 @@ class TrialLessonRequestAdmin(admin.ModelAdmin):
 
         self.message_user(
             request,
-            f'Рассылка завершена. Отправлено: {sent}, ошибок: {failed}.',
+            f'Рассылка завершена. Отправлено: {sent}, ошибок: {failed}, '
+            f'пропущено (уже есть заявка): {skipped}.',
             level=messages.SUCCESS,
         )
         return redirect('..')
