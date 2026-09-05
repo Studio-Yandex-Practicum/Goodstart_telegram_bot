@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
@@ -498,3 +499,49 @@ class TrialLessonBroadcastMessage(models.Model):
             pk=1, defaults={'text': DEFAULT_TRIAL_LESSON_BROADCAST_TEXT},
         )
         return obj
+
+
+class TeacherStudentConversation(models.Model):
+    """
+    Переписка между преподавателем и учеником через бота.
+
+    Одна запись на пару "преподаватель-ученик", текст переписки
+    пополняется новыми сообщениями по мере их отправки через бота.
+    """
+
+    teacher = models.ForeignKey(
+        'Teacher',
+        on_delete=models.CASCADE,
+        verbose_name='Преподаватель',
+        related_name='conversations',
+    )
+    student = models.ForeignKey(
+        'Student',
+        on_delete=models.CASCADE,
+        verbose_name='Ученик',
+        related_name='conversations',
+    )
+    messages = models.TextField('Переписка', blank=True, default='')
+    updated_at = models.DateTimeField(
+        'Последнее сообщение', auto_now=True,
+    )
+
+    class Meta:
+        verbose_name = 'переписка преподавателя и ученика'
+        verbose_name_plural = 'Переписки преподавателей и учеников'
+        unique_together = ('teacher', 'student')
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        """Возвращает строковое представление переписки."""
+        return (
+            f'{self.teacher.name} {self.teacher.surname} <-> '
+            f'{self.student.name} {self.student.surname}'
+        )
+
+    def add_message(self, sender_label: str, text: str):
+        """Добавляет новое сообщение в конец переписки и сохраняет её."""
+        timestamp = timezone.localtime().strftime('%d.%m.%Y %H:%M')
+        line = f'[{timestamp}] {sender_label}: {text}'
+        self.messages = f'{self.messages}\n{line}'.strip() if self.messages else line
+        self.save(update_fields=['messages', 'updated_at'])

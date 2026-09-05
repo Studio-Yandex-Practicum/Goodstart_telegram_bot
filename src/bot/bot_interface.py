@@ -20,7 +20,10 @@ from bot.handlers import (feedback_handler, help_handler, left_lessons_handler,
                           success_registration_webapp_handler,
                           unknown_command_handler, write_teacher_handler,
                           write_teacher_select_handler, write_teacher_start,
-                          write_teacher_select, write_teacher_message)
+                          write_teacher_select, write_teacher_message,
+                          write_student_handler, write_student_select_handler,
+                          write_student_start, write_student_select,
+                          write_student_message)
 from bot.handlers.conversation import help
 from bot.handlers.feedback import body, subject
 from bot.handlers.trial_lesson import trial_lesson_handler
@@ -107,6 +110,7 @@ class Bot:
             lesson_end_handler,
             left_lessons_handler,
             write_teacher_handler,
+            write_student_handler,
         ])
         await app.bot.delete_my_commands()
         await self._update_bot_commands(app)
@@ -120,14 +124,18 @@ class Bot:
             BotCommand('help', 'Необходима регистрация'),
         ]
 
-        teacher_commands = [
+        base_commands = [
             BotCommand('start', 'Запустить бота'),
             BotCommand('schedule', 'Просмотреть расписание'),
             BotCommand('feedback', 'Отправить отзыв'),
             BotCommand('help', 'Все доступные команды бота'),
         ]
 
-        student_commands = teacher_commands + [
+        teacher_commands = base_commands + [
+            BotCommand('write_student', 'Написать ученику'),
+        ]
+
+        student_commands = base_commands + [
             BotCommand('left_lessons', 'Оставшиеся уроки'),
             BotCommand('write_teacher', 'Написать преподавателю'),
         ]
@@ -216,6 +224,7 @@ async def build_main_handler():
     return ConversationHandler(
         entry_points=[
             start_handler, feedback_handler, write_teacher_handler,
+            write_student_handler,
         ],
         name='main_handler',
         persistent=True,
@@ -229,6 +238,10 @@ async def build_main_handler():
                 CallbackQueryHandler(
                     write_teacher_start,
                     pattern=f'^{UserStates.WRITE_TEACHER.value}$',
+                ),
+                CallbackQueryHandler(
+                    write_student_start,
+                    pattern=f'^{UserStates.WRITE_STUDENT.value}$',
                 ),
             ],
             UserStates.HELP: [
@@ -268,6 +281,15 @@ async def build_main_handler():
                 MessageHandler(
                     filters.TEXT & ~filters.COMMAND,
                     write_teacher_message,
+                ),
+            ],
+            UserStates.WRITE_STUDENT: [
+                write_student_select_handler,
+            ],
+            UserStates.WRITE_STUDENT_MESSAGE: [
+                MessageHandler(
+                    filters.TEXT & ~filters.COMMAND,
+                    write_student_message,
                 ),
             ],
         },

@@ -6,6 +6,7 @@ from telegram.ext import CallbackQueryHandler, CommandHandler, ContextTypes
 
 from core.logging import log_errors
 from schooling.models import Student, Teacher
+from schooling.services.conversation import record_conversation_message_async
 from bot.keyboards import WRITE_TEACHER_SELECT_PREFIX, get_write_teacher_markup
 from bot.states import UserStates
 from bot.utils import check_user_from_db
@@ -191,6 +192,12 @@ async def write_teacher_message(
         await update.message.reply_text(TEACHER_CHAT_UNAVAILABLE_MSG)
         context.user_data.pop(USER_DATA_TEACHER_ID_KEY, None)
         return UserStates.START
+
+    await record_conversation_message_async(
+        teacher, student,
+        f'Ученик {student.name} {student.surname}',
+        update.message.text,
+    )
 
     await update.message.reply_text(MESSAGE_SENT_MSG)
     context.user_data.pop(USER_DATA_TEACHER_ID_KEY, None)

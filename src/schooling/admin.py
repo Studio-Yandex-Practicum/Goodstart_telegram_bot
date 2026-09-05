@@ -19,7 +19,8 @@ from schooling.models import (Student, Teacher, Subject, StudyClass,
 from schooling.forms import LessonForm, TeacherForm, HomeworkImageFormSet
 from schooling.utils import pluralize_ru
 from schooling.utils import format_time
-from schooling.models import TrialLessonBroadcastMessage, TrialLessonRequest
+from schooling.models import (TrialLessonBroadcastMessage, TrialLessonRequest,
+                              TeacherStudentConversation)
 from schooling.services.trial_lesson_broadcast import send_trial_lesson_broadcast
 from schooling.widgets import MarkdownEditorWidget
 
@@ -481,4 +482,32 @@ class TrialLessonBroadcastMessageAdmin(admin.ModelAdmin):
         obj = TrialLessonBroadcastMessage.load()
         return redirect(
             'admin:schooling_triallessonbroadcastmessage_change', obj.pk,
+        )
+
+
+@admin.register(TeacherStudentConversation)
+class TeacherStudentConversationAdmin(admin.ModelAdmin):
+    """Просмотр переписки преподавателя и ученика через бота."""
+
+    icon_name = 'forum'
+    list_display = ('teacher', 'student', 'updated_at')
+    list_filter = ('teacher', 'student')
+    search_fields = (
+        'teacher__name', 'teacher__surname',
+        'student__name', 'student__surname',
+    )
+    readonly_fields = ('teacher', 'student', 'messages_display', 'updated_at')
+    fields = ('teacher', 'student', 'messages_display', 'updated_at')
+    ordering = ('-updated_at',)
+
+    def has_add_permission(self, request):
+        """Запрещает создание записи вручную — переписка создаётся ботом."""
+        return False
+
+    @admin.display(description='Переписка')
+    def messages_display(self, obj):
+        """Отображает переписку с сохранением переносов строк."""
+        return format_html(
+            '<pre style="white-space: pre-wrap; font-family: inherit;">{}</pre>',
+            obj.messages,
         )

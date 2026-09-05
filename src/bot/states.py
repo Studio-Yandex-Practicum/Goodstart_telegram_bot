@@ -13,3 +13,5 @@ class UserStates(TextChoices):
     LEFT_LESSONS = 'left_lessons'
     WRITE_TEACHER = 'write_teacher'
     WRITE_TEACHER_MESSAGE = 'write_teacher_message'
+    WRITE_STUDENT = 'write_student'
+    WRITE_STUDENT_MESSAGE = 'write_student_message'
