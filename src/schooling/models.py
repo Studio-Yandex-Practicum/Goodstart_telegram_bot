@@ -7,6 +7,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
 from bot.states import UserStates
+from schooling.constants import DEFAULT_TRIAL_LESSON_BROADCAST_TEXT
 from schooling.validators.phone_validators import validate_phone_number
 from schooling.validators.file_size_validator import validate_file_size
 
@@ -443,11 +444,51 @@ class TrialLessonRequest(models.Model):
     )
 
     class Meta:
-        verbose_name = 'заявка на пробный урок'
-        verbose_name_plural = 'Заявки на пробный урок'
+        verbose_name = 'заявка из рассылки'
+        verbose_name_plural = 'Заявки из рассылки'
         ordering = ['-created_at']
 
     def __str__(self):
         """Возвращает строковое представление заявки."""
         name = self.full_name or self.username or self.telegram_id
         return f'Заявка от {name} ({self.get_status_display()})'
+
+
+class TrialLessonBroadcastMessage(models.Model):
+    """
+    Редактируемый через админку текст рассылки приглашений на пробный
+    урок. Запись всегда одна (singleton) — pk жёстко зафиксирован.
+    """
+
+    text = models.TextField(
+        'Текст сообщения (Markdown)',
+        default=DEFAULT_TRIAL_LESSON_BROADCAST_TEXT,
+        help_text=(
+            'Поддерживается: **жирный**, *курсив*, `код`, '
+            '[текст ссылки](https://...). Перед отправкой в Telegram '
+            'текст автоматически конвертируется в MarkdownV2 '
+            'с экранированием спецсимволов.'
+        ),
+    )
+    updated_at = models.DateTimeField('Обновлено', auto_now=True)
+
+    class Meta:
+        verbose_name = 'текст рассылки пробного урока'
+        verbose_name_plural = 'Текст рассылки пробного урока'
+
+    def __str__(self):
+        """Возвращает строковое представление записи."""
+        return 'Текст рассылки'
+
+    def save(self, *args, **kwargs):
+        """Гарантирует единственную запись в таблице."""
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        """Возвращает единственную запись, создавая её при первом обращении."""
+        obj, _ = cls.objects.get_or_create(
+            pk=1, defaults={'text': DEFAULT_TRIAL_LESSON_BROADCAST_TEXT},
+        )
+        return obj

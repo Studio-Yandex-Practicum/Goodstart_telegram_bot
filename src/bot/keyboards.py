@@ -56,7 +56,7 @@ def get_trial_lesson_markup():
     keyboard = [
         [
             InlineKeyboardButton(
-                text='📝 Записаться на пробный урок',
+                text='📝 Записаться',
                 callback_data=TRIAL_LESSON_CALLBACK_DATA,
             ),
         ],

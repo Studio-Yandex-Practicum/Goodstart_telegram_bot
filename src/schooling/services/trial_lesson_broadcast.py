@@ -22,23 +22,10 @@ from telegram.error import BadRequest, Forbidden, RetryAfter, TimedOut
 from telegram.request import HTTPXRequest
 
 from bot.keyboards import get_trial_lesson_markup
-from schooling.models import Student, TrialLessonRequest
+from schooling.models import Student, TrialLessonBroadcastMessage, TrialLessonRequest
+from schooling.services.telegram_markdown import markdown_to_telegram_markdown_v2
 
 logger = logging.getLogger(__name__)
-
-DEFAULT_TEXT = (
-    'Привет! 👋 Хотите попробовать бесплатный пробный урок?\n'
-    'Нажмите на кнопку ниже, чтобы записаться — '
-    'наш менеджер свяжется с вами для подтверждения времени.'
-)
-
-DEFAULT_TEXT = (
-    '''Летние каникулы близятся к концу , скоро начнется учебный год 📚 Команда преподавателей Goodstart уже трудится во всю и проводит уроки 🥰
-
-Наши лучшие репетиторы проводят пробные занятия и забивают свое расписание на учебное время! Чтобы не опоздать к хорошему преподавателю, рекомендуем заранее записаться, пройти бесплатный урок и зафиксировать свое расписание, оплатив удобный формат занятий 📅
-
-Записаться на пробный урок 👇'''
-)
 
 # Сколько сообщений в секунду отправляем. У Telegram лимит около 30/сек
 # на бота суммарно по всем чатам — берём с запасом, чтобы не приближаться
@@ -51,6 +38,14 @@ DELAY_BETWEEN_MESSAGES = 1 / MESSAGES_PER_SECOND
 MAX_RETRIES = 3
 
 
+class BroadcastTextError(Exception):
+    """
+    Telegram отклонил сам текст сообщения (ошибка разметки MarkdownV2).
+    Это не зависит от получателя — при такой ошибке нет смысла
+    продолжать рассылку остальным, все попытки будут падать так же.
+    """
+
+
 def send_trial_lesson_broadcast(telegram_ids=None, text=None):
     """
     Синхронная обёртка для запуска рассылки из обычного (не async) кода:
@@ -58,8 +53,10 @@ def send_trial_lesson_broadcast(telegram_ids=None, text=None):
 
     :param telegram_ids: список telegram_id; если не передан — берутся
         все студенты из Student.
-    :param text: текст сообщения; если не передан — используется текст
-        по умолчанию.
+    :param text: текст сообщения в Markdown (**жирный**, *курсив*,
+        [текст](ссылка)); если не передан — берётся текст, сохранённый
+        в админке (TrialLessonBroadcastMessage). Перед отправкой
+        конвертируется в Telegram MarkdownV2.
     :return: кортеж (sent, failed, skipped) — количество успешных,
         неуспешных отправок и пропущенных (у кого уже есть заявка
         в статусе NEW).
@@ -85,8 +82,12 @@ def send_trial_lesson_broadcast(telegram_ids=None, text=None):
     if not telegram_ids:
         return 0, 0, skipped
 
+    if text is None:
+        text = TrialLessonBroadcastMessage.load().text
+    telegram_text = markdown_to_telegram_markdown_v2(text)
+
     sent, failed = asyncio.run(
-        _send_messages(telegram_ids, text or DEFAULT_TEXT),
+        _send_messages(telegram_ids, telegram_text),
     )
     return sent, failed, skipped
 
@@ -111,7 +112,20 @@ async def _send_messages(telegram_ids, text):
 
     async with bot:
         for i, telegram_id in enumerate(telegram_ids, start=1):
-            if await _send_one(bot, telegram_id, text, markup):
+            try:
+                success = await _send_one(bot, telegram_id, text, markup)
+            except BroadcastTextError as e:
+                # Текст сообщения не прошёл разметку — дальше слать
+                # нечего, все оставшиеся получатели считаются неудачей.
+                logger.error(
+                    f'{e} Рассылка прервана, отправлено {i - 1}/{total}, '
+                    f'остальные {total - i + 1} помечены как неудача. '
+                    'Проверьте текст рассылки в админке.',
+                )
+                failed += total - i + 1
+                break
+
+            if success:
                 sent += 1
             else:
                 failed += 1
@@ -138,6 +152,7 @@ async def _send_one(bot, telegram_id, text, markup):
             await bot.send_message(
                 chat_id=telegram_id,
                 text=text,
+                parse_mode='MarkdownV2',
                 reply_markup=markup,
             )
             return True
@@ -150,6 +165,14 @@ async def _send_one(bot, telegram_id, text, markup):
             return False
 
         except BadRequest as e:
+            # Ошибка разметки в самом тексте (не экранированный спецсимвол
+            # и т.п.) — одинаково провалится для всех получателей,
+            # продолжать рассылку с этим текстом бессмысленно.
+            if 'parse entities' in str(e).lower():
+                raise BroadcastTextError(
+                    f'Telegram отклонил текст рассылки: {e}',
+                ) from e
+
             # Некорректный chat_id / чат не найден — повторять бессмысленно.
             logger.warning(f'{telegram_id}: чат не найден ({e})')
             return False

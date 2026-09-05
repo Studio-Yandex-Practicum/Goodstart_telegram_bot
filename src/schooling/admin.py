@@ -2,6 +2,7 @@ from datetime import datetime
 import threading
 import logging
 
+from django import forms
 from django.contrib import admin, messages
 from django.shortcuts import redirect
 from django.utils.html import format_html
@@ -18,8 +19,9 @@ from schooling.models import (Student, Teacher, Subject, StudyClass,
 from schooling.forms import LessonForm, TeacherForm, HomeworkImageFormSet
 from schooling.utils import pluralize_ru
 from schooling.utils import format_time
-from schooling.models import TrialLessonRequest
+from schooling.models import TrialLessonBroadcastMessage, TrialLessonRequest
 from schooling.services.trial_lesson_broadcast import send_trial_lesson_broadcast
+from schooling.widgets import MarkdownEditorWidget
 
 
 logger = logging.getLogger(__name__)
@@ -441,3 +443,40 @@ class TrialLessonRequestAdmin(admin.ModelAdmin):
             level=messages.SUCCESS,
         )
         return redirect('..')
+
+
+class TrialLessonBroadcastMessageForm(forms.ModelForm):
+    """Форма с markdown-редактором для текста рассылки."""
+
+    class Meta:
+        model = TrialLessonBroadcastMessage
+        fields = ('text',)
+        widgets = {'text': MarkdownEditorWidget()}
+
+
+@admin.register(TrialLessonBroadcastMessage)
+class TrialLessonBroadcastMessageAdmin(admin.ModelAdmin):
+    """
+    Редактирование текста рассылки приглашений на пробный урок.
+    Запись всегда одна — сразу открываем её форму вместо списка.
+    """
+
+    form = TrialLessonBroadcastMessageForm
+    icon_name = 'campaign'
+    readonly_fields = ('updated_at',)
+    fields = ('text', 'updated_at')
+
+    def has_add_permission(self, request):
+        """Запрещает создание второй записи — текст один на весь проект."""
+        return not TrialLessonBroadcastMessage.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        """Запрещает удаление единственной записи с текстом рассылки."""
+        return False
+
+    def changelist_view(self, request, extra_context=None):
+        """Ведёт сразу на форму редактирования единственной записи."""
+        obj = TrialLessonBroadcastMessage.load()
+        return redirect(
+            'admin:schooling_triallessonbroadcastmessage_change', obj.pk,
+        )
