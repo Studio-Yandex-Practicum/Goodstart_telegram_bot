@@ -371,12 +371,14 @@ class TrialLessonRequestAdmin(admin.ModelAdmin):
     change_list_template = 'admin/schooling/triallessonrequest/change_list.html'
 
     list_display = (
-        'id', 'full_name', 'username', 'telegram_id',
+        'id', 'full_name', 'username', 'telegram_id', 'phone_number',
         'status', 'created_at', 'processed_at',
     )
     list_filter = ('status', 'created_at')
-    search_fields = ('full_name', 'username', 'telegram_id')
-    readonly_fields = ('telegram_id', 'username', 'full_name', 'created_at')
+    search_fields = ('full_name', 'username', 'telegram_id', 'phone_number')
+    readonly_fields = (
+        'telegram_id', 'username', 'full_name', 'phone_number', 'created_at',
+    )
     actions = ['mark_as_processed']
 
     @admin.action(description='Отметить выбранные заявки как обработанные')

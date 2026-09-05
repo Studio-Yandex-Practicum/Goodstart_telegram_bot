@@ -4,7 +4,7 @@ from telegram import Update
 from telegram.ext import CallbackQueryHandler, ContextTypes
 
 from bot.keyboards import TRIAL_LESSON_CALLBACK_DATA
-from schooling.models import TrialLessonRequest
+from schooling.models import Student, TrialLessonRequest
 
 
 async def trial_lesson_signup(
@@ -17,6 +17,11 @@ async def trial_lesson_signup(
     user = query.from_user
     full_name = f'{user.first_name or ""} {user.last_name or ""}'.strip()
 
+    student = await sync_to_async(
+        Student.objects.filter(telegram_id=user.id).first,
+    )()
+    phone_number = student.phone_number if student else None
+
     # Не создаём дубль, если уже есть необработанная заявка от этого юзера
     request, created = await sync_to_async(
         TrialLessonRequest.objects.get_or_create,
@@ -26,6 +31,7 @@ async def trial_lesson_signup(
         defaults={
             'username': user.username,
             'full_name': full_name,
+            'phone_number': phone_number,
         },
     )
 

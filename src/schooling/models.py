@@ -438,6 +438,12 @@ class TrialLessonRequest(models.Model):
     comment = models.TextField(
         'Комментарий менеджера', blank=True, null=True,
     )
+    phone_number = PhoneNumberField(
+        'Номер телефона',
+        region='RU',
+        blank=True,
+        null=True,
+    )
     created_at = models.DateTimeField('Дата заявки', auto_now_add=True)
     processed_at = models.DateTimeField(
         'Дата обработки', null=True, blank=True,
@@ -473,8 +479,8 @@ class TrialLessonBroadcastMessage(models.Model):
     updated_at = models.DateTimeField('Обновлено', auto_now=True)
 
     class Meta:
-        verbose_name = 'текст рассылки пробного урока'
-        verbose_name_plural = 'Текст рассылки пробного урока'
+        verbose_name = 'текст рассылки'
+        verbose_name_plural = 'Текст рассылки'
 
     def __str__(self):
         """Возвращает строковое представление записи."""
